@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"
+              xmlns:tools   = "http://schemas.android.com/tools"
+              tools:context = "com.asc.msigeosystems.geobot.GBActivity"
+              android:layout_width  = "match_parent"
+              android:layout_height = "match_parent"
+              android:background    = "@color/colorScreenBackground"
+              android:orientation   = "vertical"
+              android:paddingBottom = "@dimen/activity_vertical_margin"
+              android:paddingLeft   = "@dimen/activity_horizontal_margin"
+              android:paddingRight  = "@dimen/activity_horizontal_margin"
+              android:paddingTop    = "@dimen/activity_vertical_margin"
+     >
+    <!-- Code from Internet that's been modified for use by Prism4D -->
+    <!-- http://www.ssaurel.com/blog/learn-how-to-make-a-compass-application-for-android/ -->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp" >
+
+        <TextView
+            android:id="@+id/compass_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/compass_latitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                />
+
+            <TextView
+                android:id="@+id/compass_longitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                />
+
+        </LinearLayout>
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+
+            <com.asc.msigeosystems.prism4d.Prism4DCompassRoseView
+                android:id="@+id/compass_rose"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerInParent="true"
+                />
+        </RelativeLayout>
+
+    </LinearLayout>

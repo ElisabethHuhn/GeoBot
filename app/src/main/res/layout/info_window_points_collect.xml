@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- Point ID -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwPointIDOutput"
+            android:text="@string/point_screen_id_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwPointIDOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- # of Raw Readings -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:labelFor="@+id/iwNumRawReadingsOutput"
+            android:text="@string/iwcp_number_raw"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwNumRawReadingsOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- # of Meaned Readings -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:labelFor="@+id/iwNumMeanedReadingsOutput"
+            android:text="@string/iwcp_number_meaned"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwNumMeanedReadingsOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+
+    </TableRow>
+
+    <!-- # of fixed readings -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:labelFor="@+id/iwNumFixedReadingsOutput"
+            android:text="@string/iwcp_number_fixed"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwNumFixedReadingsOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- # of Satellites -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:labelFor="@+id/iwNumSatellitesOutput"
+            android:text="@string/iwcp_satellites"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwNumSatellitesOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+
+    </TableRow>
+
+    <!-- Latitude / Northing -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:labelFor="@+id/iwLatNorOutput"
+            android:text="@string/iwcp_latitude_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwLatNorOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+
+            android:enabled="false"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- Longitude / Easting -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwLongEastOutput"
+            android:text="@string/iwcp_longitude_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwLongEastOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+
+    </TableRow>
+
+    <!-- Elevation -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwElevationOutput"
+            android:text="@string/iwcp_elevation_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwElevationOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- Standard Deviation Latitude/Northing -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwSdLatNorOutput"
+            android:text="@string/iwcp_sd_latitude_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwSdLatNorOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- Standard Deviation Longitude / Easting -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwSdLongEastOutput"
+            android:text="@string/iwcp_sd_longitude_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwSdLongEastOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- Standard Deviation Elevation -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwSdElevationOutput"
+            android:text="@string/iwcp_sd_elevation_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwSdElevationOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+
+    </TableRow>
+
+    <!-- HRMS -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwHrmsOutput"
+            android:text="@string/iwcp_hrms_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwHrmsOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+    </TableRow>
+
+    <!-- VRMS -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:labelFor="@+id/iwVrmsOutput"
+            android:text="@string/iwcp_vrms_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="10"
+            android:gravity="end"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <TextView
+            android:id="@id/iwVrmsOutput"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="90"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGray"
+            />
+
+
+    </TableRow>
+
+</TableLayout>

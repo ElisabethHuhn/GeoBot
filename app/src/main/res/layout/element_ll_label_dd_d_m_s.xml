@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+    android:id                  = "@+id/ll_dms"
+    android:orientation         = "vertical"
+    android:layout_width        = "match_parent"
+    android:layout_height       = "wrap_content"
+    android:layout_marginBottom = "10dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <!-- | decimal degrees | degrees | minutes | seconds | -->
+        <!-- Latitude Label by default, change text if longitude -->
+        <!-- ll_label -->
+        <TextView
+            android:id            = "@+id/ll_label"
+            android:text          = "@string/latitude_label"
+            android:layout_height = "wrap_content"
+            android:layout_width  = "0dp"
+            android:layout_weight = "25"
+            android:gravity       = "end"
+
+            android:textColor     = "@color/colorTextBlack"
+            android:background    = "@color/colorScreenBackground"
+            />
+
+        <!-- Decimal Degrees ll_dd_input -->
+        <EditText
+            android:id               = "@+id/ll_dd_input"
+            android:hint             = "@string/type_decimal_degrees_label"
+
+            android:layout_height    = "wrap_content"
+            android:layout_width     = "0dp"
+            android:layout_weight    = "75"
+            android:gravity          = "center"
+
+            android:layout_marginEnd = "16dp"
+
+            android:inputType        = "numberDecimal"
+
+            android:textColor        = "@color/colorTextBlack"
+            android:background       = "@color/colorWhite"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        >
+
+        <!-- offset -->
+        <TextView
+            android:text          = ""
+            android:layout_height = "wrap_content"
+            android:layout_width  = "0dp"
+            android:layout_weight = "25"
+            android:gravity       = "end"
+
+            android:textColor     = "@color/colorTextBlack"
+            android:background    = "@color/colorScreenBackground"
+            />
+
+        <!-- degrees ll_d_input -->
+        <EditText
+            android:id            = "@+id/ll_d_Input"
+            android:hint          = "@string/type_degrees_label"
+            android:layout_height = "wrap_content"
+            android:layout_width  = "0dp"
+            android:layout_weight = "25"
+            android:gravity       = "center"
+
+
+            android:layout_marginStart = "6dp"
+            android:layout_marginEnd   = "6dp"
+
+            android:inputType        = "numberSigned"
+
+            android:textColor          = "@color/colorTextBlack"
+            android:background         = "@color/colorWhite"
+            />
+
+        <!-- minutes ll_m_input -->
+        <EditText
+            android:id            = "@+id/ll_m_Input"
+            android:hint          = "@string/type_minutes_label"
+            android:layout_height = "wrap_content"
+            android:layout_width  = "0dp"
+            android:layout_weight = "25"
+            android:gravity       = "center"
+
+
+            android:layout_marginStart = "6dp"
+            android:layout_marginEnd   = "6dp"
+
+            android:inputType        = "numberSigned"
+
+            android:textColor          = "@color/colorTextBlack"
+            android:background         = "@color/colorWhite"
+            />
+
+        <!-- seconds ll_s_input -->
+        <EditText
+        android:id            = "@+id/ll_s_Input"
+        android:hint          = "@string/type_seconds_label"
+        android:layout_height = "wrap_content"
+        android:layout_width  = "0dp"
+        android:layout_weight = "25"
+        android:gravity       = "center"
+
+        android:layout_marginStart = "6dp"
+        android:layout_marginEnd   = "16dp"
+
+        android:inputType        = "numberDecimal"
+
+        android:textColor        = "@color/colorTextBlack"
+        android:background       = "@color/colorWhite"
+        />
+
+
+    </LinearLayout>
+
+</LinearLayout>

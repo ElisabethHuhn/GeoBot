@@ -1,0 +1,168 @@
+<LinearLayout
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools   = "http://schemas.android.com/tools"
+    tools:context = "com.asc.msigeosystems.geobot.GBActivity"
+
+    android:layout_width  = "match_parent"
+    android:layout_height = "match_parent"
+    android:fillViewport  = "true"
+
+    android:background="@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+
+
+        <!-- Buttons for type of sentence to see -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            >
+
+
+            <!-- Row 7: Exit, View Existing Points, Save Changes Buttons -->
+
+            <!-- GNS -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/gnsButton"
+                android:text="@string/gns_sentence_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- GGA -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/ggaButton"
+                android:text="@string/gga_sentence_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- GSA -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/gsaButton"
+                android:text="@string/gsa_sentence_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- GSV -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/gsvButton"
+                android:text="@string/gsv_sentence_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+
+        </LinearLayout>
+
+        <!-- Title Line -->
+        <LinearLayout
+
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:focusable="false"
+                android:clickable="false"
+
+                android:paddingTop="@dimen/interum_vertical"
+
+                android:background="@color/colorScreenBackground"
+                >
+
+            <!-- # of sentences received -->
+            <TextView
+                android:id="@+id/nmeaSizeList"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorWhite"
+                />
+            <!-- NMEA Sentence title  -->
+            <TextView
+                android:text="@string/skyplot_nmea_list_title"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:layout_marginEnd="16dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorGray"
+                />
+
+        </LinearLayout>
+
+        <!-- recycler view of the nmea sentences -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            >
+
+            <!-- Recycler View containing the list of nmea sentences -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/nmeaList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+            </android.support.v7.widget.RecyclerView>
+
+            </ScrollView>
+
+
+
+
+</LinearLayout>
+

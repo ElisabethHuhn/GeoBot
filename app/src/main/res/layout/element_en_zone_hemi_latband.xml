@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+          android:orientation   = "horizontal"
+          android:layout_width  = "match_parent"
+          android:layout_height = "wrap_content"
+    >
+
+    <!-- zone hemisphers latband input fields -->
+    <!-- label -->
+    <TextView
+        android:id            = "@+id/coord_label"
+        android:text          = "@string/utm_coord_label"
+        android:layout_height = "wrap_content"
+        android:layout_width  = "0dp"
+        android:layout_weight = "25"
+        android:gravity       = "end"
+
+        android:textColor     = "@color/colorTextBlack"
+        android:background    = "@color/colorScreenBackground"
+        />
+
+    <!-- zone -->
+    <EditText
+        android:id               = "@+id/zoneOutput"
+        android:hint             = "@string/zone_label"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "50"
+
+        android:layout_marginEnd = "6dp"
+
+        android:gravity          = "center"
+
+        android:inputType        = "number"
+
+        android:textColor        = "@color/colorTextBlack"
+        android:background       = "@color/colorWhite"
+        />
+
+    <!-- hemisphere -->
+    <EditText
+        android:id               = "@+id/hemisphereOutput"
+        android:hint             = "@string/hemisphere_label"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "50"
+
+        android:layout_marginStart= "6dp"
+        android:layout_marginEnd  = "6dp"
+
+        android:gravity           = "center"
+
+        android:inputType         = "textCapCharacters"
+        android:textColor         = "@color/colorTextBlack"
+        android:background        = "@color/colorWhite"
+
+        />
+
+    <!-- LatBand -->
+    <EditText
+        android:id               = "@+id/latbandOutput"
+        android:hint             = "@string/latband_label"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "50"
+
+        android:layout_marginStart= "6dp"
+        android:layout_marginEnd  = "16dp"
+
+        android:gravity           = "center"
+
+        android:inputType         = "textCapCharacters"
+        android:textColor         = "@color/colorTextBlack"
+        android:background        = "@color/colorWhite"
+        />
+
+
+
+
+</LinearLayout>

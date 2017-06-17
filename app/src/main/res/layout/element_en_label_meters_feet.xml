@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android         = "http://schemas.android.com/apk/res/android"
+    android:orientation   = "horizontal"
+    android:layout_width  = "match_parent"
+    android:layout_height = "wrap_content"
+
+    >
+
+    <!-- label (Easting is the default) -->
+    <TextView
+        android:id            = "@+id/en_label"
+        android:text          = "@string/easting_label"
+        android:layout_height = "wrap_content"
+        android:layout_width  = "0dp"
+        android:layout_weight = "25"
+        android:gravity       = "end"
+        android:layout_marginTop="6dp"
+
+        android:textColor     = "@color/colorTextBlack"
+        android:background    = "@color/colorScreenBackground"
+
+        />
+
+    <!-- Meters -->
+    <EditText
+        android:id               = "@+id/metersOutput"
+        android:hint             = "@string/meters_label"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "75"
+
+        android:layout_marginTop  = "6dp"
+        android:layout_marginEnd  = "6dp"
+
+        android:gravity           = "center"
+
+        android:inputType        = "numberDecimal"
+
+        android:textColor         = "@color/colorTextBlack"
+        android:background        = "@color/colorWhite"
+
+        />
+
+    <!-- Feet -->
+    <EditText
+        android:id               = "@+id/feetOutput"
+        android:hint             = "@string/feet_label"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "75"
+
+        android:layout_marginTop  = "6dp"
+        android:layout_marginStart= "6dp"
+        android:layout_marginEnd  = "16dp"
+
+        android:gravity           = "center"
+
+        android:inputType        = "numberDecimal"
+
+        android:textColor         = "@color/colorTextBlack"
+        android:background        = "@color/colorWhite"
+        />
+
+
+</LinearLayout>

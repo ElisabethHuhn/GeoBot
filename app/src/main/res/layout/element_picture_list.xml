@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+          android:orientation="vertical"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+
+          android:focusable="false"
+          android:clickable="false"
+
+          android:paddingTop="@dimen/interum_vertical"
+
+          android:background="@color/colorScreenBackground"
+    >
+    <!-- Picture is short enough that it does not have to scroll horizontally -->
+    <!-- Picture Filename -->
+    <TextView
+        android:id="@+id/pictureFileNameLabel"
+        android:text="@string/picture_filename"
+
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+
+        android:layout_gravity="center"
+        android:gravity="center"
+
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- picture image -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        >
+
+
+        <!-- Image View for displaying selected Picture -->
+        <ImageView
+            android:id="@+id/pictureImage"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
+    </HorizontalScrollView>
+
+    <!-- recycler view of the pictures -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
+
+        <!-- Recycler View containing the list of nmea sentences -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/pictureList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+
+</LinearLayout>

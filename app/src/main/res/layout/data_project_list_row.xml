@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:orientation="horizontal"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:focusable="true"
+    android:clickable="true"
+
+    android:paddingTop="@dimen/interum_vertical_short"
+
+    android:background="?android:attr/selectableItemBackground"
+    >
+
+    <!-- Each field needs a weight that matches the weight of the header -->
+    <!-- ID: weight = 3 -->
+    <TextView
+        android:id="@+id/projectRowID"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+
+        android:gravity="center"
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- Name 7-->
+    <TextView
+        android:id="@+id/projectRowName"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="7"
+        android:gravity="center"
+
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- Date last maintained 5-->
+    <TextView
+        android:id="@+id/projectRowLastModified"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- Size = number of points 3-->
+    <TextView
+        android:id="@+id/projectRowSize"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+
+        android:gravity="center"
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+</LinearLayout>

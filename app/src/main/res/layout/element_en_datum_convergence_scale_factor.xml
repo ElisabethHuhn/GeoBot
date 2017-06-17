@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+          android:orientation   = "horizontal"
+          android:layout_width  = "match_parent"
+          android:layout_height = "wrap_content"
+          android:paddingBottom = "20dp"
+    >
+
+    <!-- datum / convergence / scale Factor input fields -->
+
+    <!-- Dataum -->
+    <TextView
+        android:text="@string/datum_label"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:gravity="end"
+
+        android:layout_marginTop="6dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorScreenBackground"
+        />
+    <EditText
+        android:id="@+id/datumOutput"
+        android:hint="@string/datum_label"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="50"
+
+        android:gravity="center"
+
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="16dp"
+
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- Convergence -->
+    <TextView
+        android:text="@string/convergence_label"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:gravity="end"
+
+        android:layout_marginTop="6dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorScreenBackground"
+        />
+    <EditText
+        android:id="@+id/convergenceOutput"
+        android:hint="@string/utm_convergence_label"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="50"
+
+        android:gravity="center"
+
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="16dp"
+
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- Scale Factor -->
+    <TextView
+        android:text="@string/coord_scale_factor_label"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:gravity="end"
+
+        android:layout_marginTop="6dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorScreenBackground"
+        />
+    <EditText
+        android:id="@+id/scaleFactorOutput"
+        android:hint="@string/utm_scale_factor_label"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="50"
+
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="16dp"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+</LinearLayout>

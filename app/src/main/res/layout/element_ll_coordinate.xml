@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+    android:orientation   = "vertical"
+    android:layout_width  = "match_parent"
+    android:layout_height = "wrap_content"
+
+    android:paddingBottom = "20dp"
+    >
+
+    <include android:id="@+id/latitudeContainer"       layout="@layout/element_ll_label_dd_d_m_s"/>
+    <include android:id="@+id/longitudeContainer"      layout="@layout/element_ll_label_dd_d_m_s"/>
+    <include android:id="@+id/elevationGeoidContainer" layout="@layout/element_ll_elevation_geoid"/>
+
+</LinearLayout>

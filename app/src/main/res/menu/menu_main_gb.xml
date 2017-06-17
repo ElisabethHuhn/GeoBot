@@ -1,0 +1,67 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.prism4d.MainPrism4DActivity">
+
+    <item
+        android:id="@+id/action_home"
+        android:title="@string/action_home"
+        app:showAsAction="never"
+        />
+    <!-- Remove these things from the menu
+    <item
+        android:id="@+id/action_project"
+        android:title="@string/action_project"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_collect"
+        android:title="@string/action_collect"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_stakeout"
+        android:title="@string/action_stakeout"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_cogo"
+        android:title="@string/action_cogo"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_maps"
+        android:title="@string/action_maps"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_skyplots"
+        android:title="@string/action_skyplots"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_config"
+        android:title="@string/action_config"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_help"
+        android:title="@string/action_help"
+        app:showAsAction="never"
+
+        />
+    <item
+        android:id="@+id/action_convert"
+        android:title="@string/action_convert"
+        app:showAsAction="never"
+
+        />
+
+        End of things removed from the menu -->
+
+</menu>

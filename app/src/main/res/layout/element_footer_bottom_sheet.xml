@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <!-- The Footer to collect points -->
+    <!-- Three top level footer areas: Esc/info table/Enter -->
+    <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="80dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    >
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/escButton"
+            android:text="@string/esc_button_label"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+
+            android:gravity="center"
+            android:layout_gravity="start|bottom"
+
+            android:background="@color/colorGrayest"
+            android:textColor="@color/colorGray"
+            android:enabled="false"
+            />
+
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:gravity="center"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_weight="8"
+
+            android:shrinkColumns="0,1"
+            android:stretchColumns="0,1"
+            android:background="@color/colorGray"
+            >
+
+            <!-- Row 1 with single column for filename -->
+            <TableRow
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_gravity="top"
+                android:layout_weight="1"
+                android:gravity="top|center|center_horizontal">
+
+                <TextView
+                    android:id="@+id/currentProjectField"
+                    android:text="@string/filename_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow >
+
+            <!-- Row 2 with 2 columns for Model, S/N -->
+            <TableRow
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:gravity="center|center_horizontal"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/modelField"
+                    android:text="@string/model_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+
+                    android:background="@color/colorGray"
+                    android:textColor="@color/colorTextBlack"
+
+                    android:layout_weight="1" />
+                <TextView
+                    android:id="@+id/snField"
+                    android:text="@string/sn_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+
+                    android:background="@color/colorGrayest"
+                    android:textColor="@color/colorTextBlack"
+                    android:layout_weight="1" />
+            </TableRow>
+
+            <!-- Row 3 with 2 columns for PDOP and (blank) -->
+            <TableRow
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_gravity="bottom"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/pdop_field"
+                    android:text="@string/pdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="#cac9c9"
+                    android:textColor="#000000"
+                    />
+                <TextView
+                    android:id="@+id/tdop_field"
+                    android:text=""
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="#dcdcdc"
+                    android:textColor="#000000"
+                    />
+            </TableRow>
+
+            <!-- Row 4 with 2 columns for HDOP and HRMS -->
+            <TableRow
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/hdop_field"
+                    android:text="@string/hdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="@color/colorGrayest"
+                    android:textColor="@color/colorTextBlack"
+                    />
+                <TextView
+                    android:id="@+id/hrms_field"
+                    android:text="@string/hrms_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="@color/colorGray"
+                    android:textColor="@color/colorTextBlack"
+                    />
+            </TableRow>
+
+            <!-- Row 5 with 5 columns for VDOP, VRMS -->
+            <TableRow
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/vdop_field"
+                    android:text="@string/vdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="@color/colorGray"
+                    android:textColor="@color/colorTextBlack"
+                    />
+                <TextView
+                    android:id="@+id/vrms_field"
+                    android:text="@string/vrms_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+
+                    android:background="@color/colorGrayest"
+                    android:textColor="@color/colorTextBlack"
+                    />
+            </TableRow>
+
+            </TableLayout>
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/enterButton"
+            android:text="@string/enter_button_label"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="end|bottom"
+
+            android:background="@color/colorGrayest"
+            android:textColor="@color/colorGray"
+            android:enabled="false"
+
+            />
+
+    </LinearLayout>
+
+
+
+
+

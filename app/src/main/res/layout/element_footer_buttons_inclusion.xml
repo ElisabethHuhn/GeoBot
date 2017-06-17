@@ -1,0 +1,61 @@
+
+
+
+    <!-- Truncated Footer: Esc/Enter Buttons only -->
+    <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        >
+
+        <!-- Buttons Only -->
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/escButton"
+            android:text="@string/esc_button_label"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+
+            android:gravity="center"
+            android:layout_gravity="start|bottom"
+
+            android:paddingStart="@dimen/button_start_margin"
+            android:paddingEnd="@dimen/button_interum_margin"
+
+            android:background="@color/colorGrayest"
+            android:textColor="@color/colorGray"
+            android:enabled="false"
+            />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/enterButton"
+            android:text="@string/enter_button_label"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+
+            android:gravity="center"
+            android:layout_gravity="end|bottom"
+
+            android:paddingStart="@dimen/button_interum_margin"
+            android:paddingEnd="@dimen/button_end_margin"
+
+            android:background="@color/colorGrayest"
+            android:textColor="@color/colorGray"
+            android:enabled="false"
+
+            />
+
+    </LinearLayout>
+
+
+
+
+

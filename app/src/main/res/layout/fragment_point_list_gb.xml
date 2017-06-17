@@ -1,0 +1,146 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.geobot.GBActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+
+    <!-- Everything on the screen has to scroll horizontally -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
+
+        <!-- rest of the screen -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            >
+            <!--title line for point list -->
+            <LinearLayout
+
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:focusable="false"
+                android:clickable="false"
+
+                android:paddingTop="@dimen/interum_vertical"
+
+                android:background="@color/colorScreenBackground"
+                >
+
+                <!-- Project ID 5-->
+                <TextView
+                    android:text="@string/point_row_project_id_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Point ID 6-->
+                <TextView
+                    android:text="@string/point_row_point_id_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="6"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Easting 10-->
+                <TextView
+                    android:id="@+id/easting_label"
+                    android:text="@string/point_row_easting_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Northing 10-->
+                <TextView
+                    android:id="@+id/northing_label"
+                    android:text="@string/point_row_northing_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Elevation 10-->
+                <TextView
+                    android:text="@string/point_row_elevation_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Description 15-->
+                <TextView
+                    android:text="@string/point_row_feature_code_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+            </LinearLayout>
+
+            <!--recycler view for the list of projects-->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                >
+
+                <!-- Recycler View of the points -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/pointsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                </android.support.v7.widget.RecyclerView>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+     <!-- Only buttons in the Footer  -->
+    <include layout="@layout/element_footer_buttons_inclusion"/>
+
+</LinearLayout>
+

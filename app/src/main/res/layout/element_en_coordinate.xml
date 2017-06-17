@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+          android:orientation   = "vertical"
+          android:layout_width  = "match_parent"
+          android:layout_height = "wrap_content"
+
+          android:paddingBottom = "20dp"
+    >
+
+    <!-- Easting/Northing Coordinate -->
+
+    <!-- easting and northing -->
+    <include android:id="@+id/eastingContainer"     layout="@layout/element_en_label_meters_feet"/>
+    <include android:id="@+id/northingContainer"    layout="@layout/element_en_label_meters_feet"/>
+    <!-- elevation -->
+    <include android:id="@+id/elevationContainer"   layout="@layout/element_en_elevation"/>
+
+    <!-- Zone Hemisphere Latband -->
+    <include android:id="@+id/zhlContainer"         layout="@layout/element_en_zone_hemi_latband"/>
+
+    <!-- Convergence / Scale Factor -->
+    <include android:id="@+id/convergenceContainer" layout="@layout/element_en_datum_convergence_scale_factor"/>
+
+</LinearLayout>

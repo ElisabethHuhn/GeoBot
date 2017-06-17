@@ -1,0 +1,661 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools=  "http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.geobot.GBActivity"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background= "@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+
+    <!-- This layout is for a coordinate conversion between lat/long & UTM -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <!-- Latitude Block -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+
+            android:paddingBottom="20dp"
+            >
+
+            <!-- Latitude Prompt -->
+            <TextView
+                android:text="@string/latitude_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="end"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!-- Latitude Label and input field -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                >
+                <TextView
+                    android:text="@string/latitude_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@+id/latitudeInput"
+                    android:hint="@string/type_decimal_degrees_label"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- break out degrees/minutes/seconds -->
+            <!-- into separate fields -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <!-- blank label to make fields line up on screen -->
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- degrees -->
+                <EditText
+                    android:id="@+id/latDegreesInput"
+                    android:hint="@string/type_degrees_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- minutes -->
+                <EditText
+                    android:id="@+id/latMinutesInput"
+                    android:hint="@string/type_minutes_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- seconds -->
+                <EditText
+                    android:id="@+id/latSecondsInput"
+                    android:hint="@string/type_seconds_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- Longitude Block -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            >
+
+            <!-- Longitude Prompt -->
+            <TextView
+                android:text="@string/longitude_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!-- Longitude Label and input field -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <TextView
+                    android:text="@string/longitude_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@+id/longitudeInput"
+                    android:hint="@string/type_decimal_degrees_label"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- break out degrees/minutes/seconds -->
+            <!-- into separate fields -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <!-- blank label to make fields line up on screen -->
+                <TextView
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- degrees -->
+                <EditText
+                    android:id="@+id/longDegreesInput"
+                    android:hint="@string/type_degrees_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- minutes -->
+                <EditText
+                    android:id="@+id/longMinutesInput"
+                    android:hint="@string/type_minutes_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- seconds -->
+                <EditText
+                    android:id="@+id/longSecondsInput"
+                    android:hint="@string/type_seconds_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="numberDecimal|numberSigned"
+                    android:imeOptions="flagNoExtractUi"
+
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Conversion Button, Clear Form Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="20dp"
+            >
+            <!-- blank label to make fields line up on screen -->
+            <TextView
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="35"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <!-- Conversion Button -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/convertButton"
+                android:text="@string/convert_button_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+                android:layout_weight="37.5"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGray"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- Clear Form Button -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/clearFormButton"
+                android:text="@string/clear_form_button_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+                android:layout_weight="37.5"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+
+        </LinearLayout>
+
+        <!-- UTM Block -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            >
+
+            <!-- IBM UTM Source Code  -->
+            <!-- UTM Integer (meter accuracy) Prompt -->
+            <TextView
+                android:text="@string/utm_integer_output_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorScreenBackground"
+                />
+            <!-- UTM Integer Label and output field -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="20dp"
+                >
+                <TextView
+                    android:text="@string/utm_integer_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/utmIntgerOutput"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+
+            <!-- UTM Stack Overflow  -->
+            <!-- Prompt -->
+            <TextView
+                android:text="@string/utm_so_output_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorScreenBackground"
+                />
+            <!-- UTM Stack Overflow Label and output field -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <TextView
+                    android:text="@string/utm_so_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/utmSOOutput"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+
+            <!-- UTM Rewritten from scratch  -->
+            <!--  Prompt -->
+            <TextView
+                android:text="@string/utm_nanometer_output_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorScreenBackground"
+                />
+            <!-- break out the fields individually -->
+            <!-- Zone Hemisphere Latband -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <!-- label -->
+                <TextView
+                    android:text="@string/utm_coord_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+                <!-- zone -->
+                <TextView
+                    android:id="@+id/utm_zone"
+                    android:hint="@string/utm_zone_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- hemisphere -->
+                <TextView
+                    android:id="@+id/utm_hemisphere"
+                    android:hint="@string/utm_hemisphere_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- LatBand -->
+                <TextView
+                    android:id="@+id/utm_latband"
+                    android:hint="@string/utm_latband_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </LinearLayout>
+            <!-- Easting Northing Meters -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+
+                <!-- blank label to make fields line up on screen -->
+                <TextView
+                    android:text="@string/utm_meters"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25.0"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- Easting -->
+                <TextView
+                    android:id="@+id/utm_easting_meters"
+                    android:hint="@string/utm_easting_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="37.5"
+
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- Northing -->
+                <TextView
+                    android:id="@+id/utm_northing_meters"
+                    android:hint="@string/utm_northing_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="37.5"
+
+
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </LinearLayout>
+            <!-- Easting Northing Feet -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <!-- blank label to make fields line up on screen -->
+                <TextView
+                    android:text="@string/utm_feet"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25.0"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- Easting -->
+                <TextView
+                    android:id="@+id/utm_easting_feet"
+                    android:hint="@string/utm_easting_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="37.5"
+
+
+                    android:layout_margin="6dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+                <!-- Northing -->
+                <TextView
+                    android:id="@+id/utm_northing_feet"
+                    android:hint="@string/utm_northing_label"
+                    android:freezesText="true"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="37.5"
+
+
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</ScrollView>
+

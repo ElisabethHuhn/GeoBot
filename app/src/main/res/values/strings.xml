@@ -1,0 +1,785 @@
+<resources>
+    <string name="app_name"                 >GeoBot</string>
+    <string name="snackbar_example"         >Snackbar example</string>
+
+    <string name="ygps_app_name"            >Prism4D YGPS Skyplot</string>
+    <string name="gps_app_name"             >GPS Skyplot</string>
+    <string name="title_activity_gb_collect_points_maps">Map</string>
+
+
+    <string name="unused_button_label"  > </string>
+    <string name="no_points_in_project" >No Points in Project</string>
+    <string name="exchange_subject"     >Exchange for Project </string>
+    <string name="email_message_prologue_1">This email contains CDF for Project:</string>
+    <string name="email_message_prologue_2"> and any points it contains</string>
+
+
+    <!-- Project must be open  -->
+    <string name="project_not_open_to_list_points">Project must be open to list points</string>
+    <string name="project_opened_1">Project ID =   </string>
+    <string name="project_opened_2">     now Open </string>
+    <string name="cogo_project_must_be_open">Project must be open to add points</string>
+    <string name="no_project_open">No Project Open</string>
+    <string name="collect_project_must_be_open">Project must be Open to collect points</string>
+
+
+    <!-- Errors displayed to the user  -->
+    <string name="coordinate_not_valid"        >Coordinate not valid, point not saved</string>
+    <string name="error_adding_point"          >Could not add point to DB</string>
+    <string name="programming_error"            >Programming Error</string>
+
+
+    <!-- Exceptions -->
+    <string name="database_context_exception">Can\'t create database without a context</string>
+    <string name="database_access_exception1">Attempt to access the database before it has been initialized</string>
+    <string name="database_access_exception2">Attempt to access the database before it has been opened</string>
+    <string name="project_missing_exception" >Something is wrong, project does not exist</string>
+    <string name="no_projects"               >No projects defined</string>
+    <string name="no_pictures"               >No pictures defined</string>
+    <string name="no_points"                 >No points defined</string>
+    <string name="date_hint"                 >Must use proper date input</string>
+    <string name="test_data_invalid"         >Test Data Not Valid</string>
+    <string name="error_adding_picture_to_db">Error adding picture to DB, picture not saved</string>
+    <string name="error_removing_point"      >Error removing point from project</string>
+    <string name="missing_picture_file"      >Missing Picture File: </string>
+
+    <!-- ORDER of screens is: -->
+    <!-- Menu     -->
+    <!-- Home     -->
+    <!-- Project  -->
+    <!-- Collect  -->
+    <!-- Stakeout -->
+    <!-- Cogo     -->
+    <!-- Maps     -->
+    <!-- Skyplot  -->
+    <!-- Config   -->
+    <!-- Settings -->
+    <!-- Help     -->
+    <!-- Conversions -->
+    <!-- Footer   -->
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Main Home Screen Strings -->
+    <!-- Menu Items -->
+    <string name="action_home">Home</string>
+    <string name="action_project">Project</string>
+    <string name="action_collect">Collect</string>
+    <string name="action_stakeout">Stakeout</string>
+    <string name="action_cogo">COGO</string>
+    <string name="action_maps">Maps</string>
+    <string name="action_skyplots">Skyplots</string>
+    <string name="action_config">Config</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_help">Help</string>
+    <string name="action_convert">Convert</string>
+
+
+    <!-- Project Subtitles -->
+    <string name="subtitle_home">Home</string>
+    <string name="subtitle_create_project">Create Project</string>
+    <string name="subtitle_open_project">Open Project</string>
+    <string name="subtitle_copy_project">Copy Project</string>
+    <string name="subtitle_edit_project">Edit Project</string>
+    <string name="subtitle_delete_project">Delete Project</string>
+    <string name="subtitle_error_in_path">Error in Project Path through App. Please send report</string>
+
+    <string name="subtitle_maintain_project">Maintain Project</string>
+    <string name="subtitle_maintain_point">Maintain Point</string>
+
+    <string name="subtitle_create_point">Create Point</string>
+    <string name="subtitle_open_point">Open Point</string>
+    <string name="subtitle_copy_point">Copy Point</string>
+    <string name="subtitle_edit_point">Edit Point</string>
+    <string name="subtitle_delete_point">Delete Point</string>
+    <string name="subtitle_show_point">Show Point</string>
+    <string name="subtitle_collect_points">Collect Points</string>
+
+    <string name="subtitle_collect"                 >Collect</string>
+    <string name="subtitle_cogo"                    >COGO</string>
+    <string name="subtitle_configurations"          >Configurations</string>
+    <string name="subtitle_points"                  >Points</string>
+    <string name="subtitle_projects"                >Projects</string>
+    <string name="subtitle_settings"                >Settings</string>
+    <string name="subtitle_skyplots"                >Skyplot</string>
+    <string name="subtitle_stakeout"                >Stakeout</string>
+    <string name="subtitle_maps"                    >Maps</string>
+    <string name="subtitle_support"                 >Support</string>
+    <string name="subtitle_general_settings"        >General Settings</string>
+    <string name="subtitle_compass"                 >Compass</string>
+    <string name="subtitle_coordinate_conversion"   >Coordinate Conversion</string>
+    <string name="subtitle_global_settings"         >Global Settings</string>
+    <string name="subtitle_project_settings"        >Project Settings</string>
+    <string name="subtitle_convert_to_utm"          >Convert to UTM</string>
+    <string name="subtitle_list_nmea"               >List NMEA Sentences</string>
+    <string name="subtitle_list_satellites"         >List Visible Satellites</string>
+    <string name="subtitle_gps_nmea"                >GPS data from NMEA</string>
+    <string name="subtitle_workflow"                >Coordinate Workflow</string>
+
+    <string name="subtitle_unknown_error"           >Unknown Error</string>
+
+
+    //Collect menu items
+    <string name="action_measure_points">Measure Points</string>
+    <string name="action_open">Open</string>
+    <string name="action_edit">Edit</string>
+
+    //Settings Menu items
+    <string name="action_global_settings"           >Global_Settings</string>
+    <string name="action_project_default_settings"  >Project_Defaults</string>
+
+    //misc
+    <string name="action_delete">Delete</string>
+
+    //Exception Strings
+    <string name="latitude_out_of_range">Latitude out of range</string>
+    <string name="longitude_out_of_range">Longitude out of range</string>
+    <string name="coordinate_invalid">Coordinate out of range</string>
+    <string name="coordinate_try_again">Coordinates not valid, please input again</string>
+
+
+    <!-- Button Labels -->
+    <string name="projects_button_label"    >Project</string>
+    <string name="collect_button_label"     >Collect</string>
+    <string name="stakeout_button_label"    >Stakeout</string>
+    <string name="cogo_button_label"        >COGO</string>
+    <string name="maps_button_label"        >Maps</string>
+    <string name="skyplot_button_label"     >Skyplot</string>
+    <string name="config_button_label"      >Configuration</string>
+    <string name="settings_button_label"    >Settings</string>
+    <string name="help_button_label"        >Support</string>
+
+    <!-- Text View Labels (initial text displayed) -->
+
+    <!-- Content Descriptions for images -->
+    <string name="groundstation_contentdescription"     >Ground Station Icon</string>
+    <string name="maps_single_point_contentdescription" >Single point highlighted on map</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Project Top Level Screen Strings -->
+    <!-- Menu Items -->
+
+    <!-- Button Labels -->
+    <string name="create_button_label">Create</string>
+    <string name="open_button_label">Open</string>
+    <string name="copy_button_label">Copy</string>
+    <string name="edit_button_label">Edit</string>
+    <string name="delete_button_label">Delete</string>
+    <string name="control_button_label">Control</string>
+    <string name="maintain_points_button_label">Maintain Points</string>
+    <string name="list_points_button_label">List Points</string>
+    <string name="feature_codes_button_label">Feature Codes</string>
+    <string name="exchange_button_label">Exchange</string>
+
+    <string name="unrecognized_path_encountered">Unrecognized Path Encountered: </string>
+    <string name="delete_path_1">Selected Project </string>
+    <string name="delete_path_2"> is Deleted</string>
+
+
+    <string name="project_unchanged"  >Project unchanged, exit without saving</string>
+    <string name="settings_stored"    >Settings Stored</string>
+    <string name="exit_without_save"  >Exit Without Saving</string>
+    <string name="save_contents"      >Data Saved Before Exit</string>
+    <string name="save_new_point"     >New Point saved to Permanent Storage</string>
+    <string name="save_existing_point">Existing Point updated in Permanent Storage</string>
+    <string name="save_copied_point"  >Copied Point saved to Permanent Storage</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Project Maintainence/List:  -->
+    <string name="project_demo_descr"
+        >Sargent Road Reconnaissance Survey. Party Chief: Rusty Martin, GPS Rodman: Chip Schuller
+        </string>
+    <string name="project_list_title">ID    Name    Date Last Touched    Points</string>
+
+    <!-- Button Labels -->
+    <string name="project_view_existing_label"      >View Projects</string>
+    <string name="project_create_button_label"      >Create Project</string>
+    <string name="project_settings_button_label"    >View Settings</string>
+
+
+    <!-- Text View Labels (initial text displayed) -->
+    <string name="project_screen_label">Project Attributes</string>
+    <string name="project_name_label">Name: </string>
+    <string name="project_id_label">ID: </string>
+    <string name="project_id_will_be_label">ID will be:</string>
+    <string name="project_creation_date_label">Created: </string>
+    <string name="project_last_modified_date_label">Modified: </string>
+    <string name="project_description_label">Description: </string>
+    <string name="project_coord_label">Coord Type</string>
+
+
+    <!-- Prompts -->
+    <string name="project_stored"           >Project Attributes Stored</string>
+    <string name="project_selected"         >Project Selected</string>
+    <string name="project_selection_ignored">Project Selection Ignored</string>
+    <string name="project_no_selection"     >Project Has NOT been selected yet</string>
+
+
+    <!--      NEW SCREEN      -->
+    <!-- Project List Strings -->
+    <string name="project_row_id_label"                 >ID: </string>
+    <string name="project_row_name_label"               >Name: </string>
+    <string name="project_row_creation_date_label"      >Created: </string>
+    <string name="project_row_last_modified_date_label" >Modified: </string>
+    <string name="project_row_description_label"        >Description: </string>
+    <string name="project_row_size_label"               >Size: </string>
+
+
+    <!-- Point List Strings -->
+    <string name="point_row_project_id_label"   >Project</string>
+    <string name="point_row_point_id_label"     >Point</string>
+    <string name="point_row_easting_label"      >Easting</string>
+    <string name="point_row_northing_label"     >Northing</string>
+    <string name="point_row_latitude_label"     >Latitude</string>
+    <string name="point_row_longitude_label"    >Longitude</string>
+    <string name="point_row_elevation_label"    >Elevation</string>
+    <string name="point_row_feature_code_label" >FC</string>
+    <string name="point_row_notes_label"        >Notes</string>
+
+
+    <string name="point_no_coordinate_type"     >Coordinate Type not specified</string>
+    <string name="point_no_copy"                >Can Not Copy Points at this time</string>
+
+
+    <!-- Project List Strings -->
+    <string name="satellite_row_id_label"       >ID: </string>
+    <string name="satellite_row_elevation_label">Elevation: </string>
+    <string name="satellite_row_azimuth_label"  >Azimuth: </string>
+    <string name="satellite_row_snr_label"      >Signal To Noise: </string>
+
+    <string name="satellite_selected"           >Satellite selected</string>
+
+
+    <!--      NEW SCREEN                        -->
+    <!-- Maintain/List Points Screen Strings -->
+    <string name="point_screen_label"      >All Point Attributes MUST have a value</string>
+    <string name="point_project_id_label"  >Project ID: </string>
+    <string name="point_project_name"      >Project Name:</string>
+    <string name="point_screen_id_label"   >Point ID: </string>
+    <string name="point_easting_label"     >Easting: </string>
+    <string name="point_northing_label"    >Northing: </string>
+    <string name="point_elevation_label"   >Elevation: </string>
+    <string name="point_feature_code_label">Feature Code: </string>
+    <string name="point_notes_label"       >Notes: </string>
+    <string name="point_offset_distance_label"   >Offset Distance: </string>
+    <string name="point_offset_heading_label"    >Offset Heading: </string>
+    <string name="point_offset_elevation_label"  >Offset Elevation: </string>
+    <string name="point_height_label"            >Height: </string>
+    <string name="unk_coord_type"          >Unknown Coordinate Type</string>
+
+    <string name="unknown_process">UNKNOWN process</string>
+
+    <string name="cant_view_projects">Can not view projects on create path</string>
+    <string name="cant_view_points">Can not view points on create path</string>
+    <string name="point_unchanged">Point unchanged, exit without saving</string>
+    <string name="point_no_selection">Point Has NOT been selected yet</string>
+    <string name="point_view_existing_label">View Existing Points</string>
+
+    <string name="save_new_project">New Project saved to Permanent Storage</string>
+    <string name="save_existing_project">Existing Project updated in Permanent Storage</string>
+    <string name="save_copied_project">Copied Project saved to Permanent Storage</string>
+
+    <string name="point_deleted"   >Point %s is deleted</string>
+
+
+    <!-- Button Labels -->
+    <string name="list_points_label">List Points</string>
+    <string name="save_changes_button_label">Save Changes</string>
+    <string name="exit_button_label">Exit</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Collect Top Level Collect Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="collect_points_button_label"  >Measure Points</string>
+    <string name="collect_lines_button_label"   >Measure Lines</string>
+    <string name="collect_areas_button_label"   >Measure Areas</string>
+
+    <string name="autostore_button_label"       >Auto Store</string>
+    <string name="traverse_button_label"        >Traverse</string>
+    <string name="resection_button_label"       >Resection</string>
+
+    <string name="monitor_button_label"         >Monitor</string>
+    <string name="scan_button_label"            >Scan</string>
+    <string name="level_button_label"           >Level</string>
+    <string name="current_file_label"           >Current File:     %s</string>
+    <string name="null_type_found"              >Null type found</string>
+    <string name="marker_touched"               >Marker Touched</string>
+    <string name="unable_to_update_ui"          >Unable to update UI</string>
+    <string name="scale_factor_msg"             >SF: %.0f meters per inch</string>
+    <string name="pdop_msg"                     >PDop: %.0f</string>
+    <string name="hdop_msg"                     >HDop: %.0f</string>
+    <string name="vdop_msg"                     >VDop: %.0f</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Collect Measure Points Screen Strings -->
+    <!-- Menu Items -->
+
+    <!-- Button Labels -->
+    <string name="zoom_in_button_label" >Zoom In</string>
+    <string name="zoom_out_button_label">Zoom Out</string>
+    <string name="zoom_ext_button_label">Extended Zoom</string>
+    <string name="picture_button_label" >Picture</string>
+    <string name="notes_button_label"   >Notes</string>
+
+
+    <!-- Text View Labels (initial text displayed) -->
+    <string name="scale_factor_prefix"    >SF: </string>
+    <string name="point_id_label"         >PT:</string>
+    <string name="current_northing_label" >N: </string>
+    <string name="current_easting_label"  >E: </string>
+    <string name="current_elevation_label">ELE:</string>
+    <string name="function_code_label"    >FC:</string>
+    <string name="current_height_label"   >HT:</string>
+    <string name="current_position_label" >Current Position</string>
+    <string name="store_position_label"   >Store Position</string>
+    <string name="offset_position_label"  >Offset Position</string>
+    <string name="ave_position_label"     >Average Position</string>
+    <string name="show_all_points_label"  >Show All Points</string>
+    <string name="enter_notes"            >Enter Notes</string>
+
+    <!-- Information Window on markers for collect points -->
+    <string name="iwcp_number_raw"        ># Raw Readings: </string>
+    <string name="iwcp_number_meaned"     ># Meaned Readings: </string>
+    <string name="iwcp_number_fixed"      ># Fixed Readings: </string>
+    <string name="iwcp_number_valid"      ># Valid Readings: </string>
+    <string name="iwcp_of"                > out of </string>
+    <string name="iwcp_satellites"        ># Satellites in Fix</string>
+    <string name="iwcp_project_id_label"  >Project</string>
+    <string name="iwcp_point_id_label"    >Point</string>
+    <string name="iwcp_easting_label"     >Easting</string>
+    <string name="iwcp_northing_label"    >Northing</string>
+    <string name="iwcp_latitude_label"    >Latitude</string>
+    <string name="iwcp_longitude_label"   >Longitude</string>
+    <string name="iwcp_elevation_label"   >Elevation</string>
+    <string name="iwcp_sd_easting_label"  >Std Dev Easting</string>
+    <string name="iwcp_sd_northing_label" >Std Dev Northing</string>
+    <string name="iwcp_sd_latitude_label" >Std Dev Latitude</string>
+    <string name="iwcp_sd_longitude_label">Std Dev Longitude</string>
+    <string name="iwcp_sd_elevation_label">Std Dev Elevation</string>
+    <string name="iwcp_hrms_label"        >HRMS</string>
+    <string name="iwcp_vrms_label"        >VRMS</string>
+    <string name="iwcp_feature_code_label">FC</string>
+    <string name="iwcp_notes_label"       >Notes</string>
+
+    <string name="marker_actions"         >Marker Actions Available:</string>
+    <string name="marker_edit_point"      >Edit Point</string>
+    <string name="marker_remove_point"    >Remove Point</string>
+    <string name="marker_remove_marker"   >Remove Marker</string>
+    <string name="marker_exclude_point"   >Exclude Point</string>
+    <string name="marker_set_focus"       >Set Focus</string>
+    <string name="marker_show_info"       >Show Info Window</string>
+    <string name="marker_hide_info"       >Hide Info Window</string>
+    <string name="next_point"             >Next Point Only</string>
+    <string name="all_future_points"      >All Future Points</string>
+    <string name="reset_offset"           >Reset Offset to zero</string>
+    <string name="offset_distance_meters" >Offset distance in meters:</string>
+    <string name="offset_distance_feet"   >Offset distance in feet:</string>
+    <string name="offset_heading"         >Offset Heading (degrees clockwise from N):</string>
+    <string name="offset_elevation"       >Offset Elevation:</string>
+
+
+    <string name="gps_not_running"        >GPS not running</string>
+    <string name="map_touched"            >Map touched at </string>
+    <string name="no_point_at_marker"     >No Point saved at marker</string>
+    <string name="offsets_reset"           >Offset values reset to zero</string>
+    <string name="enter_offsets"          >Enter Offset Position:</string>
+
+    <!-- Content Descriptions for images -->
+    <string name="drawing_pad_content_description">Screen area rendering points layout</string>
+    <string name="zoom_in_contentdescription">Select to zoom in or magnifying the drawing area</string>
+    <string name="zoom_out_contentdescription">Select to zoom out or condensing the drawing area</string>
+    <string name="zoom_ext_contentdescription">Select to zoom to size to fit the drawing area</string>
+
+    <string name="collect_points_current_project"   >"Current Project: "</string>
+    <string name="collect_points_test_marker"       >Marker Number </string>
+    <string name="collect_points_provisional_marker">Provisional Marker</string>
+    <string name="collect_points_destroy_error">Error attempting to destroy mapsView, ignored</string>
+    <string name="no_camera_on_this_device"        >No camera on this device</string>
+    <string name="need_permission_to_take_pictures">Need permission to take pictures</string>
+    <string name="try_camera_again"                >Try Camera Again</string>
+    <string name="unable_to_create_picture_file"   >Unable to create picture file</string>
+    <string name="picture_filename"                >Picture Filename</string>
+    <string name="invalid_screen_focus_for_picture">Must be focused on a point, or somewhere on map</string>
+    <string name="point_not_created_at_marker_yet" >Point not created yet</string>
+    <string name="meaning_terminated"       >Meaning process terminated, point not created</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Stakeout Top Level Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="stakeout_points_button_label">Stake Points</string>
+    <string name="stakeout_lines_button_label">Stake Lines</string>
+    <string name="stakeout_arcs_button_label">Stake Curves</string>
+    <string name="stakeout_offset_button_label">Stake Offsets</string>
+    <string name="stakeout_grids_button_label">Stake Grids</string>
+    <string name="stakeout_dtms_button_label">Stake DTMs</string>
+    <string name="stakeout_alignments_button_label">Stake Alignments</string>
+    <string name="stakeout_sections_button_label">Stake Sections</string>
+    <string name="stakeout_report_button_label">Stakeout Report</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Cogo Top Level Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="cogo_points_button_label">Key In Point</string>
+    <string name="cogo_coordinates_button_label">Coordinates</string>
+    <string name="cogo_workflow_button_label">Workflow</string>
+    <string name="cogo_inverse_button_label">Inverse</string>
+    <string name="cogo_intersections_button_label">Intersections</string>
+    <string name="cogo_triangles_button_label">Triangles</string>
+    <string name="cogo_curves_button_label">Curves</string>
+    <string name="cogo_areas_button_label">Areas</string>
+    <string name="cogo_map_check_button_label">Map Check</string>
+    <string name="cogo_convert_button_label">Translate</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Maps Top Level Collect Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="google_maps_button_label">Google Maps</string>
+    <string name="earth_button_label">Google Earth</string>
+    <string name="custom_maps_button_label">Custom Maps</string>
+
+    <string name="layers_button_label">Layers</string>
+    <string name="markers_button_label">Markers</string>
+    <string name="polylines_button_label">Polylines</string>
+
+    <string name="track_button_label">Track</string>
+    <string name="background_button_label">Background</string>
+    <string name="save_profile_button_label">Save Profile</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Skyplots Top Level Screen Strings -->
+
+    <string name="skyplot_gps_not_enabled">GPS NOT enabled!</string>
+
+    <!-- Field Labels -->
+    <string name="skyplot_nmea_sentence_label">List NMEA Sentence</string>
+    <string name="skyplot_time_label">Time</string>
+    <string name="skyplot_gps_position_button_label">GPS Position</string>
+
+    <string name="skyplot_plots_button_label">Skyplots</string>
+    <string name="skyplot_satinfo_button_label">Sat Info</string>
+    <string name="skyplot_qc_position_button_label">QC Position</string>
+
+    <string name="skyplot_accelerometer_button_label">Accelerometer</string>
+    <string name="skyplot_compass_button_label">Compass</string>
+    <string name="skyplot_geocasching_button_label">Geocashing</string>
+
+    <string name="skyplot_waypoints_button_label">Waypoints</string>
+    <string name="skyplot_navigate_button_label">Navigate</string>
+    <string name="skyplot_noaa_button_label">NOAA SWPC</string>
+
+    <string name="skyplot_reference_button_label">Reference</string>
+
+    <string name="skyplot_screen_label">Skyplot: Location and Status</string>
+    <string name="skyplot_location_label">LOCATION</string>
+    <string name="skyplot_status_screen_label">GPS STATUS</string>
+
+    <string name="skyplot_latitude_label">Latitude: </string>
+    <string name="skyplot_longitude_label">Longitude: </string>
+    <string name="skyplot_ellipsoid_elevation_label">Ellipsoid Elevation: </string>
+    <string name="skyplot_geoid_label">GEOID: </string>
+    <string name="skyplot_orthometric_elevation_label">Orthometric Elevation: </string>
+    <string name="skyplot_localization_file_label">Localization File: </string>
+    <string name="skyplot_local_northing_label">Local Northing: </string>
+    <string name="skyplot_local_easting_label">Local Easting: </string>
+    <string name="skyplot_local_elevation_label">Local Elevation: </string>
+
+    <string name="skyplot_status_label">Status: </string>
+    <string name="skyplot_satellites_label">Satellites: </string>
+    <string name="skyplot_hdop_label">HDOP: </string>
+    <string name="skyplot_vdop_label">VDOP: </string>
+    <string name="skyplot_tdop_label">TDOP: </string>
+    <string name="skyplot_pdop_label">PDOP: </string>
+    <string name="skyplot_gdop_label">GDOP: </string>
+    <string name="skyplot_hrms_label">HRMS: </string>
+    <string name="skyplot_vrms_label">VRMS: </string>
+
+
+    <string name="skyplot_localization_file">What is this supposed to be?</string>
+    <string name="skyplot_gps_from_nmea">GPS from NMEA fragment</string>
+    <string name="skyplot_nmea_activity">GPS from NMEA Activity</string>
+    <string name="skyplot_list_nmea">List NMEA</string>
+    <string name="skyplot_list_satellites">List Satellites</string>
+    <string name="skyplot_ygps">YGPS program</string>
+
+    <string name="skyplot_compass_fragment">Compass Fragment</string>
+    <string name="skyplot_compass_activity">Compass Activity</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Skyplot NMEA List:  -->
+    <string name="skyplot_nmea_list_title">NMEA Sentences Received</string>
+    <string name="skyplot_no_nema_found">No NMEA Sentences found</string>
+    <string name="gsa_sentence_label">GSA</string>
+    <string name="gsv_sentence_label">GSV</string>
+    <string name="gns_sentence_label">GNS</string>
+    <string name="gga_sentence_label">GGA</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Configuration Top Level Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="config_equipment_button_label">Equipment</string>
+    <string name="config_communications_button_label">Communications</string>
+    <string name="config_corrections_label">Corrections</string>
+    <string name="config_peripherals_button_label">Peripherals</string>
+    <string name="config_calibrations_button_label">Calibrations</string>
+    <string name="config_log_raw_button_label">Log Raw Data</string>
+    <string name="config_utilities_button_label">Utilities</string>
+    <string name="config_general_button_label">General</string>
+    <string name="config_save_button_label">Save Profile</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Settings Top Level Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="setting_project_id"                   >Project</string>
+    <string name="settings_project_name"                >Name</string>
+    <string name="setting_units_button_label"           >Units</string>
+    <string name="setting_formats_button_label"         >Formats</string>
+    <string name="setting_tolerances_button_label"      >Tolerances</string>
+    <string name="setting_datums_button_label"          >Datums</string>
+    <string name="setting_projections_button_label"     >Projections</string>
+    <string name="setting_geoid_models_button_label"    >Geoid Models</string>
+    <string name="setting_general_button_label"         >General</string>
+    <string name="setting_localizations_button_label"   >Localizations</string>
+    <string name="setting_survey_styles_button_label"   >Survey Styles</string>
+
+    <string name="setting_global_button_label">Global</string>
+    <string name="setting_project_defaults_button_label">Project Defaults</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Support Top Level Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="support_manuals_button_label">Manuals</string>
+    <string name="support_faq_button_label">FAQ</string>
+    <string name="support_videos_button_label">Videos</string>
+    <string name="support_modules_button_label">Modues</string>
+    <string name="support_upgrades_button_label">Upgrades</string>
+    <string name="support_registration_button_label">Registration</string>
+    <string name="support_support_button_label">Support</string>
+    <string name="support_feedback_button_label">Feedback</string>
+    <string name="support_aboutus_button_label">About Us Report</string>
+
+
+    <!--      NEW SCREEN                  -->
+    <!-- Project Defaults Settings Screen Strings -->
+
+    <!-- Button Labels -->
+    <string name="reset_defaults_button_label">Restore Defaults</string>
+
+
+    <!-- Text View Labels (initial text displayed) -->
+    <string name="distance_units_label">Distance Units: </string>
+    <string name="decimal_display_label">Decimal Display: </string>
+    <string name="angle_units_label">Angle Units: </string>
+    <string name="angle_display_label">Angle Display: </string>
+    <string name="grid_direction_label">Grid Direction: </string>
+    <string name="scale_factor_settings_label">Scale Factor: </string>
+    <string name="sea_level_label">Sea Level: </string>
+    <string name="refraction_label">Refraction: </string>
+    <string name="datum_label">Datum: </string>
+    <string name="projection_label">Projection: </string>
+
+    <string name="coordinate_display_label">Scale Factor: </string>
+    <string name="geod_model_label">Geoid Model: </string>
+    <string name="starting_point_id_label">Starting Point ID: </string>
+    <string name="alphanumeric_label">Alphanumeric: </string>
+    <string name="feature_codes_label">Feature Codes: </string>
+    <string name="feature_codes_control_file_label">FC Control File: </string>
+    <string name="feature_codes_time_stamp_label">FC Time Stamp: </string>
+
+
+    <!-- Footer -->
+    <!-- Button Labels -->
+    <string name="esc_button_label">Esc</string>
+    <string name="enter_button_label">Enter</string>
+    <string name="enter_to_save_button_label">Save / Exit</string>
+    <string name="enter_to_copy_button_label">Copy / Exit</string>
+    <string name="enter_to_create_button_label">Create / Exit</string>
+
+    <!-- Text View Labels (initial text displayed) -->
+    <string name="filename_label">Current File: Cambridge_16021002</string>
+    <string name="model_label">Model: </string>
+    <string name="sn_label">S/N:</string>
+    <string name="hdop_label">HDOP: </string>
+    <string name="vdop_label">VDOP: </string>
+    <string name="tdop_label">TDOP: </string>
+    <string name="pdop_label">PDOP: </string>
+    <string name="gdop_label">GDOP: </string>
+    <string name="hrms_label">HRMS: </string>
+    <string name="vrms_label">VRMS: </string>
+
+    <!-- Footer Strings -->
+
+
+    <!-- Coordinate Conversion Screen Strings -->
+    <!-- Menu Items -->
+
+
+    <!-- Button Labels -->
+    <string name="workflow_controls"        >---------------  Workflow Controls  ---------------</string>
+    <string name="start_gps_button_label"   >Start GPS</string>
+    <string name="stop_gps_button_label"    >Stop GPS</string>
+    <string name="start_mean_button_label"  >Start Mean</string>
+    <string name="stop_mean_button_label"   >Stop Mean</string>
+
+    <string name="convert_button_label"     >Convert</string>
+    <string name="convert_coordinates"      >Convert Coordinates</string>
+    <string name="clear_form_button_label"  >Clear Form</string>
+
+    <!-- Text View Labels (initial text displayed) -->
+    <string name="latitude_label"           >Lat:  </string>
+    <string name="longitude_label"          >Long: </string>
+    <string name="elevation_label"          >Ele:  </string>
+    <string name="geoid_height_label"       >Geoid: </string>
+
+    <string name="utm_integer_label"        >UTM Coord: </string>
+    <string name="utm_coord_label"          >UTM Coord: </string>
+    <string name="utm_so_label"             >UTM Coord: </string>
+    <string name="utm_zone_label"           >Zone </string>
+    <string name="utm_easting_label"        >Easting M/F:</string>
+    <string name="utm_northing_label"       >Northing M/F:</string>
+    <string name="utm_easting_meters_label" >Easting Meters</string>
+    <string name="utm_northing_meters_label">Northing Meters</string>
+    <string name="utm_easting_feet_label"   >Easting Feet</string>
+    <string name="utm_northing_feet_label"  >Northing Feet</string>
+    <string name="utm_hemisphere_label"     >Hemi </string>
+    <string name="utm_latband_label"        >Latband </string>
+    <string name="utm_convergence_label"    >Convergence </string>
+    <string name="utm_scale_factor_label"   >Scale Factor </string>
+    <string name="utm_meters"               >in Meters:</string>
+    <string name="utm_feet"                 >in Feet:</string>
+
+    <string name="spc_label"                >SPC Coord: </string>
+    <string name="spc_zone_label"           >Zone </string>
+    <string name="spc_easting_label"        >Easting M/F:</string>
+    <string name="spc_northing_label"       >Northing M/F:</string>
+    <string name="spc_easting_meters_label" >Easting Meters</string>
+    <string name="spc_northing_meters_label">Northing Meters</string>
+    <string name="spc_easting_feet_label"   >Easting Feet</string>
+    <string name="spc_northing_feet_label"  >Northing Feet</string>
+    <string name="spc_hemisphere_label"     >Hemi </string>
+    <string name="spc_latband_label"        >Latband </string>
+    <string name="spc_convergence_label"    >Convergence </string>
+    <string name="spc_scale_factor_label"   >Scale Factor </string>
+    <string name="spc_meters"               >in Meters:</string>
+    <string name="spc_feet"                 >in Feet:</string>
+
+    <string name="coord_label">Coord: </string>
+    <string name="zone_label">Zone </string>
+    <string name="easting_label">Easting M/F:</string>
+    <string name="northing_label">Northing M/F:</string>
+    <string name="easting_meters_label">Easting Meters</string>
+    <string name="northing_meters_label">Northing Meters</string>
+    <string name="easting_feet_label">Easting Feet</string>
+    <string name="northing_feet_label">Northing Feet</string>
+    <string name="hemisphere_label">Hemi </string>
+    <string name="latband_label">Latband </string>
+    <string name="convergence_label">Convergence </string>
+    <string name="coord_scale_factor_label">Scale Factor </string>
+    <string name="meters_label">in Meters:</string>
+    <string name="feet_label">in Feet:</string>
+
+    <!-- Edit View Fields (initial text displayed) -->
+    <string name="latitude_input_label">Enter Latitude decimal number  </string>
+    <string name="longitude_input_label">Enter Longitude decimal number </string>
+    <string name="elevation_input_label">Enter Elevation decimal number</string>
+
+    <!-- Prompts -->
+    <string name="gps_wgs84_prompt" >---------------  Current GPS Position: WGS84  ---------------</string>
+    <string name="mean_wgs84_prompt">---------------  Meaned GPS Position: WGS84  ---------------</string>
+    <string name="wgs84_prompt"             >WGS84 Coordinate</string>
+    <string name="nad83_prompt"     >---------------  NAD83 Coordinate  ---------------</string>
+    <string name="spc_prompt"       >---------------  SPSC: State Plane Coordinate  ---------------</string>
+    <string name="utm_prompt"       >---------------  UTM: Universal Transverse Mercator Coordinate  ---------------</string>
+    <string name="null_prompt"              >Please select Coordinate Type</string>
+    <string name="unrecognized_coordinate"  >Unrecognized Coordinate Type</string>
+    <string name="enter_coordinate_type"    >Select Coordinate Type for this point</string>
+    <string name="coordinate_type"          >Coordinate Type </string>
+    <string name="zero_decimal_string"      >0.0</string>
+    <string name="default_latband"          >A</string>
+    <string name="default_zone"             >0</string>
+    <string name="default_hemisphere"       >N</string>
+
+    <string name="mean_start_time_label">Start time:</string>
+    <string name="mean_end_time_label">End time:</string>
+    <string name="mean_number_of_points_label"># readings:</string>
+    <string name="mean_standard_deviation">SDev:</string>
+    <string name="mean_lat_sigma">Lat SDev:</string>
+    <string name="mean_long_sigma">Long SDev:</string>
+    <string name="mean_elev_sigma">Ele SDev:</string>
+    <string name="mean_vector_sigma">Vect SDev:</string>
+    <string name="gps_time_label">Current GPS Time:</string>
+
+    <string name="latitude_prompt">Latitude must be between -80.0 and 84.0</string>
+    <string name="longitude_prompt">Longitude must be between -180.0 and 180.0</string>
+    <string name="elevation_prompt">Elevation Prompt (What should this say?)</string>
+
+    <string name="coordinate_type_button">Change Type</string>
+    <string name="type_decimal_degrees_label">Decimal Degrees</string>
+    <string name="type_degrees_label">Degrees</string>
+    <string name="type_minutes_label">Minutes</string>
+    <string name="type_seconds_label">Seconds</string>
+    <string name="type_elevation_feet_label">Elevation feet</string>
+    <string name="type_elevation_meters_label">Elevation meters</string>
+    <string name="type_geoid_height_feet_label">Geoid Height feet</string>
+    <string name="type_geoid_height_meters_label">Geoid Height meters</string>
+
+    <string name="utm_integer_output_prompt">Meter Precision UTM</string>
+    <string name="utm_nanometer_output_prompt">Nanometer Precision UTM</string>
+    <string name="utm_so_output_prompt">Foot Precision UTM</string>
+
+    <!--Input error Message-->
+    <string name="input_double_format_error_string">Not in correct decimal Format</string>
+    <string name="input_wrong_range_error">Not within range, (see prompt)</string>
+
+    <!-- Stubs -->
+    <string name="conversion_stub">Coordinates Converted</string>
+
+
+    <!-- Content Descriptions for images -->
+
+
+    <!-- Alert Dialog Strings -->
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="continue_delete_dont_save">Permanently Delete</string>
+    <string name="delete_title">Delete Prism 4D Project</string>
+    <string name="abandon_title">Prism 4D Project Changes Could Be Lost</string>
+    <string name="continue_abandon_changes">Abandon Changes</string>
+    <string name="cancel">Cancel</string>
+
+
+    <!-- Collect Points Info Window  -->
+    <!-- Menu Items -->
+
+    <!-- Button Labels -->
+
+    <!-- Text View Labels (initial text displayed) -->
+
+    <!-- Edit View Fields (initial text displayed) -->
+
+    <!-- Prompts -->
+
+    <!--Input error Message-->
+
+    <!-- Stubs -->
+
+    <!-- Content Descriptions for images -->
+
+</resources>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android               = "http://schemas.android.com/apk/res/android"
+          android:orientation   = "horizontal"
+          android:layout_width  = "match_parent"
+          android:layout_height = "wrap_content"
+    android:layout_marginBottom = "10dp"
+    >
+
+
+    <!-- Elevation  -->
+    <TextView
+        android:text          = "@string/elevation_label"
+        android:layout_height = "wrap_content"
+        android:layout_width  = "0dp"
+        android:layout_weight = "25"
+
+        android:gravity       = "end"
+
+        android:textColor     = "@color/colorTextBlack"
+        android:background    = "@color/colorScreenBackground"
+        />
+
+    <EditText
+        android:id               = "@+id/elevationMetersInput"
+        android:hint             = "@string/type_elevation_meters_label"
+        android:layout_gravity   = "center_horizontal"
+        android:gravity          = "center"
+        android:layout_height    = "wrap_content"
+        android:layout_width     = "0dp"
+        android:layout_weight    = "75"
+
+        android:layout_marginEnd = "16dp"
+
+        android:inputType        = "numberDecimal"
+
+        android:textColor        = "@color/colorTextBlack"
+        android:background       = "@color/colorWhite"
+        />
+
+    <EditText
+            android:id               = "@+id/elevationFeetInput"
+            android:hint             = "@string/type_elevation_feet_label"
+            android:layout_gravity   = "center_horizontal"
+            android:gravity          = "center"
+            android:layout_height    = "wrap_content"
+            android:layout_width     = "0dp"
+            android:layout_weight    = "75"
+
+            android:layout_marginEnd = "16dp"
+
+            android:inputType        = "numberDecimal"
+
+            android:textColor        = "@color/colorTextBlack"
+            android:background       = "@color/colorWhite"
+
+            />
+
+</LinearLayout>

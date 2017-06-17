@@ -1,0 +1,438 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.geobot.GBActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5"
+        >
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            >
+
+            <!-- main central portion of the screen -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:background="@color/colorGrayer"
+
+                >
+
+                <!-- position buttons and fields  -->
+                <LinearLayout
+                    android:id="@+id/current_position_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    >
+
+                    <!-- Current Position Matrix  -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/currentPositionButton"
+                        android:text="@string/current_position_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorBlueButton"
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        />
+
+                    <!-- Point ID  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:labelFor="@+id/pointIDField"
+                            android:text="@string/point_id_label"
+                            android:freezesText="true"
+
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                        <EditText
+                            android:id="@id/pointIDField"
+
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                    </LinearLayout>
+                    <!-- Northing/Latitude  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:id="@+id/currentNorthingPositionLabel"
+                            android:labelFor="@+id/currentNorthingPositionField"
+                            android:text="@string/current_northing_label"
+                            android:freezesText="true"
+
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                        <EditText
+                            android:id="@id/currentNorthingPositionField"
+                            android:enabled="false"
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                    </LinearLayout>
+
+                    <!-- Easting/Longitude  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:id="@+id/currentEastingPositionLabel"
+                            android:labelFor="@+id/currentEastingPositionField"
+                            android:text="@string/current_easting_label"
+                            android:freezesText="true"
+
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                        <EditText
+                            android:id="@id/currentEastingPositionField"
+                            android:enabled="false"
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                    </LinearLayout>
+
+                    <!-- Elevation  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:id="@+id/currentElevationLabel"
+                            android:labelFor="@+id/currentElevationField"
+                            android:text="@string/current_elevation_label"
+                            android:freezesText="true"
+
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                        <EditText
+                            android:id="@id/currentElevationField"
+                            android:enabled="false"
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                    </LinearLayout>
+
+                    <!-- Feature Code  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/currentFeatureCodeLabel"
+                            android:labelFor="@+id/currentFeatureCodeField"
+                            android:text="@string/function_code_label"
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                        <EditText
+                            android:id="@id/currentFeatureCodeField"
+
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                    </LinearLayout>
+
+                    <!-- Height  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:id="@+id/currentHeightLabel"
+                            android:labelFor="@+id/currentHeightField"
+                            android:text="@string/current_height_label"
+                            android:freezesText="true"
+                            android:layout_height="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="25"
+                            android:gravity="end"
+
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+
+                        <EditText
+                            android:id="@id/currentHeightField"
+                            android:freezesText="true"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="75"
+                            android:gravity="start"
+                            android:inputType="numberDecimal"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            android:paddingBottom="10dp"
+                            />
+                    </LinearLayout>
+
+                    <!-- Buttons  -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/storePositionButton"
+                        android:text="@string/store_position_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorGrayButton"
+                        />
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/offsetPositionButton"
+                        android:text="@string/offset_position_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorGreenButton"
+                        />
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/averagePositionButton"
+                        android:text="@string/ave_position_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorRedButton"
+                        />
+                    <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/showAllPointsButton"
+                    android:text="@string/show_all_points_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorYellowButton"
+                    />
+
+                </LinearLayout>
+
+                <!-- Maps Buttons and canvas -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="vertical"
+                    >
+
+                    <!-- button row above drawing pad -->
+                    <LinearLayout
+                        android:id="@+id/drawing_buttons_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+
+                        >
+                        <!-- Buttons defining drawing pad actions -->
+                        <!-- Zoom In -->
+                        <ImageButton
+                            android:id="@+id/zoomInButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_zoom_in25"
+                            android:contentDescription="@string/zoom_in_contentdescription"
+                            android:layout_gravity="start"
+                            />
+
+                        <!-- Zoom Out -->
+                        <ImageButton
+                            android:id="@+id/zoomOutButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_zoom_out25"
+                            android:contentDescription="@string/zoom_out_contentdescription"
+
+                            />
+
+                        <!-- Zoom to fit -->
+                        <ImageButton
+                            android:id="@+id/zoomExtButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_zoom_extended25"
+                            android:contentDescription="@string/zoom_ext_contentdescription"
+
+                            />
+
+                        <!-- Scale Factor -->
+                        <TextView
+                            android:id="@+id/scaleFactorField"
+                            android:text="@string/scale_factor_prefix"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:layout_gravity="center_vertical|end"
+                            android:textColor="@color/colorTextBlack"
+                            android:background="@color/colorWhite"
+                            />
+
+                        <!-- Maps Background -->
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/mapsButtonCollect"
+                            android:text="@string/maps_button_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorTextBlack"
+                            android:layout_gravity="top"
+                            android:drawableTop="@drawable/ic_maps25"
+                            />
+
+                        <!-- Picture -->
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/pictureButton"
+                            android:text="@string/picture_button_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorTextBlack"
+                            android:drawableTop="@drawable/ic_camera25"
+                            />
+
+                        <!-- Notes -->
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/notesButton"
+                            android:text="@string/notes_button_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorTextBlack"
+                            android:layout_gravity="bottom"
+                            android:drawableTop="@drawable/ic_notes25"
+                            />
+                    </LinearLayout>
+
+                    <!-- maps area of the screen -->
+                    <com.google.android.gms.maps.MapView
+                        android:id            = "@+id/map_view"
+                        android:layout_width  = "match_parent"
+                        android:layout_height = "350dp"
+                        android:layout_weight = "20"
+                        android:contentDescription="@string/drawing_pad_content_description"
+                        />
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </ScrollView>
+
+    <!--  Footer  -->
+    <include layout="@layout/element_footer_inclusion"/>
+
+
+</LinearLayout>
+

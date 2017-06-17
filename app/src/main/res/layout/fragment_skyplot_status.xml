@@ -1,0 +1,774 @@
+
+
+    <!-- This layout shows GPS and Satellite Status -->
+    <!--  -->
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.asc.msigeosystems.geobot.GBActivity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/colorScreenBackground"
+
+        >
+
+        <!-- Container for entire screen -->
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_vertical"
+            android:shrinkColumns="*"
+            android:stretchColumns="*"
+
+            >
+            <!-- Row: Skyplot Screen Label -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotLocationScreenLabel"
+                    android:text="@string/skyplot_location_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:gravity="center_horizontal"
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+            </TableRow>
+
+            <!-- Row: NMEA Sentence -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotNmeaSentenceLabel"
+                    android:text="@string/skyplot_nmea_sentence_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotNmeaSentenceOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Time -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotTimeLabel"
+                    android:text="@string/skyplot_time_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotTimeOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Latitude -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotLatitudeLabel"
+                    android:text="@string/skyplot_latitude_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotLatitudeOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Longitude -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotLongitudeLabel"
+                    android:text="@string/skyplot_longitude_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotLongitudeOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Orthometric Elevation -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotOrthometricElevationLabel"
+                    android:text="@string/skyplot_orthometric_elevation_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotOrthometricElevationOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Geoid -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotGeoidLabel"
+                    android:text="@string/skyplot_geoid_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotGeoidOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+            <!-- Row: Ellipsoid Elevation -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotEllipsoidElevationLabel"
+                    android:text="@string/skyplot_ellipsoid_elevation_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotEllipsoidElevationOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+
+            <!-- Row: Localization File -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotLocalizationLabel"
+                    android:text="@string/skyplot_localization_file_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotLocalizationOutput"
+                    android:text="@string/skyplot_localization_file"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </TableRow>
+
+
+
+             <!-- Row: Skyplot Status Screen Label -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotStatusScreenLabel"
+                    android:text="@string/skyplot_status_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:gravity="center_horizontal"
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+            </TableRow>
+
+            <!-- Row: Status -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotStatusLabel"
+                    android:text="@string/skyplot_status_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotStatusOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: Satellites -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotSatellitesLabel"
+                    android:text="@string/skyplot_satellites_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+                <TextView
+                    android:id="@+id/skyplotSatellitesOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: HDOP -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotHdopLabel"
+                    android:text="@string/skyplot_hdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotHdopOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: VDOP -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotVdopLabel"
+                    android:text="@string/skyplot_vdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotVdopOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+
+            <!-- Row: TDOP -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotTdopLabel"
+                    android:text="@string/skyplot_tdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotTdopOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: PDOP -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotPdopLabel"
+                    android:text="@string/skyplot_pdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotPdopOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: GDOP -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotGdopLabel"
+                    android:text="@string/skyplot_gdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotGdopOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+            <!-- Row: HRMS -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotHrmsLabel"
+                    android:text="@string/skyplot_hrms_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotHrmsOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+
+            <!-- Row: VRMS -->
+            <TableRow
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                >
+                <TextView
+                    android:id="@+id/skyplotVrmsLabel"
+                    android:text="@string/skyplot_vrms_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/skyplotVrmsOutput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:layout_marginEnd="16dp"
+
+                    android:focusable="false"
+                    android:clickable="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </ScrollView>
+
+
+
+

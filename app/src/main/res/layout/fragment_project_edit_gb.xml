@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android ="http://schemas.android.com/apk/res/android"
+    xmlns:tools   ="http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.geobot.GBActivity"
+
+    android:baselineAligned="false"
+    android:layout_width ="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+    <!-- This layout is for creating a new project -->
+
+    <!-- with layout_width = 0dp, ignore the content width, for horiz orient   -->
+    <!-- with layout_height = 0dp, ignore the content height, vert orient      -->
+    <!-- with layout_weight = 1, distribute width/height between views equally -->
+    <!-- with gravity = center, center text within button                   -->
+    <!-- with layout_gravity=start, place button on left of the row         -->
+    <!-- with background, set button color to gray, grayer, grayest         -->
+    <!-- with paddingStart, set some space between this button and the next -->
+
+    <!-- Container for entire screen -->
+    <TableLayout
+        android:layout_width ="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_vertical"
+        android:shrinkColumns="*"
+        android:stretchColumns="*"
+
+        >
+        <!-- Row : Project Screen Label -->
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            >
+            <TextView
+                android:text="@string/project_screen_label"
+                android:layout_height="wrap_content"
+                android:layout_width ="wrap_content"
+
+                android:gravity="center_horizontal"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+        </TableRow>
+
+        <!-- Row : Project Name -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectNameInput"
+                android:text="@string/project_name_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectNameInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="16dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorWhite"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Project ID -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:id=      "@+id/projectIDLabel"
+                android:labelFor="@+id/projectIDInput"
+                android:text="@string/project_id_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectIDInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="16dp"
+
+                android:enabled="false"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorGray"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Project Creation Date -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectCreationDateInput"
+                android:text="@string/project_creation_date_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectCreationDateInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:layout_gravity="center"
+
+                android:inputType="date"
+                android:layout_marginEnd="16dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorGray"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Project Last Modified Date -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectModifiedDateInput"
+                android:text="@string/project_last_modified_date_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectModifiedDateInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="date"
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="16dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorGray"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Project Description -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectDescInput"
+                android:text="@string/project_description_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectDescInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+
+                android:inputType="textMultiLine"
+                android:minLines="6"
+                android:lines="8"
+                android:maxLines="10"
+                android:gravity="top|start"
+                android:scrollbars="horizontal"
+
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="16dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorWhite"
+                />
+
+
+        </TableRow>
+
+
+        <!-- Row : Project Coordinate Type -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/coordinate_type_spinner"
+                android:text="@string/project_coord_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!--  Spinner to indicate the type of coordinate for the points in this project -->
+            <Spinner
+                android:id            = "@+id/coordinate_type_spinner"
+                android:layout_width  = "0dp"
+                android:layout_height = "wrap_content"
+                android:layout_weight="75"
+                android:layout_marginEnd="16dp"
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorWhite"
+                />
+
+        </TableRow>
+
+        <!-- Row : Project Pictures List and image -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:paddingTop="10dp"
+            >
+
+            <!-- Pictures list and image -->
+            <include android:id="@+id/picturesList" layout="@layout/element_picture_list"/>
+        </TableRow>
+
+
+
+        <!-- Row : View Existing Projects, Settings Button -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+
+            <!-- View Project Settings -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectViewSettingsButton"
+                android:text="@string/project_settings_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+            <!-- List Points -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectListPointsButton"
+                android:text="@string/list_points_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="center_horizontal"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+            <!-- View Existing Projects -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectViewExistingButton"
+                android:text="@string/project_view_existing_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Exit Button, Save Changes Button -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+
+            <!-- Exit  -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectExitButton"
+                android:text="@string/exit_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="start"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+            <!-- Save Changes -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectSaveChangesButton"
+                android:text="@string/save_changes_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+        </TableRow>
+
+
+
+    </TableLayout>
+
+
+
+</ScrollView>
+
