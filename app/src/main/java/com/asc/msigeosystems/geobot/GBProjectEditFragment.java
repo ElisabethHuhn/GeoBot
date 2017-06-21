@@ -485,6 +485,8 @@ public class GBProjectEditFragment extends    Fragment
                                                 mProjectBeingMaintained.getProjectLastModified()));
         projectDescInput .setText(mProjectBeingMaintained.getProjectDescription());
         //mProjectCoordTypeOutput.setText(mProjectBeingMaintained.getProjectCoordinateType());
+
+
         CharSequence spinnerSelection = mProjectBeingMaintained.getProjectCoordinateType();
         //NOTE: THIS NEXT SECTION MUST BE IN THE SAME ORDER AS THAT WHEN THE SPINNER
         //IS CREATED. THE ORDERING IS ENFORCED BY THE PROGRAMMER AT CODING TIME

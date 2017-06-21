@@ -77,6 +77,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private static final int OFFSET_RESET      = 2;
     private static final int OFFSET_ID_CONSTANT = 100;
 
+    //Set this true to use TestData rather than NMEA live
     static final boolean  DEBUG = false;
 
     private static final String TAG = "CollectPointsFragment";
@@ -103,23 +104,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private static final String OFFSET_ELEVATION = "OffsetElev";
     private static final String OFFSET_CHECKED_ID = "OffsetID";
 
-    //Meaning Variables
-    //Flags 0 = false, 1 = true
-    private static final String IS_MEANING = "IsMeaning";
-    private static final String IS_FIRST   = "IsFirst";
-    private static final String IS_LAST    = "IsLast";
-    private static final String MEAN_TIME  = "MeanTime";
-    private static final String FIXED_READING = "FixedReading";
-    private static final String RAW_READING = "RawReading";
 
-    //Quality Variables
-    private static final String IN_FIX     = "InFix";
-    private static final String HDOP_VALUE = "HdopVal";
-    private static final String VDOP_VALUE = "VdopVal";
-    private static final String TDOP_VALUE = "TdopVal";
-    private static final String PDOP_VALUE = "PdopVal";
-    private static final String HRMS_VALUE = "HrmsVal";
-    private static final String VRMS_VALUE = "VrmsVal";
+
 
     //Maps variables
     private static final String IS_MAP_INIT = "IsMapInit";
@@ -128,10 +114,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
 
-
-    //* ****************************************/
-    //* *     variables for UI widgets      ****/
-    //* ****************************************/
 
 
 
@@ -174,28 +156,22 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
  
 
 
-       //variables for the meaning process
-    //Meaning MUST continue through reconfiguration, but intermediate points will be lost
-    private boolean isMeanInProgress = false;
-    private boolean isFirstPointInMean = false;
-    private boolean isLastPointInMean = false;
-    private double  mMeanTime;
-    private int     mFixedReadings;
-    private int     mRawReadings;
+       //Token for the meaning process
+    //This token exists throughout the life of a meaning cycle,
+    //  being handed from step to step, butilding up the mean
+    //Meaning MUST continue through reconfiguration, but it is acceptable to
+    //  miss the points that were read while this App is not current
+    //this means that if the mean is limited by time, there will be fewer points in
+    //  the intervening time period
+    private GBNmeaMeanToken mMeanToken;
 
  
 
 
+    //These fields come from NMEA, but ultimately are saved on the point
 
     //Quality fields to be added to the new point
-    private int          mInFix = 0;
-    private double       mHdop = 0d;
-    private double       mVdop = 0d;
-    private double       mTdop = 0d;
-    private double       mPdop = 0d;
-    private double       mHrms = 0d;
-    private double       mVrms = 0d;
-
+    GBPointQualityToken mPointQualityToken = new GBPointQualityToken();
 
 
 
@@ -211,7 +187,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //then use the "add all points" routine to recreate the map
 
     // TODO: 1/15/2017 how do these lists correspond to each other?
-    private ArrayList<GBCoordinateWGS84> mMeanCoordinateList;
+    //private ArrayList<GBCoordinateWGS84> mMeanToken.mMeanedCoordinates()
 
 
     //Markers that are actually on the map
@@ -231,6 +207,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //variables needed to keep track of location
     //Set by calling initializeGPS()
     //If the code finds a void LocationManager, it is simply reInitialized
+    //used as a flag to determine whether GPS initialized yet in startGPS() and stopGPS()
     private LocationManager mLocationManager;
 
 
@@ -272,9 +249,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private Polyline mPointsLine;
     private PolylineOptions mLineOptions;
 
-
-    //this recreates itself (self healing, nothing to do if it becomes null on configuration change)
-    private GBNmeaParser   mNmeaParser = new GBNmeaParser();
 
 
 
@@ -435,38 +409,20 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         outState.putInt   (OFFSET_CHECKED_ID, mOffsetCheckedID);
 
         //Meaning Variables
-        //0 = false, 1 = true
-        int tempBoolean = 0; //default = false
-        if (isMeanInProgress)tempBoolean = 1;
-        outState.putInt(IS_MEANING, tempBoolean);
-
-        tempBoolean = 0;
-        if (isFirstPointInMean)tempBoolean = 1;
-        outState.putInt(IS_FIRST, tempBoolean);
-
-        tempBoolean = 0;
-        if (isLastPointInMean) tempBoolean = 1;
-        outState.putInt(IS_LAST, tempBoolean);
-
-        outState.putDouble(MEAN_TIME,  mMeanTime);
-        outState.putInt(FIXED_READING, mFixedReadings);
-        outState.putInt(RAW_READING, mRawReadings);
+        if (mMeanToken != null){
+            mMeanToken.saveState(outState);
+        }
 
 
 
-        //Quality Variables
-        outState.putInt(IN_FIX, mInFix);
-        outState.putDouble(HDOP_VALUE, mHdop);
-        outState.putDouble(VDOP_VALUE, mVdop);
-        outState.putDouble(TDOP_VALUE, mTdop);
-        outState.putDouble(PDOP_VALUE, mPdop);
-        outState.putDouble(HRMS_VALUE, mHrms);
-        outState.putDouble(VRMS_VALUE, mVrms);
-
+        //Point Quality Variables
+        if (mPointQualityToken != null) {
+            mPointQualityToken.saveState(outState);
+        }
 
         //Map Variables
         //0 = false, 1 = true
-        tempBoolean = 0;
+        int tempBoolean = 0;
         if (isMapInitialized)tempBoolean = 1;
         outState.putInt(IS_MAP_INIT, tempBoolean);
 
@@ -650,50 +606,85 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         GBNmea nmeaData;
         //todo maybe need to do something with the timestamp
 
-         try {
-            //create an object with all the fields from the string
-             if (mNmeaParser == null){
-                 GBNmeaParser nmeaParser = GBNmeaParser.getInstance();
-             }
-
-             nmeaData = mNmeaParser.parse(nmea);
+        try {
+             //Parse the raw GPS data
+             nmeaData = GBNmeaParser.getInstance().parse(nmea);
              if (nmeaData == null)return;
 
              // TODO: 12/20/2016 remove kludge for test data
-            if (DEBUG && isMeanInProgress){
+            //replace the raw data with test data if we are in test mode
+            if (DEBUG && isMeanInProgress()){
                 if (nmeaData.getTime() <= 1)return;
-                if (mMeanTime <= 1){
-                    mMeanTime = nmeaData.getTime();
+                if (mMeanToken.getCurrentMeanTime() <= 1){
+                    mMeanToken.setCurrentMeanTime(nmeaData.getTime());
                 } else {
                     //wait at least a second between data points
-                    if ((nmeaData.getTime() - mMeanTime) < 1) return;
-                    mMeanTime = nmeaData.getTime();
+                    if ((nmeaData.getTime() - mMeanToken.getCurrentMeanTime()) < 1) return;
+                    mMeanToken.setCurrentMeanTime(nmeaData.getTime());
                 }
                 nmeaData = getNmeaFromTestData();
+                if (nmeaData == null)return;
             }
 
-            //Only returns sentences we might possibly want
-            if (nmeaData != null){
-                //update the UI
-                //strips out all sentences that are NOT locations
-                //truncates coordinate location fields as a side effect
-                nmeaData = updateUIwNmeaPosition(nmeaData);
 
-                //so while the parser recognized it, we still might not be interested
-                if (nmeaData != null){
-                    //So now, store the sentence
-                    mNmeaData = nmeaData;
+// TODO: 6/18/2017 There is too much overlap between refineNmeaPosition and updateUIwNmeaPosition
+            //refine the lat/long position based on nmea type and the projects coordinate type
+            //truncates to number of digits we are interesed in
+            //strips out some types we aren't interested in
+            nmeaData = refineNmeaPosition(nmeaData);
+            if (nmeaData == null)return;
 
-                    if ((!isMapInitialized) && (nmeaData.isFixed())){
-                        centerMap(nmeaData);
-                        isMapInitialized = true;
-                    }
+            //update the UI
+            //only returns nmeaData which are locations
+            nmeaData = updateUIwNmeaPosition(nmeaData);
+            if (nmeaData == null)return;
 
-                    if (isMeanInProgress) {
-                        updateMeanWithNmea(mNmeaData);
-                    }
+
+            //So now, store the Location
+            mNmeaData = nmeaData;
+
+            //and include it in the mean
+            if (isMeanInProgress()) {
+                //Fold the new nmea sentence into the ongoing mean
+                GBCoordinateMean meanCoordinate = mMeanToken.updateMean(mNmeaData);
+
+                //Is this the first point we have processed?
+                if (mMeanToken.isFirstPointInMean()){
+                    mMeanToken.setFirstPointInMean( false);
+                    mMeanToken.setStartMeanTime(mNmeaData.getTime());
+
+                    //No marker, so we have to create one
+                    LatLng newLocation = new LatLng(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
+
+                    mLastMarkerAdded   = makeNewMarker(newLocation,
+                            getString(R.string.collect_points_provisional_marker),
+                            markerColorProvisional);
                 }
+
+                //is meaning done?
+                boolean isMeanComplete = isMeaningDone(nmeaData, mMeanToken);
+                mMeanToken.setLastPointInMean(isMeanComplete);
+
+
+                if (mMeanToken.isLastPointInMean()){
+                    mMeanToken.setEndMeanTime(System.currentTimeMillis());
+                    //the handler is smart enough to know whether to get location from nmea or mean
+                    handleStorePosition(nmeaData, meanCoordinate);
+                } else {
+                    updateMapWMean(meanCoordinate);
+                }
+
             }
+
+            // the first fixed reading must initialize the map
+            if ((!isMapInitialized) && (nmeaData.isFixed())){
+                //put the new point on the map
+                centerMap(nmeaData);
+                isMapInitialized = true;
+            }
+
+
+
 
 
         } catch (RuntimeException e){
@@ -709,24 +700,11 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //* ****************** Nmea Utilities ********************//
     //* **********************************************************//
 
-    //only returns non-null value if it's a sentence we are interested in
-    // TODO: 12/24/2016 Need to add in other types of coordinates besides WGS and UTM
-    //truncates coordinate location fields as a side effect
-    private GBNmea updateUIwNmeaPosition(GBNmea nmeaData){
-
-        if (nmeaData == null){
-            //there was an exception processing the NMEA Sentence
-            GBUtilities.getInstance().showStatus(getActivity(),R.string.null_type_found);
-            return null;
-        }
-
-        //Which fields have meaning depend upon the type of the sentence
-        String type = nmeaData.getNmeaType().toString();
-        if (type.isEmpty())return null;
-
+    private boolean updateCoordinateLabels(){
+        //*+********* Update the UI coordinate labels ******************/
         //project has to be open
         long openProjectID = GBUtilities.getInstance().getOpenProjectID();
-        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
+        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return false;
 
         int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
         String nLable = "N: ";
@@ -745,12 +723,31 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             currentNorthingPositionLable.setText(nLable);
             currentEastingPositionLabel.setText(eLable);
         }
+        return true;
 
-        double nLat, eLong, ele;
-        GBCoordinateUTM utmCoordinate = null;
+    }
+
+    private GBNmea refineNmeaPosition(GBNmea nmeaData){
+
+        if (nmeaData == null)return null;
+
+        //Get the type of NMEA data passed
+        String type = nmeaData.getNmeaType().toString();
+        if (GBUtilities.isEmpty(type))return null;
+
+
+        //Get the coordinates type from the open project
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID();
+        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
+
+        int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
+
 
         //the primary location sentences
         if ((type.contains("GGA")) || (type.contains("GNS")) ){
+
+            double nLat, eLong, ele;
+            GBCoordinateUTM utmCoordinate = null;
 
             if (coordinateType == GBCoordinate.sLLWidgets){
                 nLat =   nmeaData.getLatitude();
@@ -758,8 +755,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             } else {
                 // TODO: 12/7/2016 this conversion assumes wgs and utm. Bad assumption, fix
                 GBCoordinateWGS84 wgsCoordinate =
-                                    new GBCoordinateWGS84(mNmeaData.getLatitude(),
-                                                               mNmeaData.getLongitude());
+                        new GBCoordinateWGS84(mNmeaData.getLatitude(),
+                                mNmeaData.getLongitude());
 
                 //The UTM constructor performs the conversion from WGS84
                 utmCoordinate = new GBCoordinateUTM(wgsCoordinate);
@@ -772,6 +769,88 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 nLat =  utmCoordinate.getNorthing();
                 eLong = utmCoordinate.getEasting();
             }
+
+
+            int precisionDigits;
+            GBProject openProject = GBUtilities.getInstance().getOpenProject();
+            if (openProject != null) {
+                precisionDigits = openProject.getSettings().getLocationPrecision();
+            } else {
+                precisionDigits = GBUtilities.sHundredthsDigitsOfPrecision;
+            }
+
+            BigDecimal bdTemp = new BigDecimal(nLat).setScale(precisionDigits, RoundingMode.HALF_UP);
+            nLat = bdTemp.doubleValue();
+
+            bdTemp = new BigDecimal(eLong).setScale(precisionDigits,RoundingMode.HALF_UP);
+            eLong = bdTemp.doubleValue();
+
+            ele = nmeaData.getOrthometricElevation();
+            bdTemp = new BigDecimal(ele).setScale(precisionDigits,RoundingMode.HALF_UP);
+            ele = bdTemp.doubleValue();
+
+
+            nmeaData.setLatitude(nLat);
+            nmeaData.setLongitude(eLong);
+
+
+            mPointQualityToken.setHdop(nmeaData.getHdop());
+            return nmeaData;
+
+        } else if (type.contains("GSA")) {
+
+            // TODO: 1/16/2017 GSA is the sentence that gives us the number of satellites in the fix
+            mPointQualityToken.setInFix( nmeaData.getSatellites());
+
+            mPointQualityToken.setPdop(nmeaData.getPdop());
+            mPointQualityToken.setHdop(nmeaData.getHdop());
+            mPointQualityToken.setVdop(nmeaData.getVdop());
+
+            return null ; //in case we are updating the UI
+
+        }
+
+        return null; //for all other nmea types, we aren't interested
+    }
+
+
+
+
+
+    //only returns non-null value if it's a sentence we are interested in
+    // TODO: 12/24/2016 Need to add in other types of coordinates besides WGS 
+    //truncates coordinate location fields as a side effect
+    private GBNmea updateUIwNmeaPosition(GBNmea nmeaData){
+
+        if (nmeaData == null){
+            //there was an exception processing the NMEA Sentence
+            GBUtilities.getInstance().showStatus(getActivity(),R.string.null_type_found);
+            return null;
+        }
+        //Which fields have meaning depend upon the type of the sentence
+        String type = nmeaData.getNmeaType().toString();
+        if (GBUtilities.isEmpty(type))return null;
+
+
+
+        //*+********* Update the UI   ******************/
+        if (!updateCoordinateLabels())return null;
+
+
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID();
+        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
+
+        int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
+
+        //the primary location sentences
+        if ((type.contains("GGA")) || (type.contains("GNS")) ){
+            //update the location values
+
+            double nLat, eLong, ele;
+
+            nLat =   nmeaData.getLatitude();
+            eLong =  nmeaData.getLongitude();
+
 
 
             int precisionDigits;
@@ -792,16 +871,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             bdTemp = new BigDecimal(ele).setScale(precisionDigits,RoundingMode.HALF_UP);
             ele = bdTemp.doubleValue();
 
-            //reset the truncated values in the coordinate
-            if (coordinateType == GBCoordinate.sLLWidgets){
-                nmeaData.setLatitude(nLat);
-                nmeaData.setLongitude(eLong);
-            } else {
-                // TODO: 12/7/2016 this conversion assumes wgs and utm. Bad assumption, fix
-                utmCoordinate.setNorthing(nLat);
-                utmCoordinate.setEasting(eLong);
-            }
-
+            View v = getView();
             if (v != null) {
 
                 TextView currentNorthingPositionField = (EditText)v.findViewById(R.id.currentNorthingPositionField);
@@ -811,58 +881,18 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 String northingValue  = String.format(Locale.getDefault(), "%.0f", nLat);
                 String eastingValue   = String.format(Locale.getDefault(), "%.0f", eLong);
                 String elevationValue = String.format(Locale.getDefault(), "%.0f", ele);
+
                 currentNorthingPositionField.setText(northingValue);
                 currentEastingPositionField.setText(eastingValue);
-
-                //mSatellitesOutput.setText(Integer.toString(nmeaData.getSatellites()));
-                // TODO: 1/19/2017 May be a point in the future where we want this field
-                //mHdopField                   .setText("HDop: "+Double.toString(nmeaData.getHdop()));
-                mHdop = nmeaData.getHdop();
                 currentElevationField.setText(elevationValue);
             }
             return nmeaData;
-
-            //mGeoidOutput.setText(Double.toString(nmeaData.getGeoid()));
-            //fixed or quality
         }
 
-        /* else if (type.contains("GNS")) {
-           // mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-            //mTimeOutput.setText(Double.toString(nmeaData.getTime()));
-            mCurrentNorthingPositionField.setText(Double.toString(nmeaData.getLatitude()));
-            mCurrentEastingPositionField.setText(Double.toString(nmeaData.getLongitude()));
-            //mSatellitesOutput.setText(Integer.toString(nmeaData.getSatellites()));
-            mHdopField.setText(Double.toString(nmeaData.getHdop()));
-            mHdop = nmeaData.getHdop();
-            mCurrentElevationField.
-                    setText(Double.toString(nmeaData.getOrthometricElevation()));
-            //mGeoidOutput.setText(Double.toString(nmeaData.getGeoid()));
-            //fixed or quality
-        } else if (type.contains("GGL")) {
-            //mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-            //mTimeOutput.setText(Double.toString(nmeaData.getTime()));
-            mCurrentNorthingPositionField.setText(Double.toString(nmeaData.getLatitude()));
-            mCurrentEastingPositionField.setText(Double.toString(nmeaData.getLongitude()));
-        } else if (type.contains("RMA")) {
-            //mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-            mCurrentNorthingPositionField.setText(Double.toString(nmeaData.getLatitude()));
-            mCurrentEastingPositionField.setText(Double.toString(nmeaData.getLongitude()));
-        } else if (type.contains("RMC")) {
-            //mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-            //mTimeOutput.setText(Double.toString(nmeaData.getTime()));
-            mCurrentNorthingPositionField.setText(Double.toString(nmeaData.getLatitude()));
-            mCurrentEastingPositionField.setText(Double.toString(nmeaData.getLongitude()));
-        }else if (type.contains("GSV")) {
-            //this is better shown graphically
-           // mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-           /// mSatellitesOutput.setText(Integer.toString(nmeaData.getSatellites()));
-            //TODO rest of satellite data
-        } */
         else if (type.contains("GSA")) {
-            //mNmeaSentenceOutput.setText(nmeaData.getNmeaSentence());
-            //mSatellitesOutput.setText(Integer.toString(nmeaData.getSatellites()));
+            //update the footer values from the satellite;
             // TODO: 1/16/2017 GSA is the sentence that gives us the number of satellites in the fix
-            mInFix = nmeaData.getSatellites();
+              View v = getView();
             if (v != null) {
                 TextView hdopField            = (TextView)v.findViewById(R.id.hdop_field);
                 TextView vdopField            = (TextView)v.findViewById(R.id.vdop_field);
@@ -879,9 +909,10 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 hdopField.setText(hdopValue);
                 vdopField.setText(vdopValue);
             }
-            mPdop = nmeaData.getPdop();
-            mHdop = nmeaData.getHdop();
-            mVdop = nmeaData.getVdop();
+            mPointQualityToken.setInFix( nmeaData.getSatellites());
+            mPointQualityToken.setPdop ( nmeaData.getPdop());
+            mPointQualityToken.setHdop ( nmeaData.getHdop());
+            mPointQualityToken.setVdop ( nmeaData.getVdop());
 
             return null;
         }
@@ -890,67 +921,44 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
     }
 
-    //adds the current nmea to the meaned collection,
-    //adds marker if the first reading in mean
-    //creates point if the last reading in mean
-    private void updateMeanWithNmea(GBNmea nmeaData){
-        //increment the number of raw readings in the mean
-        mRawReadings++;
-        //The reading must be fixed to be used in the meaning
-        if (!nmeaData.isFixed()) {
-            return;
-        } else {
-            mFixedReadings++;
-        }
-
-        //Add to the list of locations being meaned.
-        GBCoordinateWGS84 wgsCoordinate = getWgsFromNmea(nmeaData);
-        if (wgsCoordinate == null) return;
-
-        mMeanCoordinateList.add(wgsCoordinate);
-
-        //calculate the mean using the coordinates in the list
-        GBCoordinateMean meanCoordinate = calculateMeanWGS(mNmeaData,mMeanCoordinateList);
 
 
-        //Assume the marker is the most recent
-        // TODO: 12/12/2016 is marker assumption valid
-        if ((mLastMarkerAdded == null) || (isFirstPointInMean)){
-            isFirstPointInMean = false;
-
-            //No marker, so we have to create one
-            //returns LatLng of current Position, but sets mLastMarkerAdded as a side effect
-            makeNewMarkerFromNmea(nmeaData,
-                                  getString(R.string.collect_points_provisional_marker),
-                                  markerColorProvisional);
-        }
+    private boolean isMeaningDone(GBNmea nmeaData, GBNmeaMeanToken meanToken){
+        //if there isn't a mean in progress, by definition we are done
+        if (isMeanStopped()) return true;
 
         //Check if this is the last point to be meaned
         GBProject project = GBUtilities.getInstance().getOpenProject();
-        int lastPoint = project.getSettings().getMeaningNumber();
-        if (lastPoint <= mMeanCoordinateList.size())isLastPointInMean = true;
+        GBProjectSettings settings = project.getSettings();
+        boolean endMeaning = false;
 
-        //isLastPointInMean also set true by user with StorePoint
-        if (isLastPointInMean){
-            //the handler is smart enough to know whether to get location from nmea or mean
-            handleStorePosition(nmeaData, meanCoordinate);
+        if (settings.isMeanByNumber()){
+            endMeaning = (meanToken.getFixedReadings() >= settings.getMeaningNumber());
         } else {
-
-            Double npLong = meanCoordinate.getLongitude();
-            Double npLat  = meanCoordinate.getLatitude();
-            LatLng newPosition = new LatLng(npLat,npLong);
-
-
-            //change the screen focus and the marker to the most current mean
-            setFocus(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
-
-
-            mLastMarkerAdded.setPosition(newPosition);
-            //pass the info for the window to the marker
-            mLastMarkerAdded.setTag(meanCoordinate);
-            mLastMarkerAdded.showInfoWindow();
-            zoomToFit();
+            int milliseconds = (int) (nmeaData.getTime() - meanToken.getStartMeanTime()) ;
+            int seconds      = milliseconds / 1000;
+            endMeaning = (seconds > settings.getMeaningNumber());
         }
+        meanToken.setLastPointInMean(endMeaning);
+        return endMeaning;
+    }
+
+    private void updateMapWMean(GBCoordinateMean meanCoordinate){
+        Double npLong = meanCoordinate.getLongitude();
+        Double npLat  = meanCoordinate.getLatitude();
+        LatLng newPosition = new LatLng(npLat,npLong);
+
+
+        //change the screen focus and the marker to the most current mean
+        setFocus(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
+
+
+        mLastMarkerAdded.setPosition(newPosition);
+        //pass the info for the window to the marker
+        mLastMarkerAdded.setTag(meanCoordinate);
+        mLastMarkerAdded.showInfoWindow();
+        zoomToFit();
+
     }
 
 
@@ -1033,11 +1041,13 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
                 GBCoordinateMean pointMarker = (GBCoordinateMean) marker.getTag();
                 long pointID = pointMarker.getPointID();
+                //get the point corresponding to this pointID
                 GBPoint point = GBUtilities.getInstance().getOpenProject().getPoint(pointID);
                 if (point == null) {
                     GBUtilities.getInstance().showStatus(getActivity(),  R.string.no_point_at_marker);
                 } else {
-                    if (!isMeanInProgress) {
+                    if (isMeanStopped()) {
+                        //put up the dialog
                         askMarker(point, marker);
                     }
                 }
@@ -1117,11 +1127,13 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
                 //This knows whether we are in the middle of meaning or just use current position
                 GBCoordinateMean meanCoordinate =  null;
-                if (isMeanInProgress){
+                if (isMeanInProgress()){
                     //calculate the mean using the coordinates in the list
                     // TODO: 1/21/2017 does this result in the last point being used twice???
-                    meanCoordinate = calculateMeanWGS(mNmeaData,mMeanCoordinateList);
+                    meanCoordinate = mMeanToken.getMeanCoordinate();
                 }
+                //when meanCoordinate is null, the handler will know that
+                // meaning was not in progress and use mNeamData to create a new coordinate
                 handleStorePosition(mNmeaData, meanCoordinate);
 
 
@@ -1136,10 +1148,11 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 //for now, just put up a toast that the button was pressed
                 GBUtilities.getInstance().showStatus(getActivity(),  R.string.offset_position_label);
 
-                if (!isMeanInProgress) {
-                    if ((mOffsetDistance != 0d) ||
-                        (mOffsetHeading != 0d)  ||
+                if (isMeanStopped()) {
+                    if ((mOffsetDistance  != 0d) ||
+                        (mOffsetHeading   != 0d) ||
                         (mOffsetElevation != 0d)){
+
                         GBUtilities.getInstance().showStatus(getActivity(), R.string.offsets_reset);
                         mOffsetDistance  = 0d;
                         mOffsetHeading   = 0d;
@@ -1157,12 +1170,14 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             @Override
             public void onClick(View v){
                 //for now, just put up a toast that the button was pressed
-                GBUtilities.getInstance().showStatus(getActivity(), R.string.ave_position_label);
-                if (!isMeanInProgress){
+
+                if (isMeanStopped()){
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.start_mean);
                     //start the meaning process by calling the event handler
                     handleAveragePosition();
                 } else {
-                    //cancle any process in progress
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.cancel_mean);
+                    //cancel any process in progress
                     handleCancelMeaning();
                 }
             }
@@ -1191,7 +1206,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             @Override
             public void onClick(View v) {
 
-                if (!isMeanInProgress) {
+                if (isMeanStopped()) {
                     int mapType = mMap.getMapType();
                     if (mapType == GoogleMap.MAP_TYPE_TERRAIN) {
                         mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
@@ -1208,7 +1223,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             @Override
             public void onClick(View v){
 
-                if (!isMeanInProgress) {
+                if (isMeanStopped()) {
                     handleTakePicture();
                 }
 
@@ -1223,7 +1238,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             public void onClick(View v){
                 GBUtilities.getInstance().showStatus(getActivity(),  R.string.notes_button_label);
 
-                if (!isMeanInProgress) {
+                if (isMeanStopped() ){
                     handleNotes();
                 }
 
@@ -1298,8 +1313,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             @Override
             public void onClick(View v) {
 
-                if (isMeanInProgress){
-                    isMeanInProgress = false;
+                if (isMeanInProgress()){
+                    mMeanToken.setMeanInProgress(false);
                     handleCancelMeaning();
                     GBUtilities.getInstance().showStatus(getActivity(), R.string.meaning_terminated);
                 } else {
@@ -1328,10 +1343,10 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
                 //This knows whether we are in the middle of meaning or just use current position
                 GBCoordinateMean meanCoordinate =  null;
-                if (isMeanInProgress){
+                if (isMeanInProgress()){
                     // TODO: 1/21/2017 Are we using the last point twice in the mean???
                     //calculate the mean using the coordinates in the list
-                    meanCoordinate = calculateMeanWGS(mNmeaData, mMeanCoordinateList);
+                    meanCoordinate = mMeanToken.getMeanCoordinate();
                 }
                 setFocus(mNmeaData);
 
@@ -1456,11 +1471,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 GBUtilities.getInstance().showStatus(getActivity(),  R.string.unable_to_create_picture_file);
             }
             // Continue only if the File was successfully created
-            if (photoFile != null) {/*
-                Uri photoURI = FileProvider.getUriForFile(getActivity(),
-                                                          "com.asc.msigeosystems.prism4d.fileprovider",
-                                                          photoFile);
-*/
+            if (photoFile != null) {
+
                 Uri photoURI = URI.fromFile(photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
@@ -1536,7 +1548,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private void handleCurrentPosition(){
         isAutoResizeOn = true;
         //ignore the event if meaning is in process
-        if (isMeanInProgress) return;
+        if (isMeanInProgress()) return;
 
         //set screen focus to this location
         setFocus(mNmeaData);
@@ -1552,47 +1564,53 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             GBUtilities.getInstance().showStatus(getActivity(),  R.string.gps_not_running);
             return;
         }
-         //set screen focus to this location
-         setFocus(mNmeaData);
+        //set screen focus to this location
+        setFocus(mNmeaData);
 
-        //start the meaning process by setting the proper flags
-        isMeanInProgress   = true;
-        isFirstPointInMean = true;
-        isLastPointInMean  = false;
-        mRawReadings       = 0;
-        mFixedReadings     = 0;
+        mMeanToken = initializeMeanToken(mMeanToken);
 
 
-        //set the time
-        mMeanTime = 0;
-
-        //dump any old contents from past meaning processes
-        if ((mMeanCoordinateList == null) || (mMeanCoordinateList.size() > 0)){
-            mMeanCoordinateList = new ArrayList<>();
-        }
         //Actual meaning and creation of marker will happen on the next NMEA interrupt handler
         //when it notices the mean flag is set true
     }
 
+    private GBNmeaMeanToken initializeMeanToken(GBNmeaMeanToken meanToken){
+        if (meanToken == null) {
+            meanToken = new GBNmeaMeanToken();
+        }
+        //start the meaning process by setting the proper flags
+        meanToken.setMeanInProgress  (true);
+        meanToken.setFirstPointInMean(true);
+        meanToken.setLastPointInMean (false);
+        meanToken.setCurrentMeanTime (0d);
+        meanToken.setRawReadings     (0);
+        meanToken.setFixedReadings   (0);
+        meanToken.resetCoordinates   ();
+        meanToken.resetMeanCoordinate();
+
+        return meanToken;
+    }
+
+    private boolean isMeanInProgress(){
+        return ((mMeanToken != null) && mMeanToken.isMeanInProgress());
+    }
+    private boolean isMeanStopped(){return !isMeanInProgress();}
+
     private void handleCancelMeaning(){
-        isMeanInProgress   = false;
-        isFirstPointInMean = false;
-        isLastPointInMean  = false;
-        mRawReadings       = 0;
-        mFixedReadings     = 0;
+        mMeanToken = initializeMeanToken(mMeanToken);
 
-        mMeanTime          = 0;
 
-        mMeanCoordinateList = null;
         mMarkers.remove(mLastMarkerAdded);
         mLastMarkerAdded.remove();
     }
 
 
+
     //handler is smart enough to know whether mean or button press
     //This is the only place where a point and it's coordinate is actually created
+    //If we are storing a meaned position, the meanCoordinate will be non-null
     private void handleStorePosition(GBNmea nmeaData,
-                                     GBCoordinateMean locationCoordinate){
+                                     GBCoordinateMean meanCoordinate){
 
         if (nmeaData == null) return;
         setFocus(nmeaData);
@@ -1618,27 +1636,27 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         GBPoint point     = createPoint(project);
 
         //Update the UI with the point id
-        View v = getView();
-        if (v != null) {
-            TextView currentPointIDField = (TextView) v.findViewById(R.id.pointIDField);
-            currentPointIDField.setText(String.valueOf(point.getPointID()));
-        }
+        updateUIwPointID(point.getPointID());
+
         //update the meaning coordinate with the point id
-        //if locationCoordinate is null, we'll make one for the marker info window soon
-        if (locationCoordinate != null)locationCoordinate.setPointID(point.getPointID());
+        if (meanCoordinate == null){
+            //if we aren't coming from completing the mean, the passed coordinate will be null
+            //however, we still need one for the marker info window
+            meanCoordinate = new GBCoordinateMean(nmeaData);
+        }
+        meanCoordinate.setPointID(point.getPointID());
 
 
         //step 2 create the WSG coordinate
         GBCoordinateWGS84 wgs84Coordinate;
         //starts with the WSG84 coordinate, regardless of the final type
         //valid coordinate is set automatically based on latitude/longitude
-        if ((!isMeanInProgress) || (locationCoordinate == null)) {
-            //have to create the locationCoordinate from current position
-            //locationCoordinate =  getPCSFromNmea(nmeaData);
-            wgs84Coordinate = getWgsFromNmea(nmeaData);
+        if (isMeanStopped()) {
+            //have to create the meanCoordinate from current position
+            wgs84Coordinate =  new GBCoordinateWGS84(nmeaData);
         } else {
-            //creates coordinate in open project
-            wgs84Coordinate = getWgsCoordinateFromMean(locationCoordinate);
+            //creates coordinate from the meaned information
+            wgs84Coordinate = new GBCoordinateWGS84(meanCoordinate);
         }
 
         //step 2.1 Add the offset position to the location
@@ -1679,12 +1697,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         }
 
         //Step 2.2 Alter Elevation if necessary with Height
-        String heightString = "";
-        if (v != null) {
-            TextView currentHeightField           = (EditText)v.findViewById(R.id.currentHeightField);
-            heightString = currentHeightField.getText().toString();
-        }
-        if (!heightString.isEmpty()) {
+        String heightString = getHeightFromUI();
+        if (!GBUtilities.isEmpty(heightString)) {
+            // TODO: 6/18/2017 need to pay attention to either Locale or project settings here
             double height = Double.valueOf(heightString);
 
             if (height != 0d) {
@@ -1698,6 +1713,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         }
 
         //step 3 determine which kind of coordinate, create it, add to point:
+        // TODO: 6/18/2017 need to take into account the project coordinate type
         createCoordinateFromWSG(project, point, wgs84Coordinate);
 
 
@@ -1705,6 +1721,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         GBPointManager pointManager = GBPointManager.getInstance();
         boolean addToDBToo = true;
         if (!pointManager.addPointsToProject(project, point, addToDBToo)){
+            //The DB add failed, recover
             GBUtilities.getInstance().showStatus(getActivity(),  getString(R.string.error_adding_point));
 
             //remove the point from the project
@@ -1722,13 +1739,15 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //step 5 change the final location and color of the marker
         LatLng currentPosition = new LatLng(wgs84Coordinate.getLatitude(),
                                             wgs84Coordinate.getLongitude());
-
         if (mLastMarkerAdded == null){
-             //If not meaning, create a marker and zoom properly
-            String markerName = "Point ID = "+String.valueOf(point.getPointID());
+            //No marker, so create one
+            String markerName = String.format(Locale.getDefault(),
+                                                getString(R.string.point_id_fillin),
+                                                point.getPointID());
+
             //mLastMarkerAdded is updated as a side effect
             //it actually returns a LatLng
-            makeNewMarkerFromLatLng(currentPosition, markerName, markerColorFinal);
+            mLastMarkerAdded = makeNewMarker(currentPosition, markerName, markerColorFinal);
         } else {
             //change the position of the marker to the designated position
             mLastMarkerAdded.setPosition(currentPosition);
@@ -1741,51 +1760,25 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
         //step 7 change the info window
-        //we need the locationCoordinate even if we aren't meaning as it's information
-        //for the marker info window
-        //pass the info for the window to the marker
-        if (locationCoordinate == null){
-            //we weren't meaning, so we need to create this information
-            locationCoordinate = new GBCoordinateMean();
-            locationCoordinate.setPointID(point.getPointID());
-            locationCoordinate.setMeanedReadings(1);//we are only dealing with a single point
-            int fixed = 0;
-            if (nmeaData.isFixed())fixed++;
-            locationCoordinate.setFixedReadings(fixed);
-            locationCoordinate.setLatitude(nmeaData.getLatitude());
-            locationCoordinate.setLongitude(nmeaData.getLongitude());
-            locationCoordinate.setElevation(nmeaData.getOrthometricElevation());
-            locationCoordinate.setLatitudeStdDev(0);
-            locationCoordinate.setLongitudeStdDev(0);
-            locationCoordinate.setElevationStdDev(0);
-            locationCoordinate.setHrms(1);
-            locationCoordinate.setVrms(1);
-        }
-        mLastMarkerAdded.setTag(locationCoordinate);
+        mLastMarkerAdded.setTag(meanCoordinate);
         mLastMarkerAdded.showInfoWindow();
 
 
         //step 8 Change screen focus to this location
-        setFocus(locationCoordinate.getLatitude(), locationCoordinate.getLongitude());
+        setFocus(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
 
 
 
         //step 9 change the flags to indicating the meaning is over
-        isMeanInProgress   = false;
-        isLastPointInMean  = false;
-        isFirstPointInMean = false;
-        mRawReadings       = 0;
-        mFixedReadings     = 0;
-        mMeanTime          = 0;
-
+        initializeMeanToken(mMeanToken);
 
         //step 10 reset variables in preparation for next meaning process
         mLastMarkerAdded    = null;
-        mMeanCoordinateList = null;
+
     }
 
     private void handleMapTouch(LatLng latLng){
-        if (isMeanInProgress) return;
+        if (isMeanInProgress()) return;
         setFocus(latLng);
         getMarkerByFocus();//It sets the PointID as a side effect
 
@@ -1867,10 +1860,16 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             point = points.get(position);
 
             //step 3 Create a Marker
-            coordinateWGS84 = makeNewMarkerFromPoint(project, point);
+            coordinateWGS84 = getCoordinateFromPoint(project, point);
+            LatLng mapLocation = new LatLng(coordinateWGS84.getLatitude(), coordinateWGS84.getLongitude());
+
+            String markerName = String.valueOf(point.getPointID());
+
+            mLastMarkerAdded = makeNewMarker(mapLocation, markerName, markerColorFinal);
 
             //Step 4 Create a tag
-            coordinateTag = createTag(point, coordinateWGS84);
+            coordinateTag = new GBCoordinateMean(coordinateWGS84);
+            coordinateTag.setPointID(point.getPointID());
             mLastMarkerAdded.setTag(coordinateTag);
 
 
@@ -1890,13 +1889,13 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         View v = getView();
         if ((point != null) && (v != null)){
             try {
-                TextView currentPointIDField = (TextView) v.findViewById(R.id.pointIDField);
-                TextView currentHeightField = (EditText) v.findViewById(R.id.currentHeightField);
+                TextView currentPointIDField     = (TextView) v.findViewById(R.id.pointIDField);
+                TextView currentHeightField      = (EditText) v.findViewById(R.id.currentHeightField);
                 TextView currentFeatureCodeField = (EditText) v.findViewById(R.id.currentFeatureCodeField);
 
-                currentPointIDField.setText(String.valueOf(point.getPointID()));
+                currentPointIDField    .setText(String.valueOf(point.getPointID()));
                 currentFeatureCodeField.setText(point.getPointFeatureCode());
-                currentHeightField.setText(String.valueOf(point.getHeight()));
+                currentHeightField     .setText(String.valueOf(point.getHeight()));
             } catch (NullPointerException e){
                 GBUtilities.getInstance().showStatus(getActivity(),  R.string.unable_to_update_ui);
 
@@ -1932,7 +1931,32 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         }
     }
 
-     /* **********************************************************/
+
+    /* **********************************************************/
+    /* ****    Utilities to communicate with UI            ******/
+    /* **********************************************************/
+    private void updateUIwPointID(long pointID){
+        View v = getView();
+        if (v != null) {
+            TextView currentPointIDField = (TextView) v.findViewById(R.id.pointIDField);
+            currentPointIDField.setText(String.valueOf(pointID));
+        }
+    }
+
+    private String getHeightFromUI(){
+
+        View v = getView();
+        if (v == null)return "";
+
+        TextView currentHeightField = (EditText)v.findViewById(R.id.currentHeightField);
+        return currentHeightField.getText().toString();
+
+    }
+
+
+
+
+   /* **********************************************************/
     /* ****     AlertDialog Utilities                      ******/
     /* **********************************************************/
 
@@ -2258,12 +2282,12 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         }
 
         //update the quality fields
-        point.setHdop(mHdop);
-        point.setVdop(mVdop);
-        point.setTdop(mTdop);
-        point.setPdop(mPdop);
-        point.setHrms(mHrms);
-        point.setVrms(mVrms);
+        point.setHdop(mPointQualityToken.getHdop());
+        point.setVdop(mPointQualityToken.getVdop());
+        point.setTdop(mPointQualityToken.getTdop());
+        point.setPdop(mPointQualityToken.getPdop());
+        point.setHrms(mPointQualityToken.getHrms());
+        point.setVrms(mPointQualityToken.getVrms());
 
         return point;
 
@@ -2294,136 +2318,56 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             point.setCoordinate(newUtmCoordinate);
             point.setHasACoordinateID(newUtmCoordinate.getCoordinateID());
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
+            // TODO: 6/20/2017 need zone for creation of spcs coordinate
+            /*
             GBCoordinateSPCS newSpcsCoordinate = new GBCoordinateSPCS(wsg84Coordinate);
             newSpcsCoordinate.setPointID(point.getPointID());
             point.setCoordinate(newSpcsCoordinate);
             point.setHasACoordinateID(newSpcsCoordinate.getCoordinateID());
+            */
         } else {
             throw new RuntimeException("Something wrong with Coordinate type in Collect Points");
         }
     }
 
-    //called from the nmea event handler when mean is in progress
-    private GBCoordinateMean calculateMeanWGS(GBNmea nmeaData,
-                                            ArrayList<GBCoordinateWGS84> coordinateList){
-
-        //A mean coordinate for this NMEA reading
-        GBCoordinateMean meanCoordinate = new GBCoordinateMean();
-        // TODO: 1/21/2017 update the meanCoordinate with quality / fixed data from the nmeaData
-
-        //A mean coordinate for the Standard Deviation/RMS
-        GBCoordinateMean residuals      = new GBCoordinateMean();
-        int size= coordinateList.size();
-
-        double tempMeanD;
-
-        //update the mean coordinate with satellites and readings numbers
-        meanCoordinate.setSatellites(nmeaData.getSatellites());
-        meanCoordinate.setRawReadings  (mRawReadings);
-        meanCoordinate.setFixedReadings(mFixedReadings);
-
-        meanCoordinate.setMeanedReadings(size);
-
-        //assure that we have enough readings to calculate mean
-        if (size > 1){
-            //calculate the mean
-            //Step one - Sum of each member in the list
-            for (int i = 0; i<size; i++){
-                tempMeanD = meanCoordinate.getLatitude()  + coordinateList.get(i).getLatitude();
-                meanCoordinate.setLatitude(tempMeanD);
-
-                tempMeanD = meanCoordinate.getLongitude() + coordinateList.get(i).getLongitude();
-                meanCoordinate.setLongitude(tempMeanD);
-
-                tempMeanD = meanCoordinate.getElevation() + coordinateList.get(i).getElevation();
-                meanCoordinate.setElevation(tempMeanD);
-                tempMeanD = meanCoordinate.getGeoid()     + coordinateList.get(i).getGeoid();
-                meanCoordinate.setGeoid(tempMeanD);
-
-            }
-            //Step two: divide by the number in the list
-            double sizeD = (double)size;
-
-            meanCoordinate.setLatitude (meanCoordinate.getLatitude()  / sizeD);
-
-            meanCoordinate.setLongitude(meanCoordinate.getLongitude() / sizeD);
-
-            meanCoordinate.setElevation(meanCoordinate.getElevation() / sizeD);
-
-            meanCoordinate.setGeoid    (meanCoordinate.getGeoid()     / sizeD);
-
-            //calculate the variance of the squared residuals
-            //Step three: residual = sum( (mean - reading) squared  )
-            for (int i = 0; i<size; i++){
-
-                tempMeanD = meanCoordinate.getLatitude()  - coordinateList.get(i).getLatitude();
-                tempMeanD = tempMeanD * tempMeanD;
-                residuals.setLatitude (residuals.getLatitude()  + tempMeanD);
-
-                tempMeanD = meanCoordinate.getLongitude() - coordinateList.get(i).getLongitude();
-                tempMeanD = tempMeanD * tempMeanD;
-                residuals.setLongitude(residuals.getLongitude() + tempMeanD);
-
-                tempMeanD = meanCoordinate.getElevation() - coordinateList.get(i).getElevation();
-                tempMeanD = tempMeanD * tempMeanD;
-                residuals.setElevation(residuals.getElevation() + tempMeanD);
-
-                tempMeanD = meanCoordinate.getGeoid()     - coordinateList.get(i).getGeoid();
-                tempMeanD = tempMeanD * tempMeanD;
-                residuals.setGeoid    (residuals.getGeoid()    + tempMeanD);
-            }
 
 
-            //step 3.5 mean of residuals = sum / # of readings
-            //Step 4: sqrt of (mean of the residuals)
+    private GBCoordinateWGS84 getCoordinateFromPoint(GBProject project, GBPoint point){
 
-            //Treat readings as sample of a larger population
-            //so take sample mean (i.e. divide by size - 1)
-            sizeD = sizeD - 1.0;
-            meanCoordinate.setLatitudeStdDev  (Math.sqrt(residuals.getLatitude()  / sizeD));
-            meanCoordinate.setLongitudeStdDev (Math.sqrt(residuals.getLongitude() / sizeD));
-            meanCoordinate.setElevationStdDev (Math.sqrt(residuals.getElevation() / sizeD));
+        GBCoordinateWGS84 coordinateWGS84;
+        CharSequence coordinateType = project.getProjectCoordinateType();
 
-            return meanCoordinate;
+        if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)){
+            coordinateWGS84 = (GBCoordinateWGS84) point.getCoordinate();
 
+        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83)){
+            GBCoordinateNAD83 coordinateNAD83 = (GBCoordinateNAD83) point.getCoordinate();
+            coordinateWGS84 = new GBCoordinateWGS84(coordinateNAD83);
+
+        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
+            GBCoordinateUTM coordinateUTM = (GBCoordinateUTM) point.getCoordinate();
+            coordinateWGS84 = new GBCoordinateWGS84(coordinateUTM);
+
+        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
+            GBCoordinateSPCS coordinateSPCS = (GBCoordinateSPCS) point.getCoordinate();
+            coordinateWGS84 = new GBCoordinateWGS84(coordinateSPCS);
+        } else {
+            throw new RuntimeException("Something wrong with Coordinate type in Collect Points");
         }
-        return null; //
-    }
 
-    private GBCoordinateWGS84 getWgsFromNmea(GBNmea nmeaData){
-        GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(nmeaData.getLatitude(),
-                nmeaData.getLongitude());
 
-        wgsCoordinate.setElevation(nmeaData.getOrthometricElevation());
-        wgsCoordinate.setGeoid(nmeaData.getGeoid());
-
-        wgsCoordinate.setProjectID(GBUtilities.getInstance().getOpenProjectID());
-        wgsCoordinate.setTime(System.currentTimeMillis());
-        return wgsCoordinate;
+        return coordinateWGS84;
     }
 
 
-    private GBCoordinateWGS84 getWgsCoordinateFromMean(
-            GBCoordinateMean meanCoordinate){
 
-        GBCoordinateWGS84 wgs84Coordinate = new GBCoordinateWGS84(
-                meanCoordinate.getLatitude(),
-                meanCoordinate.getLongitude());
-
-        wgs84Coordinate.setElevation(meanCoordinate.getElevation());
-        wgs84Coordinate.setGeoid    (meanCoordinate.getGeoid());
-
-        wgs84Coordinate.setProjectID(GBUtilities.getInstance().getOpenProjectID());
-        wgs84Coordinate.setTime(System.currentTimeMillis());
-        return wgs84Coordinate;
-    }
 
 
     private GBNmea getNmeaFromTestData(){
 
         //Step 1 - Get Test data object
         GBTestLocationDataManager testLocationDataManager =
-                GBTestLocationDataManager.getInstance();
+                                                        GBTestLocationDataManager.getInstance();
         mTestData = testLocationDataManager.get(mTestDataCounter);
         mTestDataCounter++;
         if (mTestDataCounter >= mTestDataMax)mTestDataCounter = 0;
@@ -2521,7 +2465,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         updateScaleFactor();
     }
 
-    private LatLng makeNewMarkerFromLatLng(LatLng newPoint, String markerName, float markerColor){
+    private Marker makeNewMarker(LatLng newPoint, String markerName, float markerColor){
 
         //update the maps
         MarkerOptions newPointMarkerOptions =
@@ -2529,64 +2473,20 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                                        .title(markerName)
                                        .draggable(false)
                                        .icon(BitmapDescriptorFactory.defaultMarker(markerColor));
-        mLastMarkerAdded = mMap.addMarker(newPointMarkerOptions);
-        mMarkers.add(mLastMarkerAdded);
-        mZoomMarkers.add(mLastMarkerAdded);
+        Marker newMarker = mMap.addMarker(newPointMarkerOptions);
+        mMarkers.add(newMarker);
+        mZoomMarkers.add(newMarker);
 
-        //CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
         //get zoom level from the mpa
         float mapZoom = mMap.getCameraPosition().zoom;
 
         CameraUpdate myZoom = CameraUpdateFactory.newLatLngZoom(newPoint, mapZoom);
         updateCamera(myZoom);
 
-        return newPoint;
+        return newMarker;
     }
 
-    private LatLng makeNewMarkerFromNmea(GBNmea nmeaData, String markerName, float markerColor){
 
-        LatLng newPoint = new LatLng(nmeaData.getLatitude(), nmeaData.getLongitude());
-        return makeNewMarkerFromLatLng(newPoint, markerName, markerColor);
-    }
-
-    private GBCoordinateWGS84 makeNewMarkerFromPoint(GBProject project, GBPoint point){
-
-        GBCoordinateWGS84 coordinateWGS84;
-        CharSequence coordinateType = project.getProjectCoordinateType();
-
-        if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)){
-            coordinateWGS84 = (GBCoordinateWGS84) point.getCoordinate();
-
-        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83)){
-            GBCoordinateNAD83 coordinateNAD83 = (GBCoordinateNAD83) point.getCoordinate();
-            coordinateWGS84 = new GBCoordinateWGS84(coordinateNAD83);
-
-        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
-            GBCoordinateUTM coordinateUTM = (GBCoordinateUTM) point.getCoordinate();
-            coordinateWGS84 = new GBCoordinateWGS84(coordinateUTM);
-
-        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
-            GBCoordinateSPCS coordinateSPCS = (GBCoordinateSPCS) point.getCoordinate();
-            coordinateWGS84 = new GBCoordinateWGS84(coordinateSPCS);
-        } else {
-            throw new RuntimeException("Something wrong with Coordinate type in Collect Points");
-        }
-
-        //update the maps
-        LatLng newPoint = new LatLng(coordinateWGS84.getLatitude(), coordinateWGS84.getLongitude());
-
-        String markerName = String.valueOf(point.getPointID());
-        MarkerOptions newPointMarkerOptions = new MarkerOptions().position(newPoint)
-                                                                 .title(markerName)
-                                                                 .draggable(false)
-                                                                 .icon(
-                                           BitmapDescriptorFactory.defaultMarker(markerColorFinal));
-        mLastMarkerAdded = mMap.addMarker(newPointMarkerOptions);
-        mMarkers.add(mLastMarkerAdded);
-        mZoomMarkers.add(mLastMarkerAdded);
-
-        return coordinateWGS84;
-    }
 
     private double getProximity(){
         // TODO: 12/28/2016 calculate proximity based on zoom level
@@ -2594,25 +2494,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         return 50d;
     }
 
-    private GBCoordinateMean createTag(GBPoint point,
-                                            GBCoordinateWGS84 coordinateWGS84){
-        GBCoordinateMean coordinateTag;
-        //we weren't meaning, so we need to create this information
-        coordinateTag = new GBCoordinateMean();
-        coordinateTag.setPointID(point.getPointID());
-        coordinateTag.setMeanedReadings(1);//we are only dealing with a single point
-        coordinateTag.setFixedReadings(1);
-        coordinateTag.setLatitude(coordinateWGS84.getLatitude());
-        coordinateTag.setLongitude(coordinateWGS84.getLongitude());
-        coordinateTag.setElevation(coordinateWGS84.getElevation());
-        coordinateTag.setLatitudeStdDev(0);
-        coordinateTag.setLongitudeStdDev(0);
-        coordinateTag.setElevationStdDev(0);
-        coordinateTag.setHrms(1);
-        coordinateTag.setVrms(1);
-
-        return coordinateTag;
-    }
 
     private void addPointToLine(LatLng newPoint){
         //add the new point to the line

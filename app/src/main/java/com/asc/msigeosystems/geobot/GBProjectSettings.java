@@ -274,6 +274,8 @@ class GBProjectSettings {
     void setFCTimeStamp(boolean fcTimeStamp) {mFCTimeStamp = fcTimeStamp;}
 
     int getMeaningMethod() {  return mMeaningMethod; }
+    boolean isMeanByNumber () {return (getMeaningMethod() == sMeanByNumber);}
+    boolean isMeanByTime   () {return (getMeaningMethod() == sMeanByTime);}
     void setMeaningMethod(int meaningMethod) { mMeaningMethod = meaningMethod; }
 
     int getMeaningNumber() { return mMeaningNumber;}

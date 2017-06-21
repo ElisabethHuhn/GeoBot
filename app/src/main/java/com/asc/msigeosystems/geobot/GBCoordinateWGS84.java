@@ -29,6 +29,8 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeWGS84;
     private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassWGS84;
 
+    static final String sDatum = "WGS84";
+
 
 
     /* ******
@@ -69,6 +71,33 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     GBCoordinateWGS84(GBCoordinateSPCS coordinateSPCS){
         // TODO: 12/27/2016 finish conversion from SPCS to WGS 
         super.initializeDefaultVariables();
+    }
+
+    GBCoordinateWGS84(GBNmea nmeaData){
+        //GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(nmeaData.getLatitude(),
+                                                                //nmeaData.getLongitude());
+        initializeDefaultVariables();
+        latLongDD(nmeaData.getLatitude(), nmeaData.getLongitude());
+
+        setElevation(nmeaData.getOrthometricElevation());
+        setGeoid(nmeaData.getGeoid());
+
+        setProjectID(GBUtilities.getInstance().getOpenProjectID());
+        setTime(System.currentTimeMillis());
+    }
+
+    GBCoordinateWGS84(GBCoordinateMean meanCoordinate){
+       // GBCoordinateWGS84 wgs84Coordinate = new GBCoordinateWGS84(meanCoordinate.getLatitude(),
+                                                                  //meanCoordinate.getLongitude());
+        initializeDefaultVariables();
+        latLongDD(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
+
+
+        setElevation(meanCoordinate.getElevation());
+        setGeoid    (meanCoordinate.getGeoid());
+
+        setProjectID(GBUtilities.getInstance().getOpenProjectID());
+        setTime(System.currentTimeMillis());
     }
 
     GBCoordinateWGS84(double latitude, double longitude) {
@@ -159,6 +188,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
 
         //initialize all variables common to EN coordinates
         super.initializeDefaultVariables();
+
 
         //initialize all variables from this level
 

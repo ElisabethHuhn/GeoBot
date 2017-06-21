@@ -1518,9 +1518,10 @@ public class GBPointEditFragment extends Fragment  {
         pointENElevationMetersInput.setText(String.valueOf(elevation));
         pointENElevationFeetInput.setText(String.valueOf(coordinate.getElevationFeet()));
 
+        // TODO: 6/20/2017 fix this for UTM vs SPCS coordinates
         pointZoneInput.setText(String.valueOf(coordinate.getZone()));
-        pointLatbandInput.setText(String.valueOf(coordinate.getLatBand()));
-        pointHemisphereInput.setText(String.valueOf(coordinate.getHemisphere()));
+       // pointLatbandInput.setText(String.valueOf(coordinate.getLatBand()));
+        //pointHemisphereInput.setText(String.valueOf(coordinate.getHemisphere()));
 
         pointDatumInput.setText(String.valueOf(coordinate.getDatum()));
         pointConvergenceInput.setText(String.valueOf(coordinate.getConvergence()));
@@ -1694,6 +1695,8 @@ public class GBPointEditFragment extends Fragment  {
             returnCode = updateENCoordinateFromUI(v, point, newCoordinate);
 
         } else { //GBCoordinate.sCoordinateTypeClassSPCS
+            // TODO: 6/20/2017 have to know zone to create a new SPCS coordinate properly
+
             GBCoordinateSPCS newCoordinate = new GBCoordinateSPCS();
             returnCode = updateENCoordinateFromUI(v, point, newCoordinate);
         }
@@ -1880,8 +1883,9 @@ public class GBPointEditFragment extends Fragment  {
             coordinate.setElevation(Double.parseDouble(eleString));
 
             coordinate.setZone(Integer.parseInt(zoneString));
-            coordinate.setLatBand((latBandString.charAt(0)));
-            coordinate.setHemisphere((hemisphereString).charAt(0));
+            // TODO: 6/20/2017 fix this for UTM vs SPCS coordinates
+            //coordinate.setLatBand((latBandString.charAt(0)));
+            //coordinate.setHemisphere((hemisphereString).charAt(0));
             coordinate.setDatum(datumString);
             coordinate.setConvergence(Double.parseDouble(convergenceString));
             coordinate.setScale(Double.parseDouble(scaleString));

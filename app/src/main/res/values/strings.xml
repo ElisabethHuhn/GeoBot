@@ -6,6 +6,10 @@
     <string name="gps_app_name"             >GPS Skyplot</string>
     <string name="title_activity_gb_collect_points_maps">Map</string>
 
+    <!-- String Format -->
+    <string name="double_value"         >%d</string>
+    <string name="point_id_fillin"      >Point ID = %d</string>
+
 
     <string name="unused_button_label"  > </string>
     <string name="no_points_in_project" >No Points in Project</string>
@@ -306,7 +310,7 @@
     <string name="scan_button_label"            >Scan</string>
     <string name="level_button_label"           >Level</string>
     <string name="current_file_label"           >Current File:     %s</string>
-    <string name="null_type_found"              >Null type found</string>
+    <string name="null_type_found"              >Null NMEA type found</string>
     <string name="marker_touched"               >Marker Touched</string>
     <string name="unable_to_update_ui"          >Unable to update UI</string>
     <string name="scale_factor_msg"             >SF: %.0f meters per inch</string>
@@ -341,6 +345,9 @@
     <string name="ave_position_label"     >Average Position</string>
     <string name="show_all_points_label"  >Show All Points</string>
     <string name="enter_notes"            >Enter Notes</string>
+
+    <string name="start_mean"             >Start Meaning Process</string>
+    <string name="cancel_mean"            >Cancel Meaning Process</string>
 
     <!-- Information Window on markers for collect points -->
     <string name="iwcp_number_raw"        ># Raw Readings: </string>
@@ -675,11 +682,12 @@
     <string name="spc_easting_feet_label"   >Easting Feet</string>
     <string name="spc_northing_feet_label"  >Northing Feet</string>
     <string name="spc_hemisphere_label"     >Hemi </string>
-    <string name="spc_latband_label"        >Latband </string>
+    <string name="spc_state_label"          >State </string>
     <string name="spc_convergence_label"    >Convergence </string>
     <string name="spc_scale_factor_label"   >Scale Factor </string>
     <string name="spc_meters"               >in Meters:</string>
     <string name="spc_feet"                 >in Feet:</string>
+    <string name="spc_zone_error"           >SPCS Zone not found</string>
 
     <string name="coord_label">Coord: </string>
     <string name="zone_label">Zone </string>
@@ -695,6 +703,9 @@
     <string name="coord_scale_factor_label">Scale Factor </string>
     <string name="meters_label">in Meters:</string>
     <string name="feet_label">in Feet:</string>
+
+    <!-- Convert -->
+    <string name="coordinate_conversion"    >Coordinate Conversion</string>
 
     <!-- Edit View Fields (initial text displayed) -->
     <string name="latitude_input_label">Enter Latitude decimal number  </string>
@@ -719,7 +730,7 @@
 
     <string name="mean_start_time_label">Start time:</string>
     <string name="mean_end_time_label">End time:</string>
-    <string name="mean_number_of_points_label"># readings:</string>
+    <string name="mean_number_of_points_label"># read</string>
     <string name="mean_standard_deviation">SDev:</string>
     <string name="mean_lat_sigma">Lat SDev:</string>
     <string name="mean_long_sigma">Long SDev:</string>
@@ -733,17 +744,17 @@
 
     <string name="coordinate_type_button">Change Type</string>
     <string name="type_decimal_degrees_label">Decimal Degrees</string>
-    <string name="type_degrees_label">Degrees</string>
-    <string name="type_minutes_label">Minutes</string>
-    <string name="type_seconds_label">Seconds</string>
+    <string name="type_degrees_label">Deg</string>
+    <string name="type_minutes_label">Min</string>
+    <string name="type_seconds_label">Sec</string>
     <string name="type_elevation_feet_label">Elevation feet</string>
     <string name="type_elevation_meters_label">Elevation meters</string>
     <string name="type_geoid_height_feet_label">Geoid Height feet</string>
     <string name="type_geoid_height_meters_label">Geoid Height meters</string>
 
-    <string name="utm_integer_output_prompt">Meter Precision UTM</string>
-    <string name="utm_nanometer_output_prompt">Nanometer Precision UTM</string>
-    <string name="utm_so_output_prompt">Foot Precision UTM</string>
+    <string name="utm_integer_output_prompt">Meter Precision UTM  (from IBM)</string>
+    <string name="utm_nanometer_output_prompt">Nanometer Precision UTM (GeoBot)</string>
+    <string name="utm_so_output_prompt">Foot Precision UTM (from Stack Overflow)</string>
 
     <!--Input error Message-->
     <string name="input_double_format_error_string">Not in correct decimal Format</string>

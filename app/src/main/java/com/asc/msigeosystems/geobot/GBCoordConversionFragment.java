@@ -183,6 +183,7 @@ public class GBCoordConversionFragment extends Fragment {
             // supposed nanometer accuracy
             inputsValid = convertKarney();
         }
+        updateSPCSUI(mCoordinateWGS84);
 
     }
 
@@ -292,6 +293,105 @@ public class GBCoordConversionFragment extends Fragment {
         }
     }
 
+    private void updateSPCSUI(GBCoordinateWGS84 coordinateWgs){
+        View v = getView();
+        if (v == null)return;
+        //need to ask for zone, then convert based on the zone
+        EditText spcZoneInput = (EditText)v.findViewById(R.id.spcZoneOutput);
+        String zoneString = spcZoneInput.getText().toString();
+        if (GBUtilities.getInstance().isEmpty(zoneString)){
+            spcZoneInput.setText(getString(R.string.spc_zone_error));
+            return;
+        }
+
+        int zone = Integer.valueOf(zoneString);
+
+        GBCoordinateSPCS spcsCoordinate = new GBCoordinateSPCS(coordinateWgs, zone);
+        if (spcsCoordinate.getZone() == GBUtilities.ID_DOES_NOT_EXIST){
+            spcZoneInput.setText(getString(R.string.spc_zone_error));
+            return;
+        }
+
+        TextView spcStateOutput          =  (TextView) v.findViewById(R.id.spcStateOutput);
+
+        if ((spcsCoordinate.getZone() == (int)GBUtilities.ID_DOES_NOT_EXIST) ||
+                (spcsCoordinate.getZone() != zone))    {
+            clearSPCSUI(v);
+            spcZoneInput            .setText(String.valueOf(spcsCoordinate.getZone()));
+            spcStateOutput         .setText(getString(R.string.spc_zone_error));
+            return;
+        }
+
+
+        //SPC
+        TextView spcEastingMetersOutput  =  (TextView) v.findViewById(R.id.spcEastingMetersOutput);
+        TextView spcNorthingMetersOutput =  (TextView) v.findViewById(R.id.spcNorthingMetersOutput);
+        TextView spcEastingFeetOutput    =  (TextView) v.findViewById(R.id.spcEastingFeetOutput);
+        TextView spcNorthingFeetOutput   =  (TextView) v.findViewById(R.id.spcNorthingFeetOutput);
+
+        TextView spcConvergenceOutput    =  (TextView) v.findViewById(R.id.spcConvergenceOutput);
+        TextView spcScaleFactorOutput    =  (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+
+
+        spcZoneInput            .setText(String.valueOf(spcsCoordinate.getZone()));
+        spcStateOutput         .setText(spcsCoordinate.getState());
+        spcEastingMetersOutput .setText(String.valueOf(doubleToUI(spcsCoordinate.getEasting())));
+
+        spcNorthingMetersOutput.setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthing())));
+        spcEastingFeetOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getEastingFeet())));
+        spcNorthingFeetOutput  .setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthingFeet())));
+        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergence())));
+
+        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScale())));
+
+
+    }
+
+    private String doubleToUI(double reading){
+        return String.valueOf(truncatePrecision(reading));
+    }
+    private String intToUI   (int reading)    {return String.valueOf(reading);}
+
+    //truncate digits of precision
+    private double truncatePrecision(double reading) {
+
+        BigDecimal bd = new BigDecimal(reading).
+                setScale(GBUtilities.sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+
+    private void clearSPCSUI(View v){
+
+
+
+        //SPC
+        TextView spcZoneOutput           =  (TextView) v.findViewById(R.id.spcZoneOutput);
+        TextView spcStateOutput          =  (TextView) v.findViewById(R.id.spcStateOutput);
+
+        TextView spcEastingMetersOutput  =  (TextView) v.findViewById(R.id.spcEastingMetersOutput);
+        TextView spcNorthingMetersOutput =  (TextView) v.findViewById(R.id.spcNorthingMetersOutput);
+        TextView spcEastingFeetOutput    =  (TextView) v.findViewById(R.id.spcEastingFeetOutput);
+        TextView spcNorthingFeetOutput   =  (TextView) v.findViewById(R.id.spcNorthingFeetOutput);
+
+        TextView spcConvergenceOutput    =  (TextView) v.findViewById(R.id.spcConvergenceOutput);
+        TextView spcScaleFactorOutput    =  (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+
+
+        spcZoneOutput          .setText("");
+        spcStateOutput         .setText("");
+        spcEastingMetersOutput .setText("");
+
+        spcNorthingMetersOutput.setText("");
+        spcEastingFeetOutput   .setText("");
+        spcNorthingFeetOutput  .setText("");
+        spcConvergenceOutput   .setText("");
+
+        spcScaleFactorOutput   .setText("");
+
+
+    }
+
 
     private void clearForm() {
         View v = getView();
@@ -344,6 +444,8 @@ public class GBCoordConversionFragment extends Fragment {
         utmNmNorthingFOutput. setText(R.string.utm_northing_label);
         setLatColorPos();
         setLongColorPos();
+
+        clearSPCSUI(v);
     }
 
     private void setLatColor(){

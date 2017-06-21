@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 /**
  * Created by Elisabeth Huhn on 6/13/2016.
@@ -36,7 +37,11 @@ public class GBUtilities {
     static final int sPicometerDigitsOfPrecision = 12;
 
     static final double sEquatorialRadiusA = 6378137.0; //equatorial radius in meters
+    static final double sSemiMajorRadius   = sEquatorialRadiusA;
     static final double sPolarRadiusB      = 6356752.314245; //polar semi axis
+    static final double sSemiMinorRadius   = sPolarRadiusB;
+
+
     //flatteningF = (equatorialRadiusA-polarRadiusB)/equatorialRadiusA;
     static final double sFlattening        = 0.0033528106811837;
 
@@ -330,6 +335,12 @@ public class GBUtilities {
 
     static boolean isEmpty(CharSequence str) {
         return (str == null || str.length() == 0);
+    }
+
+    DecimalFormat df = new DecimalFormat("#.##");
+    private String convertToFormat(double value){
+
+        return df.format(value);
     }
 
     //***********************************/

@@ -14,17 +14,91 @@ package com.asc.msigeosystems.geobot;
  */
 class GBCoordinateSPCS extends GBCoordinateEN {
 
-    //variables and setters/getters at super level
+    //+*******************************************************************/
+    //+**********      Static Constants                         **********/
+    //+*******************************************************************/
+
+    static final String sDatum = "SPCS";
 
     private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeSPCS;
     private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassSPCS;
 
-    //For now, just a dummy constructor:
+
+    static final double E0 = 2000000.0000; //meters Easting of projection and grid origion
+    static final double E0feet = 6561666.667; //E0 in feet
+    static final double Nb = 500000.0000;  //meters northing of the grid base
+    static final double Nbfeet = 1640416.667; //feet
+
+
+
+
+
+    private static final double L1 = 110950.2019;
+    private static final double L2 = 9.25072;
+    private static final double L3 = 5.64572;
+    private static final double L4 = 0.017374;
+    private static final double L5 = 0.0;
+
+    private static final double n = (
+                                    (GBUtilities.sSemiMajorRadius - GBUtilities.sSemiMinorRadius) /
+                                    (GBUtilities.sSemiMajorRadius + GBUtilities.sSemiMinorRadius));
+
+    private static final double radiusOfRectifyingSphere = (
+                                                    GBUtilities.sSemiMajorRadius *
+                                                    (1 - n) *
+                                                    (1 - (n*n)) *
+                                                    (1 + ((9*(n*n))/4) + ((225*(n*n*n*n))/64) ));
+
+    //+*******************************************************************/
+    //+**********Instance Variables, Setters & Getters          **********/
+    //+*******************************************************************/
+
+    private CharSequence mState;
+
+    CharSequence getState() {
+        return mState;
+    }
+    void setState(CharSequence state) {
+        mState = state;
+    }
+
+    //This method returns the type of the instance actually instantiated
+    @Override
+    CharSequence getCoordinateType() { return mThisCoordinateType; }
+    void         setCoordinateType(){
+        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
+    }
+
+
+    //This method returns the type of the instance as a string for UI display
+    @Override
+    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
+
+
+
+    //+*******************************************************************/
+    //+**********     Constructors                              **********/
+    //+*******************************************************************/
 
     GBCoordinateSPCS() {super.initializeDefaultVariables(); }
 
-    GBCoordinateSPCS(GBCoordinateWGS84 wsg84Coordinate){
+    GBCoordinateSPCS(GBCoordinateWGS84 wsg84Coordinate, int zone){
         // TODO: 12/14/2016 complete conversion from WSG84 to SPCS
+
+        initializeDefaultVariables();
+
+        GBSpcsConstants constants = new GBSpcsConstants(zone);
+        int spcsZone = constants.getZone();
+        if (spcsZone == (int)GBUtilities.ID_DOES_NOT_EXIST) return;
+
+        super.setZone(spcsZone);
+        setState(constants.getState());
+
+        if (spcsZone == GBSpcsConstants.sLAMBERT){
+            convertWithLambert(wsg84Coordinate, constants);
+        } else {
+            convertWithMercator(wsg84Coordinate, constants);
+        }
     }
 
 /*-**************************************************************
@@ -56,38 +130,6 @@ class GBCoordinateSPCS extends GBCoordinateEN {
 
  ****************************************************************/
 
-    /*-******
-     *
-     * Setters and Getters
-     *
-     **********/
-
-    //This method returns the type of the instance actually instantiated
-    @Override
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-    void         setCoordinateType(){
-        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
-    }
-
-
-    //This method returns the type of the instance as a string for UI display
-    @Override
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
-
-
-    /*-******
-     *
-     * Static methods
-     *
-     **********/
-
-
-    /*-******
-     *
-     * Member methods
-     *
-     **********/
 
 
     protected void initializeDefaultVariables(){
@@ -99,27 +141,19 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         super.initializeDefaultVariables();
 
         //initialize all variables from this level
+        mThisCoordinateType  = sCoordinateTypeSPCS;
+        mThisCoordinateClass = sCoordinateTypeClassSPCS;
+
 
     }
 
 
-/*-**************************************************************
- private void setWgsConstants() {
- mEquatorialRadiusA = Prism4DCoordinateWGS84.sEquatorialRadiusA;
- mPolarRadiusB      = Prism4DCoordinateWGS84.sPolarRadiusB;
- }
 
- private void setNadConstants() {
- mEquatorialRadiusA = Prism4DCoordinateNAD83.sEquatorialRadiusA;
- mPolarRadiusB      = Prism4DCoordinateNAD83.sPolarRadiusB;
- }
+    //+*******************************************************************/
+    //+**********     Instance Methods                          **********/
+    //+*******************************************************************/
 
- ****************************************************************/
 
-    static final double E0 = 2000000.0000; //meters Easting of projection and grid origion
-    static final double E0feet = 6561666.667; //E0 in feet
-    static final double Nb = 500000.0000;  //meters northing of the grid base
-    static final double Nbfeet = 1640416.667; //feet
 
     private void someFunctions(double B, double L){ //B = Latitude, L = Longitude
 
@@ -273,5 +307,142 @@ class GBCoordinateSPCS extends GBCoordinateEN {
 
 
     }
+
+    private void convertWithLambert(GBCoordinateWGS84 coordinateWGS84,
+                                    GBSpcsConstants   constants){
+        //Convert degrees to radians (radians = degrees * pi/180)
+        double latAts  = coordinateWGS84.getLatitude()  * (Math.PI / 180.);
+        double latAtcp = constants.getCentralParallel() * (Math.PI / 180.);
+
+        double lngAts  = coordinateWGS84.getLongitude() * (Math.PI / 180.);
+        double lngAtcm = constants.getCentralMeridian() * (Math.PI / 180.);
+
+        double deltaLatitude = latAts - latAtcp;
+
+        double u = L1 * deltaLatitude +
+                   L2 * deltaLatitude * deltaLatitude +
+                   L3 * deltaLatitude * deltaLatitude * deltaLatitude +
+                   L4 * deltaLatitude * deltaLatitude * deltaLatitude * deltaLatitude;
+
+        double RMappingRadiusAtStation = constants.getMappingRadiusAtLat() - u;
+
+        double deltaLng = lngAtcm - lngAts;
+        double sincp    = Math.sin(latAtcp);
+
+        double convergenceAngle = deltaLng * sincp;
+
+        double sinCA = Math.sin(convergenceAngle);
+        double E1 = RMappingRadiusAtStation * sinCA;
+
+        double easting = E1 + constants.getFalseEasting();
+
+        double tanCA = Math.tan(convergenceAngle / 2.);
+        double N1 = u + (E1 * tanCA);
+
+        double northing = N1 + constants.getFalseNorthing();
+
+        double F1 = .999948401424;
+        double F2 = 1.23188E-14;
+        // TODO: 6/20/2017 I have no idea what F3 is, it was wrong in the spreadsheet and not mentioned in the document
+        double F3 = 4.54E-22;
+
+        double u2 = u*u;
+        double u3 = u*u2;
+        double scaleFactor = F1 + (F2 * (u*u)) + (F3 * u3);
+
+        super.setNorthing(northing);
+        super.setEasting(easting);
+        super.setScale(scaleFactor);
+        super.setConvergence(convergenceAngle);
+
+    }
+
+
+    private void convertWithMercator(GBCoordinateWGS84 coordinateWGS84,
+                                    GBSpcsConstants constants){
+
+        //Convert degrees to radians (radians = degrees * pi/180)
+        double latAts  = coordinateWGS84.getLatitude()  * (Math.PI / 180);
+        double latAtcp = constants.getCentralParallel() * (Math.PI / 180);
+
+        double lngAts  = coordinateWGS84.getLongitude() * (Math.PI / 180);
+        double lngAtcm = constants.getCentralMeridian() * (Math.PI / 180);
+
+        double rectifyingLatitudeAtCP = rectifyingLatitude(latAtcp, constants);
+
+        double rectifyingLatitudeAtst = rectifyingLatitude(latAts,  constants);
+
+        double cosLat = Math.cos(latAts);
+        double L = (lngAts - lngAtcm) * cosLat;
+
+        double meridionalDistanceCp = meridionalDistance(rectifyingLatitudeAtCP, constants);
+        double meridionalDistanceSt = meridionalDistance(rectifyingLatitudeAtst, constants);
+
+        double sinLat  = Math.sin(latAts);
+        double sin2Lat = sinLat * sinLat;
+        double mappingRadiusSt = ((constants.getGridScaleFactor() * GBUtilities.sSemiMajorRadius) /
+                                  ( Math.sqrt(1 - (constants.getEccentricity2() * sin2Lat))));
+
+        double tanLat = Math.tan(latAts);
+        double tan2Lat = tanLat * tanLat;
+        double tan4Lat = (tan2Lat * tan2Lat);
+        double tan6Lat = tan4Lat * tan2Lat;
+        double n2      = n*n;
+        double n4      = n2 * n2;
+
+        //A4 does not look right. I bet it is 4*tan2Lat NOT 4*n2
+        double A1 = -mappingRadiusSt;
+        double A2 = (1./2.)    * ( mappingRadiusSt * tanLat);
+        double A3 = (1./6.)    * ( 1. -    tan2Lat       +            n2 );
+        double A4 = (1./12.)   * ( 5. -     tan2Lat      +           (n2 * (9. +   (4.*n2))));
+        double A5 = (1./120.)  * ( 5. -  (18. * tan2Lat) + tan4Lat + (n2 * (14. -  (58. * tan2Lat))));
+        double A6 = (1./360.)  * ((61. - (58. * tan2Lat) + tan4Lat + (n2 * (270. - (330. * tan2Lat)))));
+        double A7 = (1./5040.) * (61. - (479. * tan2Lat) + (179. * tan4Lat) + tan6Lat);
+
+        double L2 = L * L;
+
+        double northing = ( (meridionalDistanceSt - meridionalDistanceCp) +
+                            (constants.getFalseNorthing())                +
+                            (A2 * L2 * ( 1. + (L2 *(A4 + (A6*L2))) )));
+
+        double easting = ( constants.getFalseEasting() + A1 +
+                        (L * (1. + (L2 * (A3 + (L2 * (A5 + (A7 * L2))))))));
+
+        double F2 = n2 / 2.;
+        // TODO: 6/20/2017 I am just guessing what F4 is, it is not in the documentation
+        double F4 = F2 * F2;
+        double gridScaleFactorAtSt = (constants.getGridScaleFactor() *
+                                                                    (1. + ((F2 * L2)* (1. + F4*L2) )));
+
+        double C1 = -tanLat;
+        double C3 = (1. + (3.*n2) + ((2./3.)*n4));
+        double C5 = 2. - (tan2Lat/15.);
+        double convergenceAngle = (C1*L) * (1. + (L2*(C3 + (C5*L2))));
+
+        super.setNorthing(northing);
+        super.setEasting(easting);
+        super.setScale(gridScaleFactorAtSt);
+        super.setConvergence(convergenceAngle);
+
+    }
+
+    private double rectifyingLatitude(double lat, GBSpcsConstants constants){
+        double sinLat = Math.sin(lat);
+        double cosLat = Math.cos(lat);
+        double cos2Lat = cosLat * cosLat;
+        double cos4Lat = cos2Lat * cos2Lat;
+        double cos6Lat = cos2Lat * cos4Lat;
+
+        return (lat + ((sinLat*cosLat) * (constants.getGPCuo()              +
+                                         (constants.getGPCu2() * cos2Lat)   +
+                                         (constants.getGPCu4() * cos4Lat)   +
+                                         (constants.getGPCu6() * cos6Lat))));
+
+    }
+
+    private double meridionalDistance(double rectifyingLatitude, GBSpcsConstants constants){
+        return constants.getGridScaleFactor() * rectifyingLatitude * radiusOfRectifyingSphere;
+    }
+
 
 }

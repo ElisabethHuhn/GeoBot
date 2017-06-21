@@ -251,7 +251,7 @@ public void onNmeaReceived(long timestamp, String nmea) {
             //save the raw data
             //get the nmea container
             GBNmeaManager nmeaManager = GBNmeaManager.getInstance();
-            nmeaManager.add(mNmeaData);
+            //nmeaManager.add(mNmeaData);
         }
 
 

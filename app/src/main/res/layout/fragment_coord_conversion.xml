@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
 
-            android:paddingBottom="20dp"
+            android:paddingBottom="10dp"
             >
 
             <!-- Latitude Prompt -->
@@ -34,9 +34,7 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="end"
 
-                android:paddingBottom="5dp"
-
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
                 />
 
@@ -46,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_gravity="center_horizontal"
+                android:paddingBottom="5dp"
                 >
                 <TextView
                     android:text="@string/latitude_label"
@@ -82,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-
+                android:paddingBottom="5dp"
                 >
                 <!-- blank label to make fields line up on screen -->
                 <TextView
@@ -106,8 +105,6 @@
                     android:inputType="numberDecimal|numberSigned"
                     android:imeOptions="flagNoExtractUi"
 
-                    android:layout_margin="6dp"
-
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
                     />
@@ -123,8 +120,6 @@
 
                     android:inputType="numberDecimal|numberSigned"
                     android:imeOptions="flagNoExtractUi"
-
-                    android:layout_margin="6dp"
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -143,7 +138,6 @@
                     android:imeOptions="flagNoExtractUi"
 
                     android:layout_marginStart="6dp"
-                    android:layout_marginTop="6dp"
                     android:layout_marginEnd="16dp"
 
                     android:textColor="@color/colorTextBlack"
@@ -161,8 +155,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center_vertical"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             >
 
             <!-- Longitude Prompt -->
@@ -175,7 +169,7 @@
 
                 android:paddingBottom="5dp"
 
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
                 />
 
@@ -184,7 +178,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-
+                android:paddingBottom="5dp"
                 >
                 <TextView
                     android:text="@string/longitude_label"
@@ -221,6 +215,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:paddingBottom="5dp"
 
                 >
                 <!-- blank label to make fields line up on screen -->
@@ -245,7 +240,7 @@
 
                     android:inputType="numberDecimal|numberSigned"
                     android:imeOptions="flagNoExtractUi"
-                    android:layout_margin="6dp"
+
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -262,7 +257,6 @@
 
                     android:inputType="numberDecimal|numberSigned"
                     android:imeOptions="flagNoExtractUi"
-                    android:layout_margin="6dp"
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -281,7 +275,7 @@
                     android:imeOptions="flagNoExtractUi"
 
                     android:layout_marginStart="6dp"
-                    android:layout_marginTop="6dp"
+
                     android:layout_marginEnd="16dp"
 
 
@@ -298,7 +292,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="20dp"
+            android:paddingTop="10dp"
             >
             <!-- blank label to make fields line up on screen -->
             <TextView
@@ -355,8 +349,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center_vertical"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             >
 
             <!-- IBM UTM Source Code  -->
@@ -370,7 +364,7 @@
 
                 android:paddingBottom="5dp"
 
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
                 />
             <!-- UTM Integer Label and output field -->
@@ -378,7 +372,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingBottom="20dp"
+
                 >
                 <TextView
                     android:text="@string/utm_integer_label"
@@ -418,7 +412,7 @@
 
                 android:paddingBottom="5dp"
 
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
                 />
             <!-- UTM Stack Overflow Label and output field -->
@@ -464,9 +458,10 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
 
-                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
 
-                android:textColor="@color/colorWhite"
+
+                android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
                 />
             <!-- break out the fields individually -->
@@ -499,7 +494,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="25"
 
-                    android:layout_margin="6dp"
+
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -514,7 +509,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="25"
 
-                    android:layout_margin="6dp"
+
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -530,7 +525,7 @@
                     android:layout_weight="25"
 
                     android:layout_marginStart="6dp"
-                    android:layout_marginTop="6dp"
+
                     android:layout_marginEnd="16dp"
 
                     android:textColor="@color/colorTextBlack"
@@ -544,7 +539,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-
+                android:paddingTop="5dp"
                 >
 
                 <!-- blank label to make fields line up on screen -->
@@ -567,7 +562,7 @@
                     android:layout_weight="37.5"
 
 
-                    android:layout_margin="6dp"
+
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
@@ -584,7 +579,7 @@
 
 
                     android:layout_marginStart="6dp"
-                    android:layout_marginTop="6dp"
+
                     android:layout_marginEnd="16dp"
 
 
@@ -599,6 +594,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:paddingTop="5dp"
                 >
 
                 <!-- blank label to make fields line up on screen -->
@@ -622,9 +618,6 @@
                     android:layout_width="0dp"
                     android:layout_weight="37.5"
 
-
-                    android:layout_margin="6dp"
-
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorWhite"
                     />
@@ -640,7 +633,7 @@
 
 
                     android:layout_marginStart="6dp"
-                    android:layout_marginTop="6dp"
+
                     android:layout_marginEnd="16dp"
 
 
@@ -653,6 +646,268 @@
 
 
         </LinearLayout>
+
+
+
+        <!-- State Plane Coordinates -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+
+            android:paddingTop="10dp"
+            >
+
+            <!-- SPC Prompt -->
+            <TextView
+                android:text="@string/spc_prompt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+
+                android:paddingBottom="5dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!-- break out the fields individually -->
+            <!-- Zone Hemisphere Latband -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+                <!-- label -->
+                <TextView
+                    android:text="@string/spc_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- zone -->
+                <EditText
+                    android:id="@+id/spcZoneOutput"
+                    android:hint="@string/spc_zone_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:inputType="number"
+
+                    android:gravity="center"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+                <!-- State -->
+                <TextView
+                    android:id="@+id/spcStateOutput"
+                    android:hint="@string/spc_state_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+
+                    android:layout_marginEnd="8dp"
+
+                    android:gravity="center"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- Easting Meters/Feet -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                >
+
+                <!-- Easting -->
+                <TextView
+                    android:text="@string/spc_easting_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="30"
+                    android:gravity="end"
+
+                    android:layout_marginEnd="4dp"
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- Easting Meters -->
+                <TextView
+                    android:id="@+id/spcEastingMetersOutput"
+                    android:hint="@string/spc_easting_meters_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="70"
+
+                    android:gravity="center"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+                <!-- Easting Feet -->
+                <TextView
+                    android:id="@+id/spcEastingFeetOutput"
+                    android:hint="@string/spc_easting_feet_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:gravity="center"
+
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- Northing meters/Feet -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                >
+
+                <!-- Northing -->
+                <TextView
+                    android:text="@string/spc_northing_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="30"
+                    android:gravity="end"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <!-- Northing Meters -->
+                <TextView
+                    android:id="@+id/spcNorthingMetersOutput"
+                    android:hint="@string/spc_northing_meters_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="70"
+
+                    android:gravity="center"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+                <!-- Northing Feet -->
+                <TextView
+                    android:id="@+id/spcNorthingFeetOutput"
+                    android:hint="@string/spc_northing_feet_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+
+                    android:gravity="center"
+
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </LinearLayout>
+
+            <!-- Convergence / Scale Factor -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                >
+
+                <!-- Convergence -->
+                <TextView
+                    android:text="@string/spc_convergence_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/spcConvergenceOutput"
+                    android:hint="@string/spc_convergence_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+
+                    android:gravity="center"
+
+                    android:layout_marginEnd="4dp"
+
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+                <!-- Scale Factor -->
+                <TextView
+                    android:text="@string/spc_scale_factor_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:layout_marginEnd="4dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <TextView
+                    android:id="@+id/spcScaleFactorOutput"
+                    android:hint="@string/spc_scale_factor_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

@@ -196,16 +196,22 @@ class GBCoordinateManager {
                                             ((GBCoordinateEN)coordinate).getElevation());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_ZONE,
                                             ((GBCoordinateEN)coordinate).getZone());
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE,
-                                String.valueOf(((GBCoordinateEN)coordinate).getHemisphere()));
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND,
-                                String.valueOf(((GBCoordinateEN)coordinate).getLatBand()));
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_DATUM,
-                                            (String) ((GBCoordinateEN)coordinate).getDatum());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_CONVERGENCE,
                                             ((GBCoordinateEN)coordinate).getConvergence());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_SCALE,
                                             ((GBCoordinateEN)coordinate).getScale());
+
+            if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE,
+                        String.valueOf(((GBCoordinateUTM)coordinate).getHemisphere()));
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND,
+                        String.valueOf(((GBCoordinateUTM)coordinate).getLatBand()));
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_DATUM,
+                        (String) ((GBCoordinateEN)coordinate).getDatum());
+
+            } else {
+                // TODO: 6/20/2017 fill this in for SPCS
+            }
 
         }
         return cvCoordinate;
@@ -249,16 +255,16 @@ class GBCoordinateManager {
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeUTM) {
             GBCoordinateUTM coordinate = new GBCoordinateUTM();
-            getENCoordinateFromCursor( coordinate, cursor);
-            coordinate = (GBCoordinateUTM)getENCoordinateFromCursor(coordinate, cursor);
+            getUTMCoordinateFromCursor( coordinate, cursor);
+            coordinate = (GBCoordinateUTM)getUTMCoordinateFromCursor(coordinate, cursor);
 
             coordinate.setCoordinateType();
             return coordinate;
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeSPCS) {
             GBCoordinateSPCS coordinate = new GBCoordinateSPCS();
-            getENCoordinateFromCursor( coordinate, cursor);
-            coordinate = (GBCoordinateSPCS) getENCoordinateFromCursor(coordinate, cursor);
+            getSPSCCoordinateFromCursor( coordinate, cursor);
+            coordinate = (GBCoordinateSPCS) getSPSCCoordinateFromCursor(coordinate, cursor);
 
             coordinate.setCoordinateType();
             return coordinate;
@@ -375,13 +381,6 @@ class GBCoordinateManager {
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_ZONE)));
 
 
-        String latBand = cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND));
-        coordinate.setLatBand(latBand.charAt(0));
-
-        String hemisphere = cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE));
-        coordinate.setHemisphere(hemisphere.charAt(0)  ) ;
 
 
         coordinate.setDatum(cursor.getString(
@@ -395,10 +394,39 @@ class GBCoordinateManager {
         return coordinate;
     }
 
+    private GBCoordinateUTM getUTMCoordinateFromCursor(GBCoordinateUTM coordinate,
+                                                       Cursor cursor){
+
+        //get the supertype properties
+        getENCoordinateFromCursor((GBCoordinateEN)coordinate, cursor);
+
+        String latBand = cursor.getString(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND));
+        coordinate.setLatBand(latBand.charAt(0));
+
+        String hemisphere = cursor.getString(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE));
+        coordinate.setHemisphere(hemisphere.charAt(0)  ) ;
+
+        return coordinate;
+    }
+
+    private GBCoordinateSPCS getSPSCCoordinateFromCursor(GBCoordinateSPCS coordinate, Cursor cursor){
+        //get the supertype properties
+        getENCoordinateFromCursor((GBCoordinateEN)coordinate, cursor);
+
+        // TODO: 6/20/2017 finish this method
+        return coordinate;
+
+    }
 
 
 
-    //returns the ContentValues object needed to add/update the COORDINATE to/in the DB
+
+
+
+
+        //returns the ContentValues object needed to add/update the COORDINATE to/in the DB
     ContentValues getCVFromCoordinateMean(GBCoordinateMean coordinate){
 
         ContentValues cvCoordinate = new ContentValues();
