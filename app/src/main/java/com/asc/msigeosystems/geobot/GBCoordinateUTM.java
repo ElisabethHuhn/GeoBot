@@ -95,11 +95,51 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
     GBCoordinateUTM(){super.initializeDefaultVariables();}
 
+    GBCoordinateUTM(String zoneString,
+                    String latbandString,
+                    String hemisphereString,
+                    String eastingString,
+                    String eastingFString,
+                    String northingString,
+                    String northingFString,
+                    String elevationString,
+                    String elevationFString,
+                    String geoidString,
+                    String geoidFString,
+                    String convergenceString,
+                    String scaleString){
+        int zone = Integer.valueOf(zoneString);
+        if ((zone < 1) || (zone > 60)){
+            setValidCoordinate(false);
+            return;
+        }
+        setLatBand(latbandString.charAt(0));
+        setZone(zone);
+        char hemi = hemisphereString.charAt(0);
+        if (hemi == 'h')hemi = 'H';
+        if (hemi == 's')hemi = 'S';
+        if (!((hemi == 'H') || (hemi == 'S'))){
+            setValidCoordinate(false);
+            return;
+        }
+        setEasting  (getMeters(eastingString,   eastingFString));
+        setNorthing (getMeters(northingString,  northingFString));
+        setElevation(getMeters(elevationString, elevationFString));
+        setGeoid    (getMeters(geoidString,     geoidFString));
+
+        setConvergenceAngle(Double.valueOf(convergenceString));
+        setScaleFactor(Double.valueOf(scaleString));
+
+
+    }
+
     GBCoordinateUTM(GBCoordinateWGS84 coordinate) {
         //initialize all variables to their defaults
         super.initializeDefaultVariables();
         convertWGStoUTM(coordinate.getLatitude(), coordinate.getLongitude());
         mDatum = sDatum; //eg WGS84
+        setElevation(coordinate.getElevation());
+        setGeoid(coordinate.getGeoid());
     }
 
     GBCoordinateUTM(GBCoordinateNAD83 coordinate) {
@@ -109,15 +149,6 @@ class GBCoordinateUTM extends GBCoordinateEN {
         mDatum = sDatum; //eg NAD83
     }
 
-    private void convertWGStoUTM (double lat, double longi) throws IllegalArgumentException {
-        setWgsConstants(); //use the WGS constants for the conversion
-        convertLLtoUTM(lat, longi);
-    }
-
-    private void convertNADtoUTM (double lat, double longi) throws IllegalArgumentException {
-        setNadConstants(); //use the NAD constants for the conversion
-        convertLLtoUTM(lat, longi); //on superclass
-    }
 
 
     /* ******
@@ -167,6 +198,9 @@ class GBCoordinateUTM extends GBCoordinateEN {
         super.initializeDefaultVariables();
 
         //initialize all variables from this level
+        mThisCoordinateType  = sCoordinateTypeUTM;
+        mThisCoordinateClass = sCoordinateTypeClassUTM;
+        mDatum               = sDatum; //eg WGS84
 
     }
 
@@ -175,6 +209,18 @@ class GBCoordinateUTM extends GBCoordinateEN {
     }
 
 
+    //+**************************************************
+    //+*****        Conversion Routines             *****
+    //+**************************************************
+    private void convertWGStoUTM (double lat, double longi)  {
+        setWgsConstants(); //use the WGS constants for the conversion
+        convertLLtoUTM(lat, longi);
+    }
+
+    private void convertNADtoUTM (double lat, double longi)  {
+        setNadConstants(); //use the NAD constants for the conversion
+        convertLLtoUTM(lat, longi); //on superclass
+    }
 
     private void setWgsConstants() {
         //mEquatorialRadiusA = GBCoordinateWGS84.sEquatorialRadiusA;
@@ -209,20 +255,23 @@ class GBCoordinateUTM extends GBCoordinateEN {
      *  {}  Invalid Argument Exception when Lat/Long not numbers or not within range
 
      ***/
-    void convertLLtoUTM (double lat, double longi) throws IllegalArgumentException{
+    void convertLLtoUTM (double lat, double longi) {
 
         //Assert that the input parameters are valid (ie are actually numbers)
         if (Double.isNaN(lat) || Double.isNaN(longi)){
-            throw new IllegalArgumentException();
+            setValidCoordinate(false);
+            return;
         }
         // and within range
         //lat must be larger than -80 and smaller than 84 as UTM does not span the entire globe
         if ((lat < -80.0)|| (lat > 84.) ){
-            throw new IllegalArgumentException();
+            setValidCoordinate(false);
+            return;
         }
         //Legal range of the longitude is -180 to +180
         if ((longi <-180.) || (longi > 180.)){
-            throw new IllegalArgumentException();
+            setValidCoordinate(false);
+            return;
         }
         //Longitude -180/+180 is the International Date Line
         // Date Line -180  through the Americas to 0 Greenwich
@@ -348,8 +397,8 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
         //atanhArg must be within -1 to 1
         if ((atanhArg < -1. ) || (atanhArg > 1.)){
-            //throw an exception for argument out of bounds
-            throw new IllegalArgumentException();
+            setValidCoordinate(false);
+            return;
         }
 
         double atanh = 0.5 * Math.log((1.+atanhArg)/(1.-atanhArg));
@@ -359,8 +408,8 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
         /* *  It is close enough to the tenth decimal place
          if ((atanh - atanhprime) > .0000000001) {
-         //this isn't really an illegal argument, but.....
-         throw new IllegalArgumentException();
+            setValidCoordinate(false);
+            return
          }
          ***/
         double sigma = Math.sinh( e * atanh ) ; //Karney (9)
@@ -409,12 +458,15 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //the multiplying by (j+1) instead of (j) as in the paper
         // is because we are counting 0 to 5, not 1 - 6
         //Karney (11)
-        int seriesTerms = 6;//remember we count from 0 to seriesTerms,
+
         double xi =  xiPrime;
         double jj;
-        for (int j=1; j<=seriesTerms; j++){
-            jj=(double)j;
-            xi = xi + (alpha[j-1] * Math.sin(2.*jj*xiPrime) * Math.cosh(2.*jj*etaPrime));
+        int position = 0;
+        int last = alpha.length;
+        while (position < last){
+            jj=(double)position+1;
+            xi = xi + (alpha[position] * Math.sin(2.*jj*xiPrime) * Math.cosh(2.*jj*etaPrime));
+            position++;
         }
 
 
@@ -423,9 +475,11 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //build eta with a series of 6 members
         //Karney (11)
         double eta = etaPrime;
-        for (int j=1; j<=seriesTerms; j++){
-            jj = (double)j;
-            eta += alpha[j-1] * Math.cos(2.*jj*xiPrime) * Math.sinh(2.*jj*etaPrime);
+        position = 0;
+        while (position < last){
+            jj = (double)position + 1;
+            eta += alpha[position] * Math.cos(2.*jj*xiPrime) * Math.sinh(2.*jj*etaPrime);
+            position++;
         }
 
 
@@ -449,17 +503,21 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //Karney (23)
         //rho pʹ prime
         double rhoPrime = 1.;
-        for (int j=1; j<=seriesTerms; j++) {
-            jj = (double)j;
-            rhoPrime += (2.*jj*alpha[j-1]) * Math.cos(2.*jj*xiPrime) * Math.cosh(2.*jj*etaPrime);
+        position = 0;
+        while (position < last){
+            jj = (double)position + 1;
+            rhoPrime += (2.*jj*alpha[position]) * Math.cos(2.*jj*xiPrime) * Math.cosh(2.*jj*etaPrime);
+            position++;
         }
 
         //Karney (23)
         //q prime q'
         double qʹ = 0.;
-        for (int j=1; j<=seriesTerms; j++){
-            jj = (double)j;
-            qʹ += (2.*jj*alpha[j-1]) * Math.sin(2.*jj*xiPrime) * Math.sinh(2.*jj*etaPrime);
+        position = 0;
+        while (position < last){
+            jj = (double)position + 1;
+            qʹ += (2.*jj*alpha[position]) * Math.sin(2.*jj*xiPrime) * Math.sinh(2.*jj*etaPrime);
+            position++;
         }
 
         //Meridian convergence
@@ -528,13 +586,14 @@ class GBCoordinateUTM extends GBCoordinateEN {
         BigDecimal bdConvergence = new BigDecimal(nuDegrees).
                 setScale(GBUtilities.sNanometerDigitsOfPrecision,
                         RoundingMode.HALF_UP);
-        mConvergence = bdConvergence.doubleValue();
+        mConvergenceAngle = bdConvergence.doubleValue();
 
 
         //report scale to 12 decimal places
         BigDecimal bdScale = new BigDecimal(kappa).setScale(GBUtilities.sPicometerDigitsOfPrecision,
                 RoundingMode.HALF_UP);
-        super.mScale = bdScale.doubleValue();
+        super.mScaleFactor = bdScale.doubleValue();
+        setValidCoordinate(true);
 
     }
 

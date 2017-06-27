@@ -24,6 +24,8 @@ class GBNmea {
     private CharSequence mNmeaType; //e.g. GLL, GGA, etc.
     double mTime;//UTC time: milliseconds since 1/1/1970
 
+    long mTimeStamp;
+
     //Position
     double mLatitude;
     double mLongitude;
@@ -79,6 +81,13 @@ class GBNmea {
     }
     void   setTime(double time) {
         mTime = time;
+    }
+
+    long getTimeStamp() {
+        return mTimeStamp;
+    }
+    void   setTimeStamp(long time) {
+        mTimeStamp = time;
     }
 
     double getLatitude() {
@@ -251,6 +260,7 @@ class GBNmea {
     private void initializeDefaultData(){
         mNmeaType = "GPGGA"; //e.g. GLL, GGA, etc.
         mTime = 0d ;//UTC time: milliseconds since 1/1/1970
+        mTimeStamp = 0;
 
         //Position
         mLatitude = 0d ;

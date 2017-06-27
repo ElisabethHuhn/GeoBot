@@ -47,8 +47,8 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
 
     /*  Not used, but maybe they should be
-    private double mConvergence;
-    private double mScale;
+    private double mConvergenceAngle;
+    private double mScaleFactor;
     */
 
 
@@ -794,8 +794,8 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
             utmNorthingMetersOutput.setText(String.valueOf(utmCoordinate.getNorthing()));
             utmEastingFeetOutput .setText(String.valueOf(utmCoordinate.getEastingFeet()));
             utmNorthingFeetOutput.setText(String.valueOf(utmCoordinate.getNorthingFeet()));
-            utmConvergenceOutput .setText(String.valueOf(utmCoordinate.getConvergence()));
-            utmScaleFactorOutput .setText(String.valueOf(utmCoordinate.getScale()));
+            utmConvergenceOutput .setText(String.valueOf(utmCoordinate.getConvergenceAngle()));
+            utmScaleFactorOutput .setText(String.valueOf(utmCoordinate.getScaleFactor()));
             return true;
 
         } catch (IllegalArgumentException exc) {
@@ -844,9 +844,9 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
         spcNorthingMetersOutput.setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthing())));
         spcEastingFeetOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getEastingFeet())));
         spcNorthingFeetOutput  .setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthingFeet())));
-        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergence())));
+        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergenceAngle())));
 
-        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScale())));
+        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScaleFactor())));
 
 
     }

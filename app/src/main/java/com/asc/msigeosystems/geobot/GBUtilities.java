@@ -12,7 +12,12 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Elisabeth Huhn on 6/13/2016.
@@ -342,6 +347,25 @@ public class GBUtilities {
 
         return df.format(value);
     }
+
+
+    public static String getDateTimeString(long milliSeconds){
+        Date date = new Date(milliSeconds);
+        return DateFormat.getDateTimeInstance().format(date);
+    }
+
+    public static long getDateTimeFromString(Context activity, String timeString){
+        Date date;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy hh:mm:ss", Locale.getDefault());
+            date = format.parse(timeString);
+        } catch ( ParseException e){
+            GBUtilities.getInstance().errorHandler(activity, e.getMessage());
+            return 0;
+        }
+        return date.getTime();
+    }
+
 
     //***********************************/
     //******** Constructors     *********/

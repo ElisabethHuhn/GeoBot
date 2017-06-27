@@ -50,6 +50,9 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String TABLE_COORDINATE_EN =    "CoordinateEN";
     static final String TABLE_COORDINATE_LL =    "CoordinateLL";
     static final String TABLE_COORDINATE_MEAN  = "CoordinateMean";
+    static final String TABLE_MEAN_TOKEN       = "MeanToken";
+    static final String TABLE_MEAN_TOKEN_READINGS = "MeanTokenReadings";
+
     static final String TABLE_PICTURE =          "Picture";
 
 
@@ -205,17 +208,26 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String COORDINATE_PROJECT_ID    = "coord_project_id";
     static final String COORDINATE_POINT_ID      = "coord_point_id";
     static final String COORDINATE_TYPE          = "coord_type";
+
+    static final String COORDINATE_TIME          = "coord_time";
+
+    static final String COORDINATE_ELEVATION     = "coord_elevation";
+    static final String COORDINATE_GEOID         = "coord_geoid";
+    static final String COORDINATE_CONVERGENCE   = "coord_convergence" ; //
+    static final String COORDINATE_SCALE         = "coord_scale";
+
     static final String COORDINATE_VALID_COORD   = "coord_valid_coord";//BOOLEAN  no-0/1-yes
     static final String COORDINATE_IS_FIXED      = "coord_is_fixed";   //0 = false, 1 = true
+    static final String COORDINATE_DATUM         = "coord_datum";       //eg WGS84
+
     static final String COORDINATE_EN_EASTING    = "coord_en_easting";
     static final String COORDINATE_EN_NORTHING   = "coord_en_northing";
-    static final String COORDINATE_EN_ELEVATION  = "coord_en_elevation";
     static final String COORDINATE_EN_ZONE       = "coord_en_zone";        //1-60
-    static final String COORDINATE_EN_HEMISPHERE = "coord_en_hemisphere";  //N or S
-    static final String COORDINATE_EN_LATBAND    = "coord_en_latband";
-    static final String COORDINATE_EN_DATUM      = "coord_en_datum";       //eg WGS84
-    static final String COORDINATE_EN_CONVERGENCE = "coord_en_convergence" ; //
-    static final String COORDINATE_EN_SCALE      = "coord_en_scale";
+
+    static final String COORDINATE_UTM_HEMISPHERE = "coord_utm_hemisphere";  //N or S
+    static final String COORDINATE_UTM_LATBAND    = "coord_utm_latband";
+
+    static final String COORDINATE_SPC_STATE      = "coord_stc_state";
 
 
     //create  table
@@ -226,18 +238,25 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_PROJECT_ID           + " INTEGER, "   +
             COORDINATE_POINT_ID             + " INTEGER, "   +
             COORDINATE_TYPE                 + " INTEGER, "   +
+
+            COORDINATE_TIME                 + " REAL, "      +
+
+            COORDINATE_ELEVATION            + " REAL, "      +
+            COORDINATE_GEOID                + " REAL, "      +
+            COORDINATE_CONVERGENCE          + " REAL, "      +
+            COORDINATE_SCALE                + " REAL, "      +
+
             COORDINATE_VALID_COORD          + " INTEGER, "   +
             COORDINATE_IS_FIXED             + " INTEGER, "   + //0 = FALSE, 1 = TRUE
+            COORDINATE_DATUM                + " TEXT, "      +
+
             COORDINATE_EN_EASTING           + " REAL, "      +
             COORDINATE_EN_NORTHING          + " REAL, "      +
-            COORDINATE_EN_ELEVATION         + " REAL, "      +
             COORDINATE_EN_ZONE              + " INTEGER, "   +
-            COORDINATE_EN_HEMISPHERE        + " TEXT, "      +
-            COORDINATE_EN_LATBAND           + " TEXT, "      +
-            COORDINATE_EN_DATUM             + " TEXT, "      +
-            COORDINATE_EN_CONVERGENCE       + " REAL, "      +
-            COORDINATE_EN_SCALE             + " REAL, "      +
-            KEY_CREATED_AT                  + " DATETIME"  + ")";
+            COORDINATE_UTM_HEMISPHERE       + " TEXT, "      +
+            COORDINATE_UTM_LATBAND          + " TEXT, "      +
+            COORDINATE_SPC_STATE            + " TEXT, "      +
+             KEY_CREATED_AT                 + " DATETIME"  + ")";
 
 
 
@@ -251,10 +270,15 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     //static final String COORDINATE_PROJECT_ID         = "coord_project_id";
     //static final String COORDINATE_POINT_ID           = "coord_point_id";
     //static final String COORDINATE_TYPE               = "coord_type";
-    //static final String COORDINATE_VALID_COORD        = "coord_valid_coord";//BOOLEAN  no-0/1-yes
-    //static final String COORDINATE_IS_FIXED             = "coord_is_fixed";   //0=false, 1=true
 
-    static final String COORDINATE_LL_TIME              = "coord_ll_time";
+    //static final String COORDINATE_ELEVATION          = "coord_elevation";
+    //static final String COORDINATE_CONVERGENCE        = "coord_convergence" ; //
+    //static final String COORDINATE_SCALE              = "coord_scale";
+
+    //static final String COORDINATE_VALID_COORD        = "coord_valid_coord";//BOOLEAN  no-0/1-yes
+    //static final String COORDINATE_IS_FIXED           = "coord_is_fixed";   //0=false, 1=true
+    //static final String COORDINATE_DATUM              = "coord_datum";       //eg WGS84
+
     static final String COORDINATE_LL_LATITUDE          = "coord_ll_latitude";
     //static final String COORDINATE_LL_LATITUDE_DEGREE   = "coord_ll_latitude_degree";
     //static final String COORDINATE_LL_LATITUDE_MINUTE   = "coord_ll_latitude_minute";
@@ -263,8 +287,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     //static final String COORDINATE_LL_LONGITUDE_DEGREE  = "coord_ll_longitude_degree";
     //static final String COORDINATE_LL_LONGITUDE_MINUTE  = "coord_ll_longitude_minute";
     //static final String COORDINATE_LL_LONGITUDE_SECOND  = "coord_ll_longitude_second";
-    static final String COORDINATE_LL_ELEVATION         = "coord_ll_elevation" ;
-    static final String COORDINATE_LL_GEOID             = "coord_ll_geoid";
 
 
     //create  table
@@ -275,11 +297,18 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_PROJECT_ID           + " INTEGER, " +
             COORDINATE_POINT_ID             + " INTEGER, " +
             COORDINATE_TYPE                 + " INTEGER, " +
-            COORDINATE_VALID_COORD          + " INTEGER, " +
-            COORDINATE_IS_FIXED             + " INTEGER, " +
 
-            COORDINATE_LL_TIME              + " REAL, "    +
-            COORDINATE_LL_LATITUDE          + " REAL, "    +
+            COORDINATE_TIME                 + " REAL, "    +
+
+            COORDINATE_ELEVATION            + " REAL, "    +
+            COORDINATE_GEOID                + " REAL, "    +
+            COORDINATE_CONVERGENCE          + " REAL, "    +
+            COORDINATE_SCALE                + " REAL, "    +
+
+            COORDINATE_VALID_COORD          + " INTEGER, " +
+            COORDINATE_IS_FIXED             + " INTEGER, " +//0 = FALSE, 1 = TRUE
+
+             COORDINATE_LL_LATITUDE          + " REAL, "    +
      /*
             COORDINATE_LL_LATITUDE_DEGREE   + " INTEGER, " +
             COORDINATE_LL_LATITUDE_MINUTE   + " INTEGER, " +
@@ -291,8 +320,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_LL_LONGITUDE_MINUTE  + " INTEGER, " +
             COORDINATE_LL_LONGITUDE_SECOND  + " REAL, "    +
     */
-            COORDINATE_LL_ELEVATION         + " REAL, "    +
-            COORDINATE_LL_GEOID             + " REAL, "    +
             KEY_CREATED_AT                  + " DATETIME " + ")";
 
 
@@ -301,29 +328,29 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //column names
-    static final String COORDINATE_MEAN_ID            = "coord_id";
-    static final String COORDINATE_MEAN_PROJECT_ID    = "coord_project_id";
-    static final String COORDINATE_MEAN_POINT_ID      = "coord_point_id";
-    static final String COORDINATE_MEAN_TYPE          = "coord_type";
-    static final String COORDINATE_MEAN_VALID_COORD   = "coord_valid_coord";//BOOLEAN  no-0/1-yes
-    static final String COORDINATE_MEAN_IS_FIXED      = "coord_is_fixed";//0=false, 1=true
-    static final String COORDINATE_MEAN_RAW           = "coord_mean_easting";
-    static final String COORDINATE_MEAN_MEANED        = "coord_mean_northing";
-    static final String COORDINATE_MEAN_FIXED         = "coord_mean_elevation";
-    static final String COORDINATE_MEAN_LATITUDE            = "coord_mean_lat";
-    static final String COORDINATE_MEAN_LATITUDE_STD        = "coord_mean_lat_std";
-    //static final String COORDINATE_MEAN_LATITUDE_DEGREE   = "coord_mean_lat_degree";
-    //static final String COORDINATE_MEAN_LATITUDE_MINUTE   = "coord_mean_lat_minute";
-    //static final String COORDINATE_MEAN_LATITUDE_SECOND   = "coord_mean_lat_second";
-    static final String COORDINATE_MEAN_LONGITUDE           = "coord_mean_lng";
-    static final String COORDINATE_MEAN_LONGITUDE_STD       = "coord_mean_lng_std";
-    //static final String COORDINATE_MEAN_LONGITUDE_DEGREE  = "coord_mean_lng_degree";
-    //static final String COORDINATE_MEAN_LONGITUDE_MINUTE  = "coord_mean_lng_minute";
-    //static final String COORDINATE_MEAN_LONGITUDE_SECOND  = "coord_mean_lng_second";
-    static final String COORDINATE_MEAN_ELEVATION           = "coord_mean_elev" ;
-    static final String COORDINATE_MEAN_ELEVATION_STD       = "coord_mean_elev_std" ;
-    static final String COORDINATE_MEAN_GEOID               = "coord_mean_geoid";
-    static final String COORDINATE_MEAN_SATELLITES          = "coord_mean_sat";
+    static final String COORDINATE_MEAN_ID            = "coord_mean_id";
+    static final String COORDINATE_MEAN_PROJECT_ID    = "coord_mean_project_id";
+    static final String COORDINATE_MEAN_POINT_ID      = "coord_mean_point_id";
+    static final String COORDINATE_MEAN_TYPE          = "coord_mean_type";
+    static final String COORDINATE_MEAN_VALID_COORD   = "coord_mean_valid_coord";//BOOLEAN  no-0/1-yes
+    static final String COORDINATE_MEAN_IS_FIXED      = "coord_mean_is_fixed";//0=false, 1=true
+    static final String COORDINATE_MEAN_RAW           = "coord_mean_mean_easting";
+    static final String COORDINATE_MEAN_MEANED        = "coord_mean_mean_northing";
+    static final String COORDINATE_MEAN_FIXED         = "coord_mean_mean_elevation";
+    static final String COORDINATE_MEAN_LATITUDE            = "coord_mean_mean_lat";
+    static final String COORDINATE_MEAN_LATITUDE_STD        = "coord_mean_mean_lat_std";
+    //static final String COORDINATE_MEAN_LATITUDE_DEGREE   = "coord_mean_mean_lat_degree";
+    //static final String COORDINATE_MEAN_LATITUDE_MINUTE   = "coord_mean_mean_lat_minute";
+    //static final String COORDINATE_MEAN_LATITUDE_SECOND   = "coord_mean_mean_lat_second";
+    static final String COORDINATE_MEAN_LONGITUDE           = "coord_mean_mean_lng";
+    static final String COORDINATE_MEAN_LONGITUDE_STD       = "coord_mean_mean_lng_std";
+    //static final String COORDINATE_MEAN_LONGITUDE_DEGREE  = "coord_mean_mean_lng_degree";
+    //static final String COORDINATE_MEAN_LONGITUDE_MINUTE  = "coord_mean_mean_lng_minute";
+    //static final String COORDINATE_MEAN_LONGITUDE_SECOND  = "coord_mean_mean_lng_second";
+    static final String COORDINATE_MEAN_ELEVATION           = "coord_mean_mean_elev" ;
+    static final String COORDINATE_MEAN_ELEVATION_STD       = "coord_mean_mean_elev_std" ;
+    static final String COORDINATE_MEAN_GEOID               = "coord_mean_mean_geoid";
+    static final String COORDINATE_MEAN_SATELLITES          = "coord_mean_mean_sat";
 
 
 
@@ -349,6 +376,70 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_MEAN_GEOID                + " REAL, "      +
             COORDINATE_MEAN_SATELLITES           + " INTEGER, "   +
             KEY_CREATED_AT                       + " DATETIME"  + ")";
+
+
+
+    /* ***************************************************/
+    /* ******      Mean Token              ***************/
+    /* ***************************************************/
+
+    //column names
+    static final String MEAN_TOKEN_ID           = "mean_token_id";
+    static final String MEAN_TOKEN_PROJECT_ID   = "mean_token_project_id";
+    static final String MEAN_TOKEN_IN_PROGRESS  = "mean_token_progress";
+    static final String MEAN_TOKEN_FIRST        = "mean_token_first";//0 = FALSE, 1 = TRUE
+    static final String MEAN_TOKEN_LAST         = "mean_token_last"; //0 = FALSE, 1 = TRUE
+    static final String MEAN_TOKEN_START        = "mean_token_start";
+    static final String MEAN_TOKEN_END          = "mean_token_end";
+    static final String MEAN_TOKEN_CURRENT      = "mean_token_current";
+    static final String MEAN_TOKEN_FIXED        = "mean_token_fixed";
+    static final String MEAN_TOKEN_RAW          = "mean_token_raw";
+    static final String MEAN_TOKEN_MEAN_COORD_ID = "mean_token_mean_coord_id";
+
+
+
+
+
+    //create  table
+    private static final String CREATE_TABLE_MEAN_TOKEN = "CREATE TABLE " +
+            TABLE_MEAN_TOKEN         + "("            +
+            KEY_ID                   + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            MEAN_TOKEN_ID            + " INTEGER, "   +
+            MEAN_TOKEN_PROJECT_ID    + " INTEGER, "   +
+            MEAN_TOKEN_IN_PROGRESS   + " INTEGER, "   +
+            MEAN_TOKEN_FIRST         + " INTEGER, "   + //0 = FALSE, 1 = TRUE
+            MEAN_TOKEN_LAST          + " INTEGER, "   + //0 = FALSE, 1 = TRUE
+            MEAN_TOKEN_START         + " INTEGER, "   +
+            MEAN_TOKEN_END           + " INTEGER, "   +
+            MEAN_TOKEN_CURRENT       + " INTEGER, "   +
+            MEAN_TOKEN_FIXED         + " INTEGER, "   +
+            MEAN_TOKEN_RAW           + " INTEGER, "   +
+            MEAN_TOKEN_MEAN_COORD_ID + " INTEGER, "   +
+
+            KEY_CREATED_AT                        + " DATETIME"  + ")";
+
+
+
+    /* ***************************************************/
+    /* ******      Mean Token Readings     ***************/
+    /* ***************************************************/
+
+    //column names
+    static final String MEAN_TOKEN_READING_ID            = "coord_mean_read_id";
+    static final String MEAN_TOKEN_READING_MEAN_ID       = "coord_mean_read_mean_id";
+    static final String MEAN_TOKEN_READING_COORDINATE_ID = "coord_mean_read_coord_id";
+
+
+
+
+    //create  table
+    private static final String CREATE_TABLE_MEAN_TOKEN_READINGS = "CREATE TABLE " +
+            TABLE_MEAN_TOKEN_READINGS        + "("            +
+            KEY_ID                           + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            MEAN_TOKEN_READING_ID            + " INTEGER, "   +
+            MEAN_TOKEN_READING_MEAN_ID       + " INTEGER, "   +
+            MEAN_TOKEN_READING_COORDINATE_ID + " INTEGER, "   +
+            KEY_CREATED_AT                   + " DATETIME"  + ")";
 
 
 
@@ -439,6 +530,9 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_COORDINATE_LL);
         db.execSQL(CREATE_TABLE_COORDINATE_EN);
         db.execSQL(CREATE_TABLE_COORDINATE_MEAN);
+        db.execSQL(CREATE_TABLE_MEAN_TOKEN);
+        db.execSQL(CREATE_TABLE_MEAN_TOKEN_READINGS);
+
         db.execSQL(CREATE_TABLE_PICTURE);
 
     }
@@ -468,6 +562,11 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_EN);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_LL);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_MEAN);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAN_TOKEN);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAN_TOKEN_READINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PICTURE);
+
 
 
         //Create new tables
@@ -489,10 +588,10 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     //* ************************** CREATE *************************************
 
     long add( SQLiteDatabase db,
-                     String         table,
-                     ContentValues  values,          //Column names and new values
-                     String         where_clause,
-                     String         id_key){
+             String         table,
+             ContentValues  values,          //Column names and new values
+             String         where_clause,
+             String         id_key){
 
         long returnCode = 0;
         long returnKey  = 0;

@@ -69,8 +69,23 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     }
 
     GBCoordinateWGS84(GBCoordinateSPCS coordinateSPCS){
-        // TODO: 12/27/2016 finish conversion from SPCS to WGS 
+
         super.initializeDefaultVariables();
+        int zone = coordinateSPCS.getZone();
+        GBCoordinateConstants constants = new GBCoordinateConstants(zone);
+        int spcsZone = constants.getZone();
+        if (spcsZone == (int)GBUtilities.ID_DOES_NOT_EXIST) {
+            setValidCoordinate(false);
+            return;
+        }
+
+
+
+        if (constants.getProjection() == GBCoordinateConstants.sLAMBERT){
+            convertInverseLambert(coordinateSPCS, constants);
+        } else {
+            convertInverseMercator(coordinateSPCS, constants);
+        }
     }
 
     GBCoordinateWGS84(GBNmea nmeaData){
@@ -83,7 +98,9 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         setGeoid(nmeaData.getGeoid());
 
         setProjectID(GBUtilities.getInstance().getOpenProjectID());
-        setTime(System.currentTimeMillis());
+        //setTime(System.currentTimeMillis());
+
+        setTime(nmeaData.getTimeStamp());
     }
 
     GBCoordinateWGS84(GBCoordinateMean meanCoordinate){
@@ -110,7 +127,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
 
 
     GBCoordinateWGS84(int latitudeDegree, int latitudeMinute, double latitudeSecond,
-                             int longitudeDegree, int longitudeMinute, double longitudeSecond){
+                      int longitudeDegree, int longitudeMinute, double longitudeSecond){
 
         //initialize all variables to their defaults
         super.initializeDefaultVariables();
@@ -130,13 +147,99 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
 
 
 
+    GBCoordinateWGS84(   long   timestamp,
+                         String latitudeString,
+                         String latitudeDegreeString,
+                         String latitudeMinuteString,
+                         String latitudeSecondString,
+                         String longitudeString,
+                         String longitudeDegreeString,
+                         String longitudeMinuteString,
+                         String longitudeSecondString,
+                         String elevationString,
+                         String elevationFString,
+                         String geoidString,
+                         String geoidFString) {
 
-    GBCoordinateWGS84(CharSequence latitudeDegreeString,
-                             CharSequence latitudeMinuteString,
-                             CharSequence latitudeSecondString,
-                             CharSequence longitudeDegreeString,
-                             CharSequence longitudeMinuteString,
-                             CharSequence longitudeSecondString) {
+        //initialize all variables to their defaults
+        initializeDefaultVariables();
+
+        setTime(timestamp);
+
+        if (latitudeString.isEmpty()) {
+            latitudeString = "0";
+        }
+        if (latitudeDegreeString.isEmpty()) {
+            latitudeDegreeString = "0";
+        }
+        if (latitudeMinuteString.isEmpty()){
+            latitudeMinuteString = "0";
+        }
+        if (latitudeSecondString.isEmpty() ){
+            latitudeSecondString = "0.0";
+        }
+
+
+        if (longitudeString.isEmpty()){
+            longitudeString = "0";
+        }
+        if (longitudeDegreeString.isEmpty()){
+            longitudeDegreeString = "0";
+        }
+        if (longitudeMinuteString.isEmpty() ){
+            longitudeMinuteString = "0";
+        }
+        if (longitudeSecondString.isEmpty()) {
+            longitudeSecondString = "0.0";
+        }
+
+
+        this.mLatitude       = Double.parseDouble(latitudeString);
+        this.mLatitudeDegree = Integer.valueOf   (latitudeDegreeString);
+        this.mLatitudeMinute = Integer.valueOf   (latitudeMinuteString);
+        this.mLatitudeSecond = Double.parseDouble(latitudeSecondString);
+
+        this.mLongitude       = Double.parseDouble(longitudeString);
+        this.mLongitudeDegree = Integer.valueOf   (longitudeDegreeString);
+        this.mLongitudeMinute = Integer.valueOf   (longitudeMinuteString);
+        this.mLongitudeSecond = Double.parseDouble(longitudeSecondString);
+
+        boolean latReturnCode = true;
+        boolean lngReturnCode = true;
+
+        if ((mLatitude != 0.) && (mLongitude != 0.)){
+            latReturnCode = latLongDD(mLatitude, mLongitude);
+        } else if ((mLatitude == 0.) &&
+                  ((mLatitudeDegree != 0) || (mLatitudeMinute != 0) || mLatitudeSecond != 0.)){
+            latReturnCode = convertLatDMSToDD();
+            if (mLongitude != 0) {
+                lngReturnCode = convertLngDDToDMS();
+            } else if ((mLongitude == 0) &&
+                    ((mLongitudeDegree != 0) || (mLongitudeMinute != 0) || (mLongitudeSecond != 0.))){
+                lngReturnCode = convertLngDMSToDD();
+            } else {
+                lngReturnCode = false;
+            }
+
+        } else {
+            //everything is zero. Special casee, but must handle it
+            latReturnCode = latLongDD(mLatitude, mLongitude);
+        }
+        setValidCoordinate(latReturnCode && lngReturnCode);
+
+        if (!isValidCoordinate())return;
+
+        setElevation(getMeters(elevationString, elevationFString));
+        setGeoid    (getMeters(geoidString    , geoidFString));
+    }
+
+
+    GBCoordinateWGS84(   CharSequence latitudeDegreeString,
+                         CharSequence latitudeMinuteString,
+                         CharSequence latitudeSecondString,
+                         CharSequence longitudeDegreeString,
+                         CharSequence longitudeMinuteString,
+                         CharSequence longitudeSecondString) {
 
         //initialize all variables to their defaults
         initializeDefaultVariables();
@@ -148,6 +251,12 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
                           longitudeMinuteString,
                           longitudeSecondString);
     }
+
+
+
+
+
+
 
     /* ******
      *
@@ -191,6 +300,78 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
 
 
         //initialize all variables from this level
+        mThisCoordinateType  = sCoordinateTypeWGS84;
+        mThisCoordinateClass = sCoordinateTypeClassWGS84;
+
+        mDatum       = sDatum; //eg WGS84
+
+    }
+
+
+    private void convertInverseLambert(GBCoordinateSPCS coordinateSPCS,
+                                       GBCoordinateConstants constants){
+
+        double N1  = coordinateSPCS.getNorthing() - constants.getFalseNorthing();
+        double E1  = coordinateSPCS.getEasting()  - constants.getFalseEasting();
+
+        double R1  = constants.getMappingRadiusAtLat() - N1;
+
+        double radER = Math.toRadians(E1 / R1);
+
+        double convergenceAngle = Math.atan(radER);
+
+        double radB0 = Math.toRadians(constants.getCentralParallel());
+        double sinB0 = Math.sin(radB0);
+
+        double longitude = constants.getCentralMeridian() - (convergenceAngle / sinB0);
+
+        double tanCA = Math.tan(Math.toRadians(convergenceAngle / 2.));
+        double u = N1 - (E1 * tanCA);
+        double u2 = u*u;
+        double u3 = u*u2;
+
+        double G1 = constants.getG1();
+        double G2 = constants.getG2();
+        double G3 = constants.getG3();
+        double G4 = constants.getG4();
+        double G5 = constants.getG5();
+
+
+        double deltaLat = (G1*u) + (G2*u2) + (G3 *u2) + (G4*u2) + (G5*u2);
+
+        double latitude = constants.getCentralParallel() + deltaLat;
+
+        double F1 = constants.getF1();
+        double F2 = constants.getF2();
+        double F3 = constants.getF3();
+
+        double scaleFactor = F1 + (F2 * u2) + (F3 * u3);
+
+
+        super.setLatitude(latitude);
+        super.setLongitude(longitude);
+        super.setScaleFactor(scaleFactor);
+        super.setConvergenceAngle(convergenceAngle);
+
+    }
+
+
+
+    private void convertInverseMercator(GBCoordinateSPCS coordinateSPCS,
+                                       GBCoordinateConstants constants){
+
+        double latitude = 0;
+        double longitude = 0;
+        double scaleFactor = 0;
+        double convergenceAngle = 0;
+
+        setValidCoordinate(false);
+
+
+        super.setLatitude(latitude);
+        super.setLongitude(longitude);
+        super.setScaleFactor(scaleFactor);
+        super.setConvergenceAngle(convergenceAngle);
 
     }
 

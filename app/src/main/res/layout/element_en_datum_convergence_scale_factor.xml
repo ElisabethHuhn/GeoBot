@@ -7,7 +7,7 @@
           android:paddingBottom = "20dp"
     >
 
-    <!-- datum / convergence / scale Factor input fields -->
+    <!-- datum / convergenceAngle / scaleFactor Factor input fields -->
 
     <!-- Dataum -->
     <TextView

@@ -28,27 +28,7 @@
 
                 >
                 <!-- Row: Point Screen Label -->
-                <TableRow
 
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    >
-                    <TextView
-                        android:id="@+id/pointScreenLabel"
-                        android:text="@string/point_screen_label"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:layout_gravity="center"
-
-                        android:gravity="center_horizontal"
-
-                        android:textColor="@color/colorTextBlack"
-                        android:background="@color/colorScreenBackground"
-                        />
-
-                </TableRow>
 
                 <!-- Row: Project ID -->
                 <TableRow

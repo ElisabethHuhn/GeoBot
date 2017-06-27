@@ -30,7 +30,8 @@ class GBNmeaMeanToken {
     // ******************************************************** //
 
     //variables for the meaning process
-    private long    mMeanValuesID;
+    private long    mMeanTokenID;
+    private long    mProjectID;
     private boolean mIsMeanInProgress = false;
     private boolean mIsFirstPointInMean = false;
     private boolean mIsLastPointInMean = false;
@@ -77,7 +78,7 @@ class GBNmeaMeanToken {
 
 
     private void initializeDefaultValues(){
-        mMeanValuesID = GBUtilities.ID_DOES_NOT_EXIST;
+        mMeanTokenID = GBUtilities.ID_DOES_NOT_EXIST;
         mIsMeanInProgress   = false;
         mIsFirstPointInMean = false;
         mIsLastPointInMean  = false;
@@ -95,8 +96,13 @@ class GBNmeaMeanToken {
     // ******************************************************** //
 
 
-    long getMeanValuesID() { return mMeanValuesID;}
-    void setMeanValuesID(long meanValuesID) {mMeanValuesID = meanValuesID;}
+    long getMeanTokenID() { return mMeanTokenID;}
+    void setMeanTokenID(long meanTokenID) {
+        mMeanTokenID = meanTokenID;}
+
+    long getProjectID() { return mProjectID;}
+    void setProjectID(long projectID) {
+        mProjectID = projectID;}
 
     boolean isMeanInProgress() {return mIsMeanInProgress;}
     void setMeanInProgress(boolean meanInProgress) {mIsMeanInProgress = meanInProgress;}
@@ -116,7 +122,16 @@ class GBNmeaMeanToken {
     double getCurrentMeanTime() {return mCurrentMeanTime;}
     void   setCurrentMeanTime(double meanTime) {mCurrentMeanTime = meanTime;}
 
-    GBCoordinateMean getMeanCoordinate() {return mMeanCoordinate;}
+    GBCoordinateMean getMeanCoordinate() {
+        //if the meanCoordinate is null, we might be recovering from a configuration change
+        //  and need to recalculate
+        if (mMeanCoordinate == null){
+            //recalculate the mean from the raw coordinates if we don't have a copy of the results
+            // TODO: 6/26/2017 figure out what to do about # satellites
+            recalculateMean();
+        }
+        return mMeanCoordinate;
+    }
     GBCoordinateMean getMeanCoordinate(boolean calculateMean){
 
         if (mMeanCoordinate == null){
@@ -138,12 +153,21 @@ class GBNmeaMeanToken {
     void incRawReadings() {       mRawReadings++;}
     void setRawReadings(int rawReadings) {mRawReadings = rawReadings;}
 
+    //These are the raw coordinates that have contributed to the mean
     ArrayList<GBCoordinateWGS84> getCoordinates() {
-        if (mMeanedCoordinates == null){
-            mMeanedCoordinates = new ArrayList<>();
+        if (!areCoordinatesInMemory()) {
+            GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
+            mMeanedCoordinates = coordinateManager.getCoordinatesForToken(getMeanTokenID());
         }
         return mMeanedCoordinates;
     }
+    boolean areCoordinatesInMemory(){
+        return (!((mMeanedCoordinates == null) || (mMeanedCoordinates.size()==0))) ;
+    }
+    void    setCoordinates(ArrayList<GBCoordinateWGS84> meanedCoordinates) {
+        mMeanedCoordinates = meanedCoordinates;
+    }
+
     int getCoordinateSize() {
         if (mMeanedCoordinates == null)return 0;
         return mMeanedCoordinates.size();
@@ -160,9 +184,7 @@ class GBNmeaMeanToken {
     boolean addCoordinate(GBCoordinateWGS84 newCoordinate){
         return getCoordinates().add(newCoordinate);
     }
-    void    setCoordinates(ArrayList<GBCoordinateWGS84> meanedCoordinates) {
-        mMeanedCoordinates = meanedCoordinates;
-    }
+
     void    resetCoordinates(){
         if (mMeanedCoordinates == null)return;
         mMeanedCoordinates = new ArrayList<>();
@@ -201,6 +223,13 @@ class GBNmeaMeanToken {
 
 
         return meanCoordinate;
+    }
+
+    GBCoordinateMean recalculateMean(){
+        GBCoordinateMean coordinateMean = new GBCoordinateMean();
+        setMeanCoordinate(coordinateMean);
+        mMeanCoordinate.updateMean(0, this);
+        return coordinateMean;
     }
 
 

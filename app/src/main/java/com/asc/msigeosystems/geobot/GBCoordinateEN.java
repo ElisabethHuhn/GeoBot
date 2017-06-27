@@ -22,13 +22,11 @@ abstract class GBCoordinateEN extends GBCoordinate {
 
 
 
-    protected   double       mEasting;
-    protected   double       mNorthing;
-    protected   double       mElevation;
-    protected   int          mZone;        //1-60
-    protected CharSequence mDatum = "WGS84"; //eg WGS84
-    protected   double       mConvergence; //
-    protected   double       mScale;
+    protected double       mEasting;
+    protected double       mNorthing;
+
+    protected int          mZone;        //1-60
+
 
 
 
@@ -42,26 +40,18 @@ abstract class GBCoordinateEN extends GBCoordinate {
 
 
     double getEasting()     { return mEasting;  }
+    void   setEasting(double easting)   { mEasting = easting;  }
+
     double getNorthing()    { return mNorthing; }
-    double getElevation()   { return mElevation; }
+    void   setNorthing(double northing) { mNorthing = northing;}
+
 
     double getEastingFeet() { return GBUtilities.convertMetersToFeet(mEasting);  }
     double getNorthingFeet(){ return GBUtilities.convertMetersToFeet(mNorthing); }
-    double getElevationFeet(){return GBUtilities.convertMetersToFeet(mElevation);}
 
-    int    getZone()        { return mZone;     }
-    CharSequence getDatum() { return mDatum;    }
-    double getConvergence() { return mConvergence; }
-    double getScale()       { return mScale;    }
-
-
-    void setEasting(double easting)   { mEasting = easting;  }
-    void setNorthing(double northing) { mNorthing = northing;}
-    void setElevation(double elevation) { mElevation = elevation; }
+    int  getZone()        { return mZone;     }
     void setZone(int zone)              { mZone = zone;   }
-    void setDatum(CharSequence datum)   { mDatum = datum;  }
-    void setConvergence(double convergence) { mConvergence = convergence; }
-    void setScale(double scale)         { mScale = scale; }
+
 
 
 
@@ -92,10 +82,6 @@ abstract class GBCoordinateEN extends GBCoordinate {
         mZone        = 0;        //1-60
         //mHemisphere  = 'N';  //N or S
         //mLatBand     = 'A';
-        mValidCoordinate = false;
-        mDatum       = sDatum; //eg WGS84
-        mConvergence = 1d; //
-        mScale       = 1d;
 
     }
 

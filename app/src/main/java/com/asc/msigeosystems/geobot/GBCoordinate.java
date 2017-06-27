@@ -38,12 +38,23 @@ abstract class GBCoordinate {
     /* *********************************************************/
     /* ***    Variables common to ALL coordinates        *******/
     /* *********************************************************/
-    private long mCoordinateID; //All coordinates have a DB ID
-    private long mProjectID; //May or may not describe a point
-    private long mPointID;   //These will be null if not describing a point
+    protected long    mCoordinateID; //All coordinates have a DB ID
+    protected long    mProjectID; //May or may not describe a point
+    protected long    mPointID;   //These will be null if not describing a point
 
-    protected boolean      mValidCoordinate = true;
-    private boolean      mIsFixed         = true;
+    protected long    mTime; //time coordinate taken in milliseconds
+
+    protected double  mElevation; //Orthometric Elevation in Meters
+    protected double  mGeoid;     //Mean Sea Level in Meters
+
+    protected double  mScaleFactor;
+    protected double  mConvergenceAngle;
+
+    protected boolean mValidCoordinate = true;
+    protected boolean mIsFixed         = true;
+
+    protected CharSequence mDatum = "SPCS"; //eg WGS84
+
 
     /* *********************************************************/
     /* ***    Static methods                             *******/
@@ -114,6 +125,25 @@ abstract class GBCoordinate {
     void setPointID(long pointID) { mPointID = pointID; }
 
 
+    long getTime()              {  return mTime;    }
+    void setTime(long time)     {  mTime = time;  }
+
+
+    double getElevation()       {  return mElevation;   }
+    void setElevation(double elevation) { mElevation = elevation;   }
+    double getElevationFeet() {return GBUtilities.convertMetersToFeet(mElevation); }
+
+    double getGeoid()           {  return mGeoid; }
+    double getGeoidFeet() { return GBUtilities.convertMetersToFeet(mGeoid);}
+    void setGeoid(double geoid) { mGeoid = geoid;  }
+
+    double getScaleFactor()       { return mScaleFactor;       }
+    void setScaleFactor(double scaleFactor) { mScaleFactor = scaleFactor; }
+
+    double getConvergenceAngle()       { return mConvergenceAngle;       }
+    void setConvergenceAngle(double convergenceAngle) { mConvergenceAngle = convergenceAngle; }
+
+
     void    setValidCoordinate(boolean validCoordinate){ this.mValidCoordinate = validCoordinate;}
     boolean isValidCoordinate() {
         return mValidCoordinate;
@@ -121,6 +151,9 @@ abstract class GBCoordinate {
 
     void    setIsFixed(boolean isFixed){this.mIsFixed = isFixed;}
     boolean isFixed()                  {return mIsFixed;}
+
+    CharSequence getDatum() { return mDatum;    }
+    void setDatum(CharSequence datum)   { mDatum = datum;  }
 
 
     /* *********************************************************/
@@ -136,6 +169,33 @@ abstract class GBCoordinate {
 
         mProjectID = 0; //assume does not describe a point
         mPointID = 0;
+
+        mTime           = 0; //time coordinate taken
+        mValidCoordinate = false;
+
+        mElevation        = 0d;
+        mGeoid            = 0d;
+        mConvergenceAngle = 1d; //
+        mScaleFactor      = 1d;
+
+
+    }
+
+    protected double getMeters(String metersString, String feetString){
+        double meters;
+        if (GBUtilities.isEmpty(metersString)) {
+            if (GBUtilities.isEmpty(feetString)) {
+                //both are empty
+                meters = 0.;
+            } else {
+                meters = Double.valueOf(feetString);
+                meters = GBUtilities.convertFeetToMeters(meters);
+            }
+        } else {
+            meters = Double.valueOf(metersString);
+        }
+        return meters;
+
     }
 
 

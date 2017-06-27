@@ -72,21 +72,83 @@ class GBCoordinateManager {
 
     //* ****************  CREATE *******************************************
 
-   public long addCoordinateMean(GBCoordinateMean coordinateMean){
-       GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-       return databaseManager.addCoordinateMean(coordinateMean);
-   }
+    public long addCoordinateMean(GBCoordinateMean coordinateMean){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        return databaseManager.addCoordinateMean(coordinateMean);
+    }
+
+    public long addCoordinate(GBCoordinate coordinate){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        return databaseManager.addCoordinate(coordinate);
+    }
+
+    public long addCoordinateToReading(ContentValues cv, long coordinateID){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        return databaseManager.addCoordinateToReading(cv, coordinateID);
+    }
 
     //* ****************  READ *******************************************
+
+    public GBCoordinateWGS84 getCoordinateWgs84(long coordinateID, long projectID){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        String table = GBDatabaseSqliteHelper.TABLE_COORDINATE_LL; //assume a default
+
+        return (GBCoordinateWGS84) databaseManager.getCoordinateFromDB(coordinateID, projectID);
+    }
+
+    public GBCoordinateWGS84 getCoordinateWgs84(long coordinateID){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        String table = GBDatabaseSqliteHelper.TABLE_COORDINATE_LL; //assume a default
+
+        return (GBCoordinateWGS84) databaseManager.getCoordinateFromDB(coordinateID, table);
+    }
 
     public ArrayList<GBCoordinateMean> getAllCoordinateMeanFromDB (int projectID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.getAllCoordinateMeanFromDB(projectID);
     }
 
-    public GBCoordinateMean getCoordinateMeanFromDB(int coordinateMeanID, int projectID){
+    public GBCoordinateMean getCoordinateMeanFromDB(long coordinateMeanID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-        return databaseManager.getCoordinateMeanFromDB(coordinateMeanID, projectID);
+        return databaseManager.getCoordinateMeanFromDB(coordinateMeanID);
+    }
+
+    public ArrayList<GBCoordinateWGS84> getCoordinatesForToken(long tokenID){
+        ArrayList<GBCoordinateWGS84> rawCoordinates = null;
+
+        //Get the cursor of token readings for this tokenID
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        Cursor cursor = databaseManager.getTokenReadings(tokenID);
+
+        //Step through the cursor, adding to our list of raw coordinates with each row
+        int last = cursor.getCount();
+        int position = 0;
+        GBCoordinateWGS84 coordinateWGS84;
+        while (position < last){
+            coordinateWGS84 = getCoordinateWgsFromTokenReadingsCursor(cursor, position);
+            if (coordinateWGS84 != null){
+                rawCoordinates.add(coordinateWGS84);
+            }
+            position++;
+        }
+        cursor.close();
+        return rawCoordinates;
+    }
+
+    GBCoordinateWGS84 getCoordinateWgsFromTokenReadingsCursor(Cursor cursor, int position){
+
+        int last = cursor.getCount();
+        if (position >= last) return null;
+
+        cursor.moveToPosition(position);
+
+        //Get the ID of the raw coordinate we are interested in
+        long coordinateID = cursor.getLong  (
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.MEAN_TOKEN_READING_COORDINATE_ID));
+
+        //Then get the raw coordinate
+
+        return getCoordinateWgs84(coordinateID);
     }
 
     //* ****************  UPDATE *******************************************
@@ -123,35 +185,51 @@ class GBCoordinateManager {
         ContentValues cvCoordinate = new ContentValues();
         //put(columnName, value);
         cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_ID,       coordinate.getCoordinateID());
-        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID,  coordinate.getProjectID());
-        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_POINT_ID,     coordinate.getPointID());
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID,coordinate.getProjectID());
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_POINT_ID,  coordinate.getPointID());
+
 
         CharSequence coordinateType = coordinate.getCoordinateType();
         if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)){
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TYPE,
-                             GBCoordinate.sCoordinateDBTypeWGS84);
+                                                               GBCoordinate.sCoordinateDBTypeWGS84);
 
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83)){
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TYPE,
-                             GBCoordinate.sCoordinateDBTypeNAD83);
+                                                               GBCoordinate.sCoordinateDBTypeNAD83);
 
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TYPE,
-                             GBCoordinate.sCoordinateDBTypeUTM);
+                                                                GBCoordinate.sCoordinateDBTypeUTM);
 
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TYPE,
-                             GBCoordinate.sCoordinateDBTypeSPCS);
+                                                                GBCoordinate.sCoordinateDBTypeSPCS);
         } else {
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TYPE,
-                             GBCoordinate.sCoordinateDBTypeUnknown);
+                                                            GBCoordinate.sCoordinateDBTypeUnknown);
         }
+
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_TIME,       coordinate.getTime());
+
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_ELEVATION,  coordinate.getElevation());
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_GEOID,      coordinate.getGeoid());
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_CONVERGENCE,coordinate.getConvergenceAngle());
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_SCALE,      coordinate.getScaleFactor());
+
 
         int valCoord = 0; //false
         boolean validCoordinate = coordinate.isValidCoordinate();
         if (validCoordinate)valCoord = 1;//true;
-
         cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_VALID_COORD, valCoord);
+
+        int fixed = 0; //false
+        boolean isFixed = coordinate.isValidCoordinate();
+        if (isFixed)fixed = 1;//true;
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_IS_FIXED, fixed);
+
+        cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_DATUM,  coordinate.getDatum().toString());
+
 
 
         //The rest of the attributes depend upon the specific subtype
@@ -159,8 +237,6 @@ class GBCoordinateManager {
         if ((coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84))||
             (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83))    ){
 
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_LL_TIME,
-                                            ((GBCoordinateLL)coordinate).getTime());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE,
                                             ((GBCoordinateLL)coordinate).getLatitude());
  /*
@@ -181,36 +257,26 @@ class GBCoordinateManager {
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE_SECOND,
                                             ((GBCoordinateLL)coordinate).getLongitudeSecond());
  */
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_LL_ELEVATION,
-                                            ((GBCoordinateLL)coordinate).getElevation());
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_LL_GEOID,
-                                            ((GBCoordinateLL)coordinate).getGeoid());
 
 
         } else {
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_EASTING,
-                                            ((GBCoordinateEN)coordinate).getEasting());
+                                                        ((GBCoordinateEN)coordinate).getEasting());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_NORTHING,
-                                            ((GBCoordinateEN)coordinate).getNorthing());
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_ELEVATION,
-                                            ((GBCoordinateEN)coordinate).getElevation());
+                                                        ((GBCoordinateEN)coordinate).getNorthing());
             cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_ZONE,
-                                            ((GBCoordinateEN)coordinate).getZone());
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_CONVERGENCE,
-                                            ((GBCoordinateEN)coordinate).getConvergence());
-            cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_SCALE,
-                                            ((GBCoordinateEN)coordinate).getScale());
+                                                        ((GBCoordinateEN)coordinate).getZone());
 
             if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
-                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE,
-                        String.valueOf(((GBCoordinateUTM)coordinate).getHemisphere()));
-                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND,
-                        String.valueOf(((GBCoordinateUTM)coordinate).getLatBand()));
-                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_EN_DATUM,
-                        (String) ((GBCoordinateEN)coordinate).getDatum());
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_UTM_HEMISPHERE,
+                                    String.valueOf(((GBCoordinateUTM)coordinate).getHemisphere()));
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_UTM_LATBAND,
+                                    String.valueOf(((GBCoordinateUTM)coordinate).getLatBand()));
 
             } else {
-                // TODO: 6/20/2017 fill this in for SPCS
+                cvCoordinate.put(GBDatabaseSqliteHelper.COORDINATE_SPC_STATE,
+                                    String.valueOf(((GBCoordinateSPCS)coordinate).getState()));
+
             }
 
         }
@@ -239,15 +305,18 @@ class GBCoordinateManager {
 
         if (coordinateType == GBCoordinate.sCoordinateDBTypeWGS84) {
             GBCoordinateWGS84 coordinate = new GBCoordinateWGS84();
+            coordinate = (GBCoordinateWGS84)getTopCoordinateFromCursor(coordinate, cursor);
             coordinate = (GBCoordinateWGS84) getLLCoordinateFromCursor(coordinate, cursor);
+            //There are no specific WGS84 properties beyond LL, so no need for an WGS level method
 
             coordinate.setCoordinateType();
             return coordinate;
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeNAD83) {
-                GBCoordinateNAD83 coordinate = new GBCoordinateNAD83();
-                getLLCoordinateFromCursor( coordinate, cursor);
-                coordinate = (GBCoordinateNAD83) getLLCoordinateFromCursor(coordinate, cursor);
+            GBCoordinateNAD83 coordinate = new GBCoordinateNAD83();
+            coordinate = (GBCoordinateNAD83) getTopCoordinateFromCursor(coordinate, cursor);
+            coordinate = (GBCoordinateNAD83) getLLCoordinateFromCursor(coordinate, cursor);
+            //There are no specific NAD83 properties beyond LL, so no need for an NAD level method
 
             coordinate.setCoordinateType();
             return coordinate;
@@ -255,16 +324,18 @@ class GBCoordinateManager {
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeUTM) {
             GBCoordinateUTM coordinate = new GBCoordinateUTM();
-            getUTMCoordinateFromCursor( coordinate, cursor);
-            coordinate = (GBCoordinateUTM)getUTMCoordinateFromCursor(coordinate, cursor);
+            coordinate = (GBCoordinateUTM) getTopCoordinateFromCursor(coordinate, cursor);
+            coordinate = (GBCoordinateUTM) getENCoordinateFromCursor (coordinate, cursor);
+            coordinate =                   getUTMCoordinateFromCursor(coordinate, cursor);
 
             coordinate.setCoordinateType();
             return coordinate;
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeSPCS) {
             GBCoordinateSPCS coordinate = new GBCoordinateSPCS();
-            getSPSCCoordinateFromCursor( coordinate, cursor);
-            coordinate = (GBCoordinateSPCS) getSPSCCoordinateFromCursor(coordinate, cursor);
+            coordinate = (GBCoordinateSPCS) getTopCoordinateFromCursor(coordinate, cursor);
+            coordinate = (GBCoordinateSPCS) getENCoordinateFromCursor (coordinate, cursor);
+            coordinate =                    getSPSCCoordinateFromCursor(coordinate, cursor);
 
             coordinate.setCoordinateType();
             return coordinate;
@@ -273,20 +344,33 @@ class GBCoordinateManager {
         return null;
     }
 
-    private GBCoordinateLL getLLCoordinateFromCursor(GBCoordinateLL coordinate,
-                                                           Cursor cursor){
+    private GBCoordinate   getTopCoordinateFromCursor(GBCoordinate coordinate, Cursor cursor){
         coordinate.setCoordinateID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ID)));
         coordinate.setProjectID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID)));
         coordinate.setPointID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_POINT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_POINT_ID)));
 
-        //type is set in calling routine
+        //type is set in calling routine                                 COORDINATE_TYPE
+
+        coordinate.setTime(cursor.getLong (
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_TIME)));
+
+        coordinate.setElevation(cursor.getDouble(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ELEVATION)));
+        coordinate.setGeoid(cursor.getDouble(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_GEOID)));
+
+        coordinate.setConvergenceAngle(cursor.getDouble(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_CONVERGENCE)));
+        coordinate.setScaleFactor(cursor.getDouble(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ELEVATION)));
+
 
 
         int valid = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_VALID_COORD));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_VALID_COORD));
         if (valid == 0) {
             coordinate.setValidCoordinate(false);
         }else{
@@ -295,16 +379,20 @@ class GBCoordinateManager {
 
 
         int isFixed = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_IS_FIXED));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_IS_FIXED));
         if (isFixed == 0) {
             coordinate.setIsFixed(false);
         }else{
             coordinate.setIsFixed(true);
         }
 
+        coordinate.setDatum(cursor.getString(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_DATUM)));
 
-        coordinate.setTime(cursor.getLong (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_TIME)));
+        return coordinate;
+    }
+
+    private GBCoordinateLL getLLCoordinateFromCursor(GBCoordinateLL coordinate, Cursor cursor){
 
         coordinate.setLatitude(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE)));
@@ -328,10 +416,6 @@ class GBCoordinateManager {
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE_SECOND)));
 */
 
-        coordinate.setElevation(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_ELEVATION)));
-        coordinate.setGeoid(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_GEOID)));
 
         //Degrees, minutes, seconds are not stored in the DB
         coordinate.convertDDToDMS();
@@ -339,85 +423,38 @@ class GBCoordinateManager {
         return coordinate;
     }
 
-
-
-    private GBCoordinateEN getENCoordinateFromCursor(GBCoordinateEN coordinate,
-                                                          Cursor cursor){
-        coordinate.setCoordinateID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ID)));
-        coordinate.setProjectID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID)));
-        coordinate.setPointID(cursor.getInt  (
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_POINT_ID)));
-
-        //type set in caller of this routine
-
-
-        int valid = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_VALID_COORD));
-        if (valid == 0) {
-            coordinate.setValidCoordinate(false);
-        }else{
-            coordinate.setValidCoordinate(true);
-        }
-
-        int isFixed = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_IS_FIXED));
-        if (isFixed == 0) {
-            coordinate.setIsFixed(false);
-        }else{
-            coordinate.setIsFixed(true);
-        }
-
+    private GBCoordinateEN getENCoordinateFromCursor(GBCoordinateEN coordinate, Cursor cursor){
 
         coordinate.setEasting(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_EASTING)));
         coordinate.setNorthing(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_NORTHING)));
-        coordinate.setElevation(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_ELEVATION)));
 
         coordinate.setZone(cursor.getInt(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_ZONE)));
 
-
-
-
-        coordinate.setDatum(cursor.getString(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_DATUM)));
-        coordinate.setConvergence(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_CONVERGENCE)));
-        coordinate.setScale(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_ELEVATION)));
-
-
         return coordinate;
     }
 
-    private GBCoordinateUTM getUTMCoordinateFromCursor(GBCoordinateUTM coordinate,
-                                                       Cursor cursor){
-
-        //get the supertype properties
-        getENCoordinateFromCursor((GBCoordinateEN)coordinate, cursor);
+    private GBCoordinateUTM getUTMCoordinateFromCursor(GBCoordinateUTM coordinate, Cursor cursor){
 
         String latBand = cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_LATBAND));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_UTM_LATBAND));
         coordinate.setLatBand(latBand.charAt(0));
 
         String hemisphere = cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_EN_HEMISPHERE));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_UTM_HEMISPHERE));
         coordinate.setHemisphere(hemisphere.charAt(0)  ) ;
 
         return coordinate;
     }
 
     private GBCoordinateSPCS getSPSCCoordinateFromCursor(GBCoordinateSPCS coordinate, Cursor cursor){
-        //get the supertype properties
-        getENCoordinateFromCursor((GBCoordinateEN)coordinate, cursor);
+        String spcState = cursor.getString(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_SPC_STATE));
+        coordinate.setState(spcState);
 
-        // TODO: 6/20/2017 finish this method
         return coordinate;
-
     }
 
 
@@ -480,11 +517,11 @@ class GBCoordinateManager {
         GBCoordinateMean coordinate = new GBCoordinateMean();
 
         coordinate.setCoordinateID(cursor.getInt  (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_ID)));
         coordinate.setProjectID(cursor.getInt  (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_PROJECT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_PROJECT_ID)));
         coordinate.setPointID(cursor.getInt  (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_POINT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_POINT_ID)));
 
         //type is set in calling routine
 
@@ -498,7 +535,7 @@ class GBCoordinateManager {
 
 
         int valid = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_VALID_COORD));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_VALID_COORD));
         if (valid == 0) {
             coordinate.setValidCoordinate(false);
         }else{
@@ -506,7 +543,7 @@ class GBCoordinateManager {
         }
 
         int isFixed = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_IS_FIXED));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_IS_FIXED));
         if (isFixed == 0) {
             coordinate.setIsFixed(false);
         }else{
@@ -514,19 +551,19 @@ class GBCoordinateManager {
         }
 
         coordinate.setRawReadings(cursor.getInt (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_RAW)));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_RAW)));
 
         coordinate.setMeanedReadings(cursor.getInt (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_MEANED)));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_MEANED)));
 
         coordinate.setFixedReadings(cursor.getInt (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_FIXED)));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_FIXED)));
 
         coordinate.setLatitude(cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LATITUDE)));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LATITUDE)));
 
         coordinate.setLongitude(cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LONGITUDE)));
+                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LONGITUDE)));
 
 
         //convert DD to DMS by creating a new coordinateWGS
@@ -559,11 +596,12 @@ class GBCoordinateManager {
         coordinate.setSatellites(cursor.getInt(
                 cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_SATELLITES)));
 
-
-
         return coordinate;
 
     }
+
+
+
 
 
     /* ******************************************/

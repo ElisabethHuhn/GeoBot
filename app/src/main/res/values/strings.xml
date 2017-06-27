@@ -9,6 +9,7 @@
     <!-- String Format -->
     <string name="double_value"         >%d</string>
     <string name="point_id_fillin"      >Point ID = %d</string>
+    <string name="save_label"           >Save</string>
 
 
     <string name="unused_button_label"  > </string>
@@ -80,24 +81,24 @@
 
 
     <!-- Project Subtitles -->
-    <string name="subtitle_home">Home</string>
-    <string name="subtitle_create_project">Create Project</string>
-    <string name="subtitle_open_project">Open Project</string>
-    <string name="subtitle_copy_project">Copy Project</string>
-    <string name="subtitle_edit_project">Edit Project</string>
-    <string name="subtitle_delete_project">Delete Project</string>
-    <string name="subtitle_error_in_path">Error in Project Path through App. Please send report</string>
+    <string name="subtitle_home"            >Home</string>
+    <string name="subtitle_create_project"  >Create Project</string>
+    <string name="subtitle_open_project"    >Open Project</string>
+    <string name="subtitle_copy_project"    >Copy Project</string>
+    <string name="subtitle_edit_project"    >Edit Project</string>
+    <string name="subtitle_delete_project"  >Delete Project</string>
+    <string name="subtitle_error_in_path"   >Error in Project Path through App. Please send report</string>
 
     <string name="subtitle_maintain_project">Maintain Project</string>
-    <string name="subtitle_maintain_point">Maintain Point</string>
+    <string name="subtitle_maintain_point"  >Maintain Point</string>
 
-    <string name="subtitle_create_point">Create Point</string>
-    <string name="subtitle_open_point">Open Point</string>
-    <string name="subtitle_copy_point">Copy Point</string>
-    <string name="subtitle_edit_point">Edit Point</string>
-    <string name="subtitle_delete_point">Delete Point</string>
-    <string name="subtitle_show_point">Show Point</string>
-    <string name="subtitle_collect_points">Collect Points</string>
+    <string name="subtitle_create_point"    >Create Point</string>
+    <string name="subtitle_open_point"      >Open Point</string>
+    <string name="subtitle_copy_point"      >Copy Point</string>
+    <string name="subtitle_edit_point"      >Edit Point</string>
+    <string name="subtitle_delete_point"    >Delete Point</string>
+    <string name="subtitle_show_point"      >Show Point</string>
+    <string name="subtitle_collect_points"  >Collect Points</string>
 
     <string name="subtitle_collect"                 >Collect</string>
     <string name="subtitle_cogo"                    >COGO</string>
@@ -114,11 +115,13 @@
     <string name="subtitle_coordinate_conversion"   >Coordinate Conversion</string>
     <string name="subtitle_global_settings"         >Global Settings</string>
     <string name="subtitle_project_settings"        >Project Settings</string>
-    <string name="subtitle_convert_to_utm"          >Convert to UTM</string>
+
     <string name="subtitle_list_nmea"               >List NMEA Sentences</string>
     <string name="subtitle_list_satellites"         >List Visible Satellites</string>
     <string name="subtitle_gps_nmea"                >GPS data from NMEA</string>
     <string name="subtitle_workflow"                >Coordinate Workflow</string>
+    <string name="subtitle_convert"                 >Coordinate Conversion</string>
+
 
     <string name="subtitle_unknown_error"           >Unknown Error</string>
 
@@ -643,8 +646,13 @@
     <string name="workflow_controls"        >---------------  Workflow Controls  ---------------</string>
     <string name="start_gps_button_label"   >Start GPS</string>
     <string name="stop_gps_button_label"    >Stop GPS</string>
+    <string name="gps_on"                   >GPS is on</string>
+    <string name="gps_off"                  >GPS is off</string>
     <string name="start_mean_button_label"  >Start Mean</string>
     <string name="stop_mean_button_label"   >Stop Mean</string>
+
+    <string name="mean_in_progress_string"  >Mean in progress</string>
+    <string name="mean_not_in_progress_string">Mean NOT in progress</string>
 
     <string name="convert_button_label"     >Convert</string>
     <string name="convert_coordinates"      >Convert Coordinates</string>
@@ -706,6 +714,26 @@
 
     <!-- Convert -->
     <string name="coordinate_conversion"    >Coordinate Conversion</string>
+    <string name="start_stop_data"          >Start / Stop Data </string>
+    <string name="start_stop_mean"          >Start / Stop Mean </string>
+    <string name="data_source_label"        >Coordinate Source</string>
+    <string name="select_data_source"       >Select Data Source</string>
+    <string name="manual_wgs_data_source"   >Manual WGS84 Entry</string>
+    <string name="manual_spcs_data_source"  >Manual SPCS Entry</string>
+    <string name="manual_utm_data_source"   >Manual UTM Entry</string>
+    <string name="phone_gps"                >Phone GPS</string>
+    <string name="external_gps"             >External GPS</string>
+    <string name="cell_tower_triangulation" >Cell tower triangulation</string>
+    <string name="can_not_mean_manual"      >Can not mean manually entered data</string>
+
+    <string name="external_gps_not_available">External GPS not availiable</string>
+    <string name="phone_gps_not_available"  >Phone GPS not available</string>
+    <string name="cell_tower_triangu_not_available" >Cell Tower triangulation not available</string>
+    <string name="save_not_available"       >Save not available</string>
+    <string name="conversion_failed"        >Conversion Failed</string>
+    <string name="can_not_convert_during_mean">Can not convert while mean is in progress</string>
+    <string name="zone_input_hint"          >Must input UTM Zone before converting</string>
+
 
     <!-- Edit View Fields (initial text displayed) -->
     <string name="latitude_input_label">Enter Latitude decimal number  </string>
@@ -714,6 +742,7 @@
 
     <!-- Prompts -->
     <string name="gps_wgs84_prompt" >---------------  Current GPS Position: WGS84  ---------------</string>
+    <string name="gps_raw_data_prompt">---------------  Raw Data Sourced Position: WGS84  ---------------</string>
     <string name="mean_wgs84_prompt">---------------  Meaned GPS Position: WGS84  ---------------</string>
     <string name="wgs84_prompt"             >WGS84 Coordinate</string>
     <string name="nad83_prompt"     >---------------  NAD83 Coordinate  ---------------</string>
@@ -728,40 +757,43 @@
     <string name="default_zone"             >0</string>
     <string name="default_hemisphere"       >N</string>
 
-    <string name="mean_start_time_label">Start time:</string>
-    <string name="mean_end_time_label">End time:</string>
-    <string name="mean_number_of_points_label"># read</string>
-    <string name="mean_standard_deviation">SDev:</string>
-    <string name="mean_lat_sigma">Lat SDev:</string>
-    <string name="mean_long_sigma">Long SDev:</string>
-    <string name="mean_elev_sigma">Ele SDev:</string>
-    <string name="mean_vector_sigma">Vect SDev:</string>
-    <string name="gps_time_label">Current GPS Time:</string>
+    <string name="mean_start_time_label"        >Start time:</string>
+    <string name="mean_end_time_label"          >End time:</string>
+    <string name="mean_start_timestamp_label"        >Start:</string>
+    <string name="mean_end_timestamp_label"          >End:</string>
+    <string name="mean_number_of_points_label"  ># read</string>
+    <string name="mean_standard_deviation"      >SDev:</string>
+    <string name="mean_lat_sigma"               >Lat SDev:</string>
+    <string name="mean_long_sigma"              >Long SDev:</string>
+    <string name="mean_elev_sigma"              >Ele SDev:</string>
+    <string name="mean_vector_sigma"            >Vect SDev:</string>
+    <string name="gps_time_label"               >Timestamp:</string>
+    <string name="gps_timestamp_label"          >NMEA timestamp</string>
 
-    <string name="latitude_prompt">Latitude must be between -80.0 and 84.0</string>
-    <string name="longitude_prompt">Longitude must be between -180.0 and 180.0</string>
-    <string name="elevation_prompt">Elevation Prompt (What should this say?)</string>
+    <string name="latitude_prompt"      >Latitude must be between -80.0 and 84.0</string>
+    <string name="longitude_prompt"     >Longitude must be between -180.0 and 180.0</string>
+    <string name="elevation_prompt"     >Elevation Prompt (What should this say?)</string>
 
-    <string name="coordinate_type_button">Change Type</string>
-    <string name="type_decimal_degrees_label">Decimal Degrees</string>
-    <string name="type_degrees_label">Deg</string>
-    <string name="type_minutes_label">Min</string>
-    <string name="type_seconds_label">Sec</string>
-    <string name="type_elevation_feet_label">Elevation feet</string>
-    <string name="type_elevation_meters_label">Elevation meters</string>
-    <string name="type_geoid_height_feet_label">Geoid Height feet</string>
+    <string name="coordinate_type_button"       >Change Type</string>
+    <string name="type_decimal_degrees_label"   >Decimal Degrees</string>
+    <string name="type_degrees_label"           >Deg</string>
+    <string name="type_minutes_label"           >Min</string>
+    <string name="type_seconds_label"           >Sec</string>
+    <string name="type_elevation_feet_label"    >Elevation feet</string>
+    <string name="type_elevation_meters_label"  >Elevation meters</string>
+    <string name="type_geoid_height_feet_label" >Geoid Height feet</string>
     <string name="type_geoid_height_meters_label">Geoid Height meters</string>
 
-    <string name="utm_integer_output_prompt">Meter Precision UTM  (from IBM)</string>
-    <string name="utm_nanometer_output_prompt">Nanometer Precision UTM (GeoBot)</string>
-    <string name="utm_so_output_prompt">Foot Precision UTM (from Stack Overflow)</string>
+    <string name="utm_integer_output_prompt"    >Meter Precision UTM  (from IBM)</string>
+    <string name="utm_nanometer_output_prompt"  >Nanometer Precision UTM (GeoBot)</string>
+    <string name="utm_so_output_prompt"         >Foot Precision UTM (from Stack Overflow)</string>
 
     <!--Input error Message-->
-    <string name="input_double_format_error_string">Not in correct decimal Format</string>
-    <string name="input_wrong_range_error">Not within range, (see prompt)</string>
+    <string name="input_double_format_error_string" >Not in correct decimal Format</string>
+    <string name="input_wrong_range_error"          >Not within range, (see prompt)</string>
 
     <!-- Stubs -->
-    <string name="conversion_stub">Coordinates Converted</string>
+    <string name="conversion_stub"                  >Coordinates Converted</string>
 
 
     <!-- Content Descriptions for images -->

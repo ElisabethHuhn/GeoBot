@@ -2,42 +2,28 @@ package com.asc.msigeosystems.geobot;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
+
 
 /**
- * Currently, this has all the utilities code for development, but not the final product
- *
- * Created by Elisabeth Huhn on 11/19/2016.
+ * The Home screen for the Conversion product
+ * Elisabeth Huhn 6/23/2017
  */
-public class GBTopSettingsGeneralFragment extends Fragment {
-
-    /* *********************************************************************/
-    /* ********   Member Variables  ****************************************/
-    /* *********************************************************************/
+public class GBTopConversionFragment extends Fragment {
 
 
-    /* *********************************************************************/
-    /* ********      Constructor    ****************************************/
-    /* *********************************************************************/
-
-
-    public GBTopSettingsGeneralFragment() {
-        //for now, we don't need to initialize anything when the fragment
-        //  is first created
+    public GBTopConversionFragment() {
     }
-
-    /* *********************************************************************/
-    /* ********   LifeCycle Methods ****************************************/
-    /* *********************************************************************/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        //Initialize the DB if necessary
+        GBDatabaseManager.getInstance(getActivity());
 
         //Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_top_matrix, container, false);
@@ -46,27 +32,30 @@ public class GBTopSettingsGeneralFragment extends Fragment {
         //Wire up the UI widgets so they can handle events later
         wireWidgets(v);
 
-
-
         return v;
     }
 
-    public void onResume(){
+    @Override
+    public void onResume() {
         super.onResume();
         setSubtitle();
     }
 
     private void setSubtitle(){
-        ((GBActivity)getActivity()).setSubtitle(R.string.subtitle_general_settings);
+        ((GBActivity)getActivity()).setSubtitle(R.string.subtitle_home);
     }
+
 
     private void wireWidgets(View v){
         //Tell the user which project is open
+        /*
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
+
+
         screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
-
+        */
 
 
 
@@ -111,38 +100,21 @@ public class GBTopSettingsGeneralFragment extends Fragment {
 
 
 
-        Button m4Button = (Button) v.findViewById(R.id.row2Button1);
-        m4Button.setEnabled(false);
-        m4Button.setText("");
 
-        m4Button.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
-        m4Button.setOnClickListener(new View.OnClickListener() {
+        Button listNmeaSentencesButton = (Button) v.findViewById(R.id.row2Button1);
+        listNmeaSentencesButton.setText(R.string.skyplot_nmea_sentence_label);
+        listNmeaSentencesButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
+        listNmeaSentencesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                GBUtilities.getInstance().showStatus(getActivity(), "");
+                ((GBActivity)getActivity()).switchToListNmeaScreen();
 
-                //Intent intent = new Intent(getActivity(), GBGPSActivity.class);
-                //startActivity(intent);
 
             }
         });
 
 
-        Button gpsFromNmeaButton = (Button) v.findViewById(R.id.row2Button2);
-        gpsFromNmeaButton.setText(R.string.skyplot_gps_from_nmea);
-        gpsFromNmeaButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
-        gpsFromNmeaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-
-
-                ((GBActivity)getActivity()).switchToGpsNmeaScreen();
-
-            }
-        });
-
-
-        Button listSattelitesButton = (Button) v.findViewById(R.id.row2Button3);
+        Button listSattelitesButton = (Button) v.findViewById(R.id.row2Button2);
         listSattelitesButton.setText(R.string.skyplot_list_satellites);
         listSattelitesButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
         listSattelitesButton.setOnClickListener(new View.OnClickListener() {
@@ -157,21 +129,8 @@ public class GBTopSettingsGeneralFragment extends Fragment {
 
 
 
-        Button m7Button = (Button) v.findViewById(R.id.row3Button1);
-        m7Button.setText("Prism4D Home");
-        m7Button.setBackgroundResource(R.color.colorWhite);
-        m7Button.setFocusable(false);
-        m7Button.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
-        m7Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-                ((GBActivity)getActivity()).switchToPrism4DHomeScreen();
 
-            }
-        });
-
-
-        Button compassFragmentButton = (Button) v.findViewById(R.id.row3Button2);
+        Button compassFragmentButton = (Button) v.findViewById(R.id.row2Button3);
         compassFragmentButton.setText(R.string.skyplot_compass_fragment);
         compassFragmentButton.setFocusable(true);
         compassFragmentButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
@@ -186,22 +145,57 @@ public class GBTopSettingsGeneralFragment extends Fragment {
         });
 
 
-        Button listNmeaSentencesButton = (Button) v.findViewById(R.id.row3Button3);
-        listNmeaSentencesButton.setText(R.string.skyplot_nmea_sentence_label);
-        listNmeaSentencesButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_817_generalsettings, 0, 0);
-        listNmeaSentencesButton.setOnClickListener(new View.OnClickListener() {
+
+
+        //config Button
+        Button configButton = (Button) v.findViewById(R.id.row3Button1);
+        configButton.setText(R.string.config_button_label);
+        configButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_007_config, 0, 0);
+        configButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                ((GBActivity)getActivity()).switchToListNmeaScreen();
+            public void onClick(View v) {
+
+                ((GBActivity) getActivity()).switchToTopConfigScreen();
 
 
             }
         });
 
+        //settings Button
+        Button settingsButton = (Button) v.findViewById(R.id.row3Button2);
+        settingsButton.setText(R.string.settings_button_label);
+        settingsButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_008_settings, 0, 0);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
 
+                ((GBActivity) getActivity()).switchToTopSettingsScreen();
+            }
+        });
+
+        //help Button
+        Button helpButton = (Button) v.findViewById(R.id.row3Button3);
+        helpButton.setText(R.string.help_button_label);
+        helpButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_009_support, 0, 0);
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                GBUtilities.getInstance().showStatus(getActivity(), R.string.help_button_label);
+
+                ((GBActivity) getActivity()).switchToTopSupportScreen();
+
+            }
+        });
+
+        //ESC and Enter are disabled on the Help Screen
 
 
     }
+
+
+
+
+
+
+
 }
-
-

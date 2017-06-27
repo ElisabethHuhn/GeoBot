@@ -423,7 +423,8 @@ public class GBActivity extends AppCompatActivity {
 
         if (fragment == null) {
             //when we first create the activity, the fragment needs to be the home screen
-            fragment = new GBTopHomeFragment();
+            //fragment = new GBTopHomeFragment();
+            fragment = new GBTopConversionFragment();
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();
@@ -544,6 +545,19 @@ public class GBActivity extends AppCompatActivity {
     void switchToHomeScreen(){
         //replace the fragment with the Home UI
 
+        //Fragment fragment    = new GBTopHomeFragment();
+        Fragment fragment    = new GBTopConversionFragment();
+        String   tag         = sHomeTag;
+        int      title       = R.string.subtitle_home;
+
+        switchScreen(fragment, tag, title);
+
+    }
+
+
+    void switchToPrism4DHomeScreen(){
+        //replace the fragment with the Home UI
+
         Fragment fragment    = new GBTopHomeFragment();
         String   tag         = sHomeTag;
         int      title       = R.string.subtitle_home;
@@ -551,6 +565,7 @@ public class GBActivity extends AppCompatActivity {
         switchScreen(fragment, tag, title);
 
     }
+
 
 
 
@@ -874,6 +889,17 @@ public class GBActivity extends AppCompatActivity {
 
 
 
+    void switchToCoordConvert(){
+
+        Fragment fragment = new GBCoordConvertFragment();
+        String tag        = sConversionTag;
+        int subTitle      = R.string.subtitle_coordinate_conversion;
+
+        switchScreen(fragment, tag, subTitle);
+
+
+    }
+
     void switchToCoordWorkflow(){
 
         Fragment fragment = new GBCoordWorkflowFragment();
@@ -890,9 +916,9 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToConvertScreen(){
 
-        Fragment fragment = new GBCoordConversionFragment();
+        Fragment fragment = new GBCoordConversionOldFragment();
         String tag        = sConversionTag;
-        int subTitle      = R.string.subtitle_convert_to_utm;
+        int subTitle      = R.string.subtitle_coordinate_conversion;
 
         switchScreen(fragment, tag, subTitle);
 

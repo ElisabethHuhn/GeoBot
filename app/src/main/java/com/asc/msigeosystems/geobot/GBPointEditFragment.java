@@ -1524,8 +1524,8 @@ public class GBPointEditFragment extends Fragment  {
         //pointHemisphereInput.setText(String.valueOf(coordinate.getHemisphere()));
 
         pointDatumInput.setText(String.valueOf(coordinate.getDatum()));
-        pointConvergenceInput.setText(String.valueOf(coordinate.getConvergence()));
-        pointScaleFactorInput.setText(String.valueOf(coordinate.getScale()));
+        pointConvergenceInput.setText(String.valueOf(coordinate.getConvergenceAngle()));
+        pointScaleFactorInput.setText(String.valueOf(coordinate.getScaleFactor()));
 
         if (elevation < 0.0){
             pointElevationMetersInput.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorNegNumber));
@@ -1887,8 +1887,8 @@ public class GBPointEditFragment extends Fragment  {
             //coordinate.setLatBand((latBandString.charAt(0)));
             //coordinate.setHemisphere((hemisphereString).charAt(0));
             coordinate.setDatum(datumString);
-            coordinate.setConvergence(Double.parseDouble(convergenceString));
-            coordinate.setScale(Double.parseDouble(scaleString));
+            coordinate.setConvergenceAngle(Double.parseDouble(convergenceString));
+            coordinate.setScaleFactor(Double.parseDouble(scaleString));
             coordinate.setValidCoordinate(true);
 
             mPointBeingMaintained.setHasACoordinateID(coordinate.getCoordinateID());

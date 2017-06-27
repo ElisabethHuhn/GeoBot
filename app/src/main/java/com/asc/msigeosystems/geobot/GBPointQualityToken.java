@@ -77,42 +77,42 @@ public class GBPointQualityToken {
     public double getHdop() {
         return mHdop;
     }
-    public void setHdop(double hdop) {
+    public void   setHdop(double hdop) {
         mHdop = hdop;
     }
 
     public double getVdop() {
         return mVdop;
     }
-    public void setVdop(double vdop) {
+    public void   setVdop(double vdop) {
         mVdop = vdop;
     }
 
     public double getTdop() {
         return mTdop;
     }
-    public void setTdop(double tdop) {
+    public void   setTdop(double tdop) {
         mTdop = tdop;
     }
 
     public double getPdop() {
         return mPdop;
     }
-    public void setPdop(double pdop) {
+    public void   setPdop(double pdop) {
         mPdop = pdop;
     }
 
     public double getHrms() {
         return mHrms;
     }
-    public void setHrms(double hrms) {
+    public void   setHrms(double hrms) {
         mHrms = hrms;
     }
 
     public double getVrms() {
         return mVrms;
     }
-    public void setVrms(double vrms) {
+    public void   setVrms(double vrms) {
         mVrms = vrms;
     }
 

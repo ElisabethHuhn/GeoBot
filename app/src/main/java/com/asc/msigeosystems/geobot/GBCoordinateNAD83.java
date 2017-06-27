@@ -40,6 +40,7 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
 
     private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeNAD83;
     private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassNAD83;
+    static final String sDatum = "NAD83";
 
     /* ******
      *
@@ -103,6 +104,11 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
         super.initializeDefaultVariables();
 
         //initialize all variables from this level
+        //initialize all variables from this level
+        mThisCoordinateType  = sCoordinateTypeNAD83;
+        mThisCoordinateClass = sCoordinateTypeClassNAD83;
+
+        mDatum               = sDatum; //eg WGS84
 
     }
 

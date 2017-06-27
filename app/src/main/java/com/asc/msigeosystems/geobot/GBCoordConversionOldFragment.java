@@ -19,7 +19,7 @@ import java.math.RoundingMode;
  * when the user is making point measurements in the field
  * Created by Elisabeth Huhn on 4/13/2016.
  */
-public class GBCoordConversionFragment extends Fragment {
+public class GBCoordConversionOldFragment extends Fragment {
 
     /**
      * Create variables for all the widgets
@@ -31,12 +31,12 @@ public class GBCoordConversionFragment extends Fragment {
 
     private GBCoordinateWGS84 mCoordinateWGS84;
 
-    //private double mConvergence;
-    //private double mScale;
+    //private double mConvergenceAngle;
+    //private double mScaleFactor;
 
 
 
-    public GBCoordConversionFragment() {
+    public GBCoordConversionOldFragment() {
         //for now, we don't need to initialize anything when the fragment
         //  is first created
     }
@@ -340,9 +340,9 @@ public class GBCoordConversionFragment extends Fragment {
         spcNorthingMetersOutput.setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthing())));
         spcEastingFeetOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getEastingFeet())));
         spcNorthingFeetOutput  .setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthingFeet())));
-        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergence())));
+        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergenceAngle())));
 
-        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScale())));
+        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScaleFactor())));
 
 
     }

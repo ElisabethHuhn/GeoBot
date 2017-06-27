@@ -7,10 +7,20 @@
     <color name="colorWindowBackground">#FFFFFF</color>
     <color name="colorTextColorPrimary">#FFFFFF</color>
 
-    <color name="colorGray">#dcdcdc</color>
-    <color name="colorGrayer">#d3d3d3</color>
-    <color name="colorGrayest">#cac9c9</color>
+    <color name="colorGray"     >#dcdcdc</color>
+    <color name="colorGrayer"   >#d3d3d3</color>
+    <color name="colorGrayest"  >#cac9c9</color>
     <color name="colorScreenBackground">#f0f8ff</color>
+    <color name="colorGrayish"  >#fffbea</color>
+    <color name="colorLightGrayish"  >#efefef</color>
+
+    <color name="colorYellowish">#fffdde</color>
+    <color name="colorDarkerYellowish">#fffa9f</color>
+    <color name="colorDarkestYellowish">#fff59f</color>
+
+    <color name="colorRedish"   >#ffcff0</color>
+    <color name="colorGreenish" >#dafbe7</color>
+    <color name="colorBlueish"  >#dce6fe</color>
 
 
     <color name="colorBlueButton">#03a9f4</color>
