@@ -5,10 +5,12 @@ package com.asc.msigeosystems.geobot;
  * This exists just to check the intermediate results of a conversion
  */
 
-class GBLamberConversionCheck {
+class GBLambertConversionCheck {
 
     double mLatitude;
+    double mLatRad;
     double mLongitude;
+    double mLngRad;
     double mDeltaLatitude;
     double mu;
     double mR;
@@ -19,6 +21,8 @@ class GBLamberConversionCheck {
     double mNPrime;
     double mNorthing;
     double mScaleFactor;
+
+    GBLambertConversionCheck() {}
 
     double getLatitude() {
         return mLatitude;
@@ -32,6 +36,20 @@ class GBLamberConversionCheck {
     }
     void setLongitude(double longitude) {
         mLongitude = longitude;
+    }
+
+    double getLatRad() {
+        return mLatRad;
+    }
+    void setLatRad(double latRad) {
+        mLatRad = latRad;
+    }
+
+    double getLngRad() {
+        return mLngRad;
+    }
+    void setLngRad(double lngRad) {
+        mLngRad = lngRad;
     }
 
     double getDeltaLatitude() {

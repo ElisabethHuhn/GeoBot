@@ -8,6 +8,21 @@
         android:title="@string/action_home"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/action_project_open"
+        android:title="@string/action_project_open"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_project_edit"
+        android:title="@string/action_project_edit"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_project_create"
+        android:title="@string/action_project_create"
+        app:showAsAction="never"
+        />
     <!-- Remove these things from the menu
     <item
         android:id="@+id/action_project"

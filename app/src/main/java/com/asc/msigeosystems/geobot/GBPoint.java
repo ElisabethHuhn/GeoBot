@@ -59,6 +59,8 @@ class GBPoint {
     // TODO: 6/11/2017 The coordinate type is on the project, is this sufficient??? 
     private GBCoordinate mCoordinate;
 
+    private int          mPointNumber;
+
     //The original offset. The Coordinate has this offset calculated into it
     private double       mOffsetDistance;
     private double       mOffsetHeading;
@@ -181,6 +183,8 @@ class GBPoint {
     GBCoordinate getCoordinate()                { return mCoordinate;  }
     void setCoordinate(GBCoordinate coordinate) { mCoordinate = coordinate; }
 
+    int getPointNumber() {  return mPointNumber;   }
+    void setPointNumber(int pointNumber) {  mPointNumber = pointNumber; }
 
     double getOffsetDistance() {  return mOffsetDistance;   }
     void setOffsetDistance(double offsetDistance) {  mOffsetDistance = offsetDistance; }
@@ -279,6 +283,7 @@ class GBPoint {
         this.mForProjectID     = GBUtilities.ID_DOES_NOT_EXIST;
         this.mPointID          = GBUtilities.ID_DOES_NOT_EXIST;
         this.mHasACoordinateID = GBUtilities.ID_DOES_NOT_EXIST;
+        this.mPointNumber      = 0;
         this.mCoordinate       = null;
 
         this.mOffsetDistance   = 0d;

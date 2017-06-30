@@ -2,10 +2,12 @@ package com.asc.msigeosystems.geobot;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 /**
@@ -48,14 +50,14 @@ public class GBTopConversionFragment extends Fragment {
 
     private void wireWidgets(View v){
         //Tell the user which project is open
-        /*
+
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
 
 
         screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
-        */
+
 
 
 

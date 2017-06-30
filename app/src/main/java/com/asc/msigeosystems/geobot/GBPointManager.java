@@ -271,6 +271,7 @@ public class GBPointManager {
         values.put(GBDatabaseSqliteHelper.POINT_ID,               point.getPointID());
         values.put(GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID,   point.getForProjectID());
         values.put(GBDatabaseSqliteHelper.POINT_ISA_COORDINATE_ID,point.getHasACoordinateID());
+        values.put(GBDatabaseSqliteHelper.POINT_NUMBER,           point.getPointNumber());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_DISTANCE,  point.getOffsetDistance());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_HEADING,   point.getOffsetHeading());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_ELEVATION, point.getOffsetElevation());
@@ -310,14 +311,16 @@ public class GBPointManager {
         point.setForProjectID    (cursor.getLong   (
                                   cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID)));
         point.setHasACoordinateID(cursor.getLong   (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_ISA_COORDINATE_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_ISA_COORDINATE_ID)));
 
+        point.setPointNumber     (cursor.getInt(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_NUMBER)));
         point.setOffsetDistance  (cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_DISTANCE)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_DISTANCE)));
         point.setOffsetHeading   (cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_HEADING)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_HEADING)));
         point.setOffsetElevation (cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_ELEVATION)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_ELEVATION)));
 
         point.setHeight          (cursor.getDouble(
                 cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HEIGHT)));

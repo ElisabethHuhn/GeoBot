@@ -68,21 +68,35 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String PROJECT_LAST_MAINTAINED = "proj_last_maintained";
     static final String PROJECT_DESCRIPTION =     "proj_description";
     static final String PROJECT_COORDINATE_TYPE = "proj_coordinate_type";
+    static final String PROJECT_DIST_UNITS      = "proj_dist_units";
+    static final String PROJECT_NUM_MEAN        = "proj_num_mean";
+    static final String PROJECT_EN_V_NE         = "proj_en_v_ne";
+    static final String PROJECT_NXT_POINT_NUM   = "proj_nxt_pt_num";
+    static final String PROJECT_LOCATION_PRECISION = "projset_location_precision";
+    static final String PROJECT_STDDEV_PRECISION  = "projset_stddev_precision";
+    static final String PROJECT_RMS_V_STDDEV      = "projset_rms_v_stddev";
 
 
     //create project table
     //NOTE: Dates are stored as long, NOT as a Date.
     //      The conversion is done when CV is created and when Cursor is translated
     private static final String CREATE_TABLE_PROJECT = "CREATE TABLE " +
-            TABLE_PROJECT           + "("            +
-            KEY_ID                  + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            PROJECT_ID              + " INTEGER, "   +
-            PROJECT_NAME            + " TEXT, "      +
-            PROJECT_CREATED         + " TEXT, "      +
-            PROJECT_LAST_MAINTAINED + " TEXT, "      +
-            PROJECT_DESCRIPTION     + " TEXT, "      +
-            PROJECT_COORDINATE_TYPE + " TEXT, "      +
-            KEY_CREATED_AT          + " DATETIME"    + ")";
+            TABLE_PROJECT               + "("            +
+            KEY_ID                      + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            PROJECT_ID                  + " INTEGER, "   +
+            PROJECT_NAME                + " TEXT, "      +
+            PROJECT_CREATED             + " TEXT, "      +
+            PROJECT_LAST_MAINTAINED     + " TEXT, "      +
+            PROJECT_DESCRIPTION         + " TEXT, "      +
+            PROJECT_COORDINATE_TYPE     + " TEXT, "      +
+            PROJECT_DIST_UNITS          + " INTEGER, "   +
+            PROJECT_NUM_MEAN            + " INTEGER, "   +
+            PROJECT_EN_V_NE             + " INTEGER, "   +
+            PROJECT_NXT_POINT_NUM       + " INTEGER, "   +
+            PROJECT_LOCATION_PRECISION  + " INTEGER, "  +
+            PROJECT_STDDEV_PRECISION    + " INTEGER, "  +
+            PROJECT_RMS_V_STDDEV        + " INTEGER, "  +
+            KEY_CREATED_AT              + " DATETIME"    + ")";
 
     /* ***************************************************/
     /* ******  Project Settings   ************************/
@@ -161,9 +175,10 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String POINT_ID             = "point_id";
     static final String POINT_FOR_PROJECT_ID = "point_project_id";
     static final String POINT_ISA_COORDINATE_ID =  "point_coordinate_ID";
-    static final String POINT_OFFSET_DISTANCE =  "point_offset_distance";
+    static final String POINT_NUMBER          = "point_number";
+    static final String POINT_OFFSET_DISTANCE = "point_offset_distance";
     static final String POINT_OFFSET_HEADING =  "point_offset_heading";
-    static final String POINT_OFFSET_ELEVATION =  "point_offset_elevation";
+    static final String POINT_OFFSET_ELEVATION = "point_offset_elevation";
     static final String POINT_HEIGHT         =  "point_height";
     static final String POINT_FEATURE_CODE   = "point_feature_code";
     static final String POINT_NOTES          = "point_notes";
@@ -183,6 +198,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             POINT_ID                + " INTEGER, " +
             POINT_FOR_PROJECT_ID    + " INTEGER, " +
             POINT_ISA_COORDINATE_ID + " INTEGER, " +
+            POINT_NUMBER            + " INTEGER, " +
             POINT_OFFSET_DISTANCE   + " REAL, "    +
             POINT_OFFSET_HEADING    + " REAL, "    +
             POINT_OFFSET_ELEVATION  + " REAL, "    +

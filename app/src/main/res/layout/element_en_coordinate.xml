@@ -10,7 +10,7 @@
 
     <!-- Easting/Northing Coordinate -->
 
-    <!-- easting and northing -->
+    <!-- easting and falseNorthing2 -->
     <include android:id="@+id/eastingContainer"     layout="@layout/element_en_label_meters_feet"/>
     <include android:id="@+id/northingContainer"    layout="@layout/element_en_label_meters_feet"/>
     <!-- elevation -->

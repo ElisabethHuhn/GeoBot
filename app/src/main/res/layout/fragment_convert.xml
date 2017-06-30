@@ -396,9 +396,7 @@
                             android:background="@color/colorWhite"
                             />
 
-
                     </LinearLayout>
-
 
                     <!-- Longitude Label and input fields -->
                     <!-- break out into separate fields -->
@@ -498,74 +496,149 @@
 
                     </LinearLayout>
 
-
                     <!-- Convergence / Scale Factor -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:orientation="vertical"
+                        android:layout_marginTop="5dp"
                         >
 
-                        <!-- Convergence -->
-                        <TextView
-                            android:text="@string/spc_convergence_label"
+                        <!-- Convergence / Scale Factor -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
 
-                            android:layout_marginEnd="4dp"
+                            >
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <TextView
-                            android:id="@+id/gpsWgs84ConvergenceOutput"
-                            android:hint="@string/spc_convergence_label"
-
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
-
-                            android:gravity="center"
-
-                            android:layout_marginEnd="4dp"
+                            <!-- Convergence -->
+                            <TextView
+                                android:text="@string/convergence_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:layout_marginEnd="4dp"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <!-- Decimal Degrees -->
+                            <EditText
+                                android:id="@+id/gpsWgs84ConvergenceInput"
+                                android:hint="@string/convergence_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="65"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|numberDecimal"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorGrayish"
+                                />
+                            <!-- degrees -->
+                            <EditText
+                                android:id="@+id/gpsWgs84ConvDegreesInput"
+                                android:hint="@string/type_degrees_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- minutes -->
+                            <EditText
+                                android:id="@+id/gpsWgs84ConvMinutesInput"
+                                android:hint="@string/type_minutes_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- seconds -->
+                            <EditText
+                                android:id="@+id/gpsWgs84ConvSecondsInput"
+                                android:hint="@string/type_seconds_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="35"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|numberDecimal"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="8dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+
+                        </LinearLayout>
 
                         <!-- Scale Factor -->
-                        <TextView
-                            android:text="@string/spc_scale_factor_label"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
+                            android:paddingTop="5dp"
+                            >
 
-                            android:layout_marginEnd="4dp"
+                            <!-- Scale Factor -->
+                            <TextView
+                                android:text="@string/scale_factor_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <TextView
-                            android:id="@+id/gpsWgs84ScaleFactorOutput"
-                            android:hint="@string/spc_scale_factor_label"
+                                android:layout_marginEnd="4dp"
 
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <EditText
+                                android:id="@+id/gpsWgs84ScaleFactor"
+                                android:hint="@string/scale_factor_label"
 
-                            android:layout_marginEnd="8dp"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="125"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:layout_marginEnd="8dp"
+                                android:inputType="numberSigned|numberDecimal"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+
+                        </LinearLayout>
 
                     </LinearLayout>
-
 
                     <!-- Elevation/Geoid input fields -->
                     <LinearLayout
@@ -777,7 +850,6 @@
 
                     </LinearLayout>
 
-
                     <!-- Standard Deviations -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -897,9 +969,6 @@
 
 
                     </LinearLayout>
-
-
-
 
                     <!-- Latitude Label and input fields -->
                     <!-- break out into separate fields -->
@@ -1388,69 +1457,142 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:layout_marginTop="5dp"
                         >
 
-                        <!-- Convergence -->
-                        <TextView
-                            android:text="@string/spc_convergence_label"
+                        <!-- Convergence / Scale Factor -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
 
-                            android:layout_marginEnd="4dp"
+                            >
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <EditText
-                            android:id="@+id/spcConvergenceOutput"
-                            android:hint="@string/spc_convergence_label"
-
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
-
-                            android:gravity="center"
-
-                            android:layout_marginEnd="4dp"
-                            android:inputType="numberSigned|numberDecimal"
+                            <!-- Convergence -->
+                            <TextView
+                                android:text="@string/convergence_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:layout_marginEnd="4dp"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <!-- Decimal Degrees -->
+                            <EditText
+                                android:id="@+id/spcConvergenceInput"
+                                android:hint="@string/convergence_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="65"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|numberDecimal"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorGrayish"
+                                />
+                            <!-- degrees -->
+                            <EditText
+                                android:id="@+id/spcConvDegreesInput"
+                                android:hint="@string/type_degrees_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- minutes -->
+                            <EditText
+                                android:id="@+id/spcConvMinutesInput"
+                                android:hint="@string/type_minutes_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- seconds -->
+                            <EditText
+                                android:id="@+id/spcConvSecondsInput"
+                                android:hint="@string/type_seconds_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="35"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|numberDecimal"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="8dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+
+                        </LinearLayout>
 
                         <!-- Scale Factor -->
-                        <TextView
-                            android:text="@string/spc_scale_factor_label"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
+                            android:paddingTop="5dp"
+                            >
 
-                            android:layout_marginEnd="4dp"
+                            <!-- Scale Factor -->
+                            <TextView
+                                android:text="@string/scale_factor_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <EditText
-                            android:id="@+id/spcScaleFactorOutput"
-                            android:hint="@string/spc_scale_factor_label"
+                                android:layout_marginEnd="4dp"
 
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <EditText
+                                android:id="@+id/spcScaleFactor"
+                                android:hint="@string/scale_factor_label"
 
-                            android:layout_marginEnd="8dp"
-                            android:inputType="numberSigned|numberDecimal"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="125"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:layout_marginEnd="8dp"
+                                android:inputType="numberSigned|numberDecimal"
 
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- Elevation/Geoid input fields -->
@@ -1796,67 +1938,142 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:layout_marginTop="5dp"
                         >
 
-                        <!-- Convergence -->
-                        <TextView
-                            android:text="@string/utm_convergence_label"
+                        <!-- Convergence / Scale Factor -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
+
+                            >
+
+                            <!-- Convergence -->
+                            <TextView
+                                android:text="@string/convergence_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
 
-                            android:layout_marginEnd="4dp"
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <EditText
-                            android:id="@+id/utmConvergence"
-                            android:hint="@string/utm_convergence_label"
+                                android:layout_marginEnd="4dp"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <!-- Decimal Degrees -->
+                            <EditText
+                                android:id="@+id/utmConvergenceInput"
+                                android:hint="@string/convergence_label"
 
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="65"
+                                android:gravity="center"
 
-                            android:gravity="center"
+                                android:inputType="numberSigned|numberDecimal"
+                                android:enabled="false"
 
-                            android:layout_marginEnd="4dp"
-                            android:inputType="numberSigned|numberDecimal"
+                                android:layout_marginEnd="4dp"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorGrayish"
+                                />
+                            <!-- degrees -->
+                            <EditText
+                                android:id="@+id/utmConvDegreesInput"
+                                android:hint="@string/type_degrees_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- minutes -->
+                            <EditText
+                                android:id="@+id/utmConvMinutesInput"
+                                android:hint="@string/type_minutes_label"
+
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="15"
+                                android:gravity="center"
+
+                                android:inputType="numberSigned|number"
+                                android:enabled="false"
+
+                                android:layout_marginEnd="4dp"
+
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                            <!-- seconds -->
+                            <EditText
+                                    android:id="@+id/utmConvSecondsInput"
+                                    android:hint="@string/type_seconds_label"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="35"
+                                    android:gravity="center"
+
+                                    android:inputType="numberSigned|numberDecimal"
+                                    android:enabled="false"
+
+                                    android:layout_marginEnd="8dp"
+
+                                    android:textColor="@color/colorTextBlack"
+                                    android:background="@color/colorWhite"
+                                    />
+
+                        </LinearLayout>
+
                         <!-- Scale Factor -->
-                        <TextView
-                            android:text="@string/utm_scale_factor_label"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="25"
-                            android:gravity="end"
+                            android:orientation="horizontal"
+                            android:paddingTop="5dp"
+                            >
 
-                            android:layout_marginEnd="4dp"
+                            <!-- Scale Factor -->
+                            <TextView
+                                android:text="@string/scale_factor_label"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="25"
+                                android:gravity="end"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorScreenBackground"
-                            />
-                        <EditText
-                            android:id="@+id/utmScaleFactor"
-                            android:hint="@string/utm_scale_factor_label"
+                                android:layout_marginEnd="4dp"
 
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp"
-                            android:layout_weight="50"
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorScreenBackground"
+                                />
+                            <EditText
+                                android:id="@+id/utmScaleFactor"
+                                android:hint="@string/scale_factor_label"
 
-                            android:layout_marginEnd="8dp"
-                            android:inputType="numberSigned|numberDecimal"
+                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_weight="125"
 
-                            android:textColor="@color/colorTextBlack"
-                            android:background="@color/colorWhite"
-                            />
+                                android:layout_marginEnd="8dp"
+                                android:inputType="numberSigned|numberDecimal"
 
+                                android:textColor="@color/colorTextBlack"
+                                android:background="@color/colorWhite"
+                                />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- Elevation/Geoid input fields -->
@@ -1982,6 +2199,7 @@
 
                         </LinearLayout>
                     </LinearLayout>
+
 
                 </LinearLayout>
 

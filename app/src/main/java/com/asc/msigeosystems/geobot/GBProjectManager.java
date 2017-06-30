@@ -472,8 +472,6 @@ class GBProjectManager {
             
         }
 
-
-
         return toProject;
     }
 
@@ -495,6 +493,14 @@ class GBProjectManager {
                                                 project.getProjectDescription().toString());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_COORDINATE_TYPE,
                                                 project.getProjectCoordinateType().toString());
+
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS, project.getDistanceUnits());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN,   project.getNumMean());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_EN_V_NE,    project.getEnVNe());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM, project.getNextPointNumber());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION, project.getLocPrecision());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION, project.getStdDevPrecision());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV, project.getRMSvStD());
 
         return cvProject;
     }
@@ -634,6 +640,21 @@ class GBProjectManager {
                 cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DESCRIPTION)));
         project.setProjectCoordinateType(cursor.getString(
                 cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_COORDINATE_TYPE)));
+
+        project.setDistanceUnits(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS)));
+        project.setNumMean(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN)));
+        project.setNextPointNumber(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM)));
+        project.setNumMean(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN)));
+        project.setLocPrecision(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION)));
+        project.setStdDevPrecision(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION)));
+        project.setRMSvStD(cursor.getInt(
+                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV)));
 
         return project;
     }

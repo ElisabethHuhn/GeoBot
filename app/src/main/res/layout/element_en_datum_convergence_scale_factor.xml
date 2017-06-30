@@ -56,7 +56,7 @@
         />
     <EditText
         android:id="@+id/convergenceOutput"
-        android:hint="@string/utm_convergence_label"
+        android:hint="@string/convergence_label"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"
@@ -75,7 +75,7 @@
 
     <!-- Scale Factor -->
     <TextView
-        android:text="@string/coord_scale_factor_label"
+        android:text="@string/scale_factor_label"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="25"
@@ -88,7 +88,7 @@
         />
     <EditText
         android:id="@+id/scaleFactorOutput"
-        android:hint="@string/utm_scale_factor_label"
+        android:hint="@string/scale_factor_label"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"

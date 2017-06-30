@@ -123,8 +123,8 @@ class GBPicture {
 
     private void initializeDefaultVariables(){
         this.mPictureID  = ";";
-        this.mProjectID  = 0;
-        this.mPointID    = 0;
+        this.mProjectID  = GBUtilities.ID_DOES_NOT_EXIST;
+        this.mPointID    = GBUtilities.ID_DOES_NOT_EXIST;
         this.mPathName   = "";
         this.mFileName   = "";
     }

@@ -293,7 +293,7 @@ class IBMCoordinateConversion {
         }
 
         /**
-         * getNorthing() and getEasting()
+         * getFalseNorthing2() and getEasting()
          * use variables that were
          * set in the setVariables() method
          * @param latitude value

@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import static com.asc.msigeosystems.geobot.R.color.colorNegNumber;
 import static com.asc.msigeosystems.geobot.R.color.colorPosNumber;
+import static com.asc.msigeosystems.geobot.R.id.spcScaleFactorOutput;
 
 /**
  * The Collect Fragment is the UI
@@ -337,6 +338,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                clearForm();
                 mCurDataSource = position;
 
                 int msg = 0;
@@ -428,8 +430,59 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //            Button Handlers                                       //
     //******************************************************************//
     private void onSave(){
-        GBUtilities.getInstance().showStatus(getActivity(), R.string.save_not_available);
+         if (isMeanInProgress()){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.save_not_available);
+            return;
+        }
 
+        long projectID = GBUtilities.getInstance().getOpenProjectID();
+        if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+            return;
+        }
+
+        GBProject    project        = GBUtilities.getInstance().getOpenProject();
+        GBPoint point = null;
+
+        CharSequence coordinateType = project.getProjectCoordinateType();
+
+        GBCoordinate coordinate = null;
+
+        if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)){
+
+            if ((mMeanToken != null) && (mMeanToken.getCoordinateSize() > 0)){
+                //Use the meaned result to generate coordinate
+                coordinate = new GBCoordinateWGS84( mMeanToken.getMeanCoordinate());
+            } else {
+                //use the raw WGS input to generate the coordinate
+                coordinate = convertWgsInputs();
+            }
+
+        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
+            coordinate = convertUtmInputs();
+
+        } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
+            coordinate = convertSpcsInputs();
+
+        }
+        coordinate.setProjectID(projectID);
+
+        if (coordinate.isValidCoordinate()) {
+            // TODO: 6/28/2017 Point may already exist
+            point = new GBPoint(project);
+            point.setCoordinate(coordinate);
+            //now add the point to memory and db
+            GBPointManager pointManager = GBPointManager.getInstance();
+            boolean addToDBToo = true;
+            if (!pointManager.addPointsToProject(project, point, addToDBToo)) {
+                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
+                return;
+            }
+        } else {
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_not_valid);
+            return;
+        }
+        ((GBActivity)getActivity()).switchToEditPointScreen(projectID, new GBPath(GBPath.sEditTag), point);
 
     }
 
@@ -479,6 +532,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                     //no need to recalcuclate the mean.
                     updateMeanUI(mMeanToken.getMeanCoordinate(false), mMeanToken);
                     mMeanToken.setLastPointInMean(false);
+                    // TODO: 6/27/2017 sound a tone indicating the mean is complete
                 }
                 coordinateWGS84 = new GBCoordinateWGS84(nmeaData);
 
@@ -554,68 +608,85 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         if (v == null)return false;
 
         //Time
-        //TextView gpsWgs84TimeOutput   = (TextView) v.findViewById(R.id.gpsWgs84TimeOutput);
-        TextView gpsWgs84TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
+        //TextView TimeOutput   = (TextView) v.findViewById(R.id.gpsWgs84TimeOutput);
+        TextView TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        TextView gpsWgs84LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        TextView gpsWgs84LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        TextView gpsWgs84LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        TextView gpsWgs84LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
 
         //GPS Longitude
-        TextView gpsWgs84LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        TextView gpsWgs84LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        TextView gpsWgs84LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        TextView gpsWgs84LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        TextView LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        TextView LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        TextView LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        TextView LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
 
         //Elevation
-        TextView gpsWgs84ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        TextView gpsWgs84GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        TextView gpsWgs84ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        TextView gpsWgs84GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+        TextView ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        TextView GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        TextView ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        TextView GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
 
-        TextView gpsWgs84ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceOutput);
-        TextView gpsWgs84ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+
+        //scale factor
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
         String nmeaTimeString = String.format(Locale.getDefault(), "%.0f", nmeaData.getTime());
         //String wgsTimeString  = String.format(Locale.getDefault(), "%.0f", coordinateWGS84.getTime());
-        //gpsWgs84TimeOutput.setText(nmeaTimeString);
+        //TimeOutput.setText(nmeaTimeString);
                 //todo fix time between nmea and coordinate WGS84
                 //setText(Double.toString(coordinateWGS84.getTime()));
                 //setText(Double.toString(nmeaData.getTime()));
 
         //String timestampString = GBUtilities.getDateTimeString((long)nmeaData.getTimeStamp());
         String timestampString = GBUtilities.getDateTimeString(coordinateWGS84.getTime());
-        gpsWgs84TimestampOutput.setText(timestampString);
+        TimestampOutput.setText(timestampString);
 
-        gpsWgs84LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
+        LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
 
-        gpsWgs84LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
+        LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
 
-        gpsWgs84ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
-        gpsWgs84GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
-        gpsWgs84ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
-        gpsWgs84GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
+        ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
+        GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
+        ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
+        GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
 
 
+        //input range check depends on what is being converted
+        boolean isCA = false;
         boolean isLatitude = true;
         convertDDtoDMS(getActivity(),
-                        gpsWgs84LatitudeInput,
-                        gpsWgs84LatDegreesInput,
-                        gpsWgs84LatMinutesInput,
-                        gpsWgs84LatSecondsInput,
+                        LatitudeInput,
+                        LatDegreesInput,
+                        LatMinutesInput,
+                        LatSecondsInput,
+                        isCA,
                         isLatitude);
 
         isLatitude = false;
         convertDDtoDMS(getActivity(),
-                        gpsWgs84LongitudeInput,
-                        gpsWgs84LongDegreesInput,
-                        gpsWgs84LongMinutesInput,
-                        gpsWgs84LongSecondsInput,
+                        LongitudeInput,
+                        LongDegreesInput,
+                        LongMinutesInput,
+                        LongSecondsInput,
+                        isCA,
                         isLatitude);
 
-        gpsWgs84ConvergenceAngleInput.setText(doubleToUI(coordinateWGS84.getConvergenceAngle()));
-        gpsWgs84ScaleFactorInput.setText(doubleToUI(coordinateWGS84.getScaleFactor()));
+        isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceAngleInput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        isLatitude);
+
 
         return true;
     }
@@ -696,12 +767,15 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         meanWgs84LongSigmaOutput.setText(doubleToUI(meanCoordinate.getLongitudeStdDev()));
         meanWgs84ElevSigmaOutput.setText(doubleToUI(meanCoordinate.getElevationStdDev()));
 
+        //input range check depends on what is being converted
+        boolean isCA = false;
         boolean isLatitude = true;
         convertDDtoDMS(getActivity(),
                         meanWgs84LatitudeInput,
                         meanWgs84LatDegreesInput,
                         meanWgs84LatMinutesInput,
                         meanWgs84LatSecondsInput,
+                        isCA,
                         isLatitude);
 
         isLatitude = false;
@@ -710,6 +784,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         meanWgs84LongDegreesInput,
                         meanWgs84LongMinutesInput,
                         meanWgs84LongSecondsInput,
+                        isCA,
                         isLatitude);
 
         return true;
@@ -761,65 +836,83 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         if (v == null)return false;
 
         //Time
-        //TextView gpsWgs84TimeOutput   = (TextView) v.findViewById(gpsWgs84TimeOutput);
-        TextView gpsWgs84TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
+        //TextView TimeOutput   = (TextView) v.findViewById(R.id.gpsWgs84TimeOutput);
+        TextView TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        TextView gpsWgs84LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        TextView gpsWgs84LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        TextView gpsWgs84LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        TextView gpsWgs84LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
 
         //GPS Longitude
-        TextView gpsWgs84LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        TextView gpsWgs84LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        TextView gpsWgs84LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        TextView gpsWgs84LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        TextView LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        TextView LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        TextView LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        TextView LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
 
         //Elevation
-        TextView gpsWgs84ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        TextView gpsWgs84GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        TextView gpsWgs84ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        TextView gpsWgs84GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+        TextView ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        TextView GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        TextView ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        TextView GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
 
-        TextView gpsWgs84ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceOutput);
-        TextView gpsWgs84ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
 
         long timeStamp = coordinateWGS84.getTime();
         String timestampString = GBUtilities.getDateTimeString(timeStamp);
 
         String timeString = String.format(Locale.getDefault(), "%d", coordinateWGS84.getTime());
-        //gpsWgs84TimeOutput.setText(timeString);
+        //TimeOutput.setText(timeString);
 
-        gpsWgs84TimestampOutput.setText(timestampString);
+        if (timeStamp == 0){
+            TimestampOutput.setText("0");
+        } else {
+            TimestampOutput.setText(timestampString);
+        }
 
-        gpsWgs84LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
+        LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
 
-        gpsWgs84LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
+        LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
 
-        gpsWgs84ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
-        gpsWgs84GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
-        gpsWgs84ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
-        gpsWgs84GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
+        ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
+        GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
+        ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
+        GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
 
 
+        //input range check depends on what is being converted
+        boolean isCA = false;
         boolean isLatitude = true;
         convertDDtoDMS(getActivity(),
-                        gpsWgs84LatitudeInput,
-                        gpsWgs84LatDegreesInput,
-                        gpsWgs84LatMinutesInput,
-                        gpsWgs84LatSecondsInput,
+                        LatitudeInput,
+                        LatDegreesInput,
+                        LatMinutesInput,
+                        LatSecondsInput,
+                        isCA,
                         isLatitude);
 
         isLatitude = false;
         convertDDtoDMS(getActivity(),
-                        gpsWgs84LongitudeInput,
-                        gpsWgs84LongDegreesInput,
-                        gpsWgs84LongMinutesInput,
-                        gpsWgs84LongSecondsInput,
+                        LongitudeInput,
+                        LongDegreesInput,
+                        LongMinutesInput,
+                        LongSecondsInput,
+                        isCA,
                         isLatitude);
 
-        gpsWgs84ConvergenceAngleInput.setText(doubleToUI(coordinateWGS84.getConvergenceAngle()));
-        gpsWgs84ScaleFactorInput     .setText(doubleToUI(coordinateWGS84.getScaleFactor()));
+        isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceAngleInput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        isLatitude);
+
 
 
         return true;
@@ -852,8 +945,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmGeoidOutput           = (TextView) v.findViewById(R.id.utmGeoidHeightMetersInput) ;
         TextView utmGeoidFeetOutput       = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput) ;
 
-        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergence);
-        TextView utmScaleFactorOutput    = (TextView) v.findViewById(R.id.utmScaleFactor);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.utmConvergenceInput);
+        TextView CAdegInput  = (TextView) v.findViewById(R.id.utmConvDegreesInput);
+        TextView CAminInput  = (TextView) v.findViewById(R.id.utmConvMinutesInput);
+        TextView CAsecInput  = (TextView) v.findViewById(R.id.utmConvSecondsInput);
+
+        //scale factor
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.utmScaleFactor);
 
         //Also output the result in separate fields
         utmZoneOutput        .setText(String.valueOf(coordinateUTM.getZone()));
@@ -870,8 +969,18 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         utmGeoidOutput        .setText(String.valueOf(coordinateUTM.getGeoid()));
         utmGeoidFeetOutput    .setText(String.valueOf(coordinateUTM.getGeoidFeet()));
 
-        utmConvergenceOutput .setText(String.valueOf(coordinateUTM.getConvergenceAngle()));
-        utmScaleFactorOutput .setText(String.valueOf(coordinateUTM.getScaleFactor()));
+        ConvergenceAngleInput .setText(String.valueOf(coordinateUTM.getConvergenceAngle()));
+        // degrees minutes seconds
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceAngleInput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        false);
+
+        ScaleFactorInput .setText(String.valueOf(coordinateUTM.getScaleFactor()));
         return true;
 
 
@@ -894,7 +1003,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
         if ((coordinateSPCS.getZone() == (int)GBUtilities.ID_DOES_NOT_EXIST) ||
             (coordinateSPCS.getZone() != zone))    {
-            clearSPCSUI(v);
+            clearSpcUI(v);
             spcZoneInput  .setText(String.valueOf(coordinateSPCS.getZone()));
             spcStateOutput.setText(getString(R.string.spc_zone_error));
             return false;
@@ -925,8 +1034,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView spcConvergenceOutput    = (TextView) v.findViewById(R.id.spcConvergenceOutput);
-        TextView spcScaleFactorOutput    = (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView CAdegInput  = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput  = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput  = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+
+        //scale factor
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.spcScaleFactor);
 
 
         spcZoneInput           .setText(String.valueOf(coordinateSPCS.getZone()));
@@ -942,8 +1057,18 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         spcsGeoidHeightMetersInput.setText(String.valueOf(doubleToUI(coordinateSPCS.getGeoid())));
         spcsGeoidHeightFeetInput  .setText(String.valueOf(doubleToUI(coordinateSPCS.getGeoidFeet())));
 
-        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(coordinateSPCS.getConvergenceAngle())));
-        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(coordinateSPCS.getScaleFactor())));
+        ConvergenceAngleInput   .setText(String.valueOf(doubleToUI(coordinateSPCS.getConvergenceAngle())));
+
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceAngleInput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        false);
+
+        ScaleFactorInput   .setText(String.valueOf(doubleToUI(coordinateSPCS.getScaleFactor())));
 
         return true;
 
@@ -972,6 +1097,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                            TextView tudeDInput,
                            TextView tudeMInput,
                            TextView tudeSInput,
+                           boolean  isCA,
                            boolean  isLatitude) {
 
         String tudeString = tudeDDInput.getText().toString().trim();
@@ -983,8 +1109,9 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         double tude = Double.parseDouble(tudeString);
 
         //The user inputs have to be within range to be
-        if (   (isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
-                ((!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
+        //no range check necessary for convergence angle
+        if (((!isCA) &&   isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
+            ((!isCA) && (!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
 
             tudeDInput.setText(R.string.zero_decimal_string);
             tudeMInput.setText(R.string.zero_decimal_string);
@@ -1052,6 +1179,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //******************************************************************//
     private void onConvert(){
         if (isMeanInProgress())return;
+        View v = getView();
+        if (v == null)return;
 
         GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_stub);
 
@@ -1066,9 +1195,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 }
 
                 //Convert the WGS84 to UTM
+                clearUtmUI(v);
                 updateUtmUI(coordinateWGS84);
 
                 //Convert to State Plane
+                clearSpcUIxZone(v);
                 updateSpcsUI(coordinateWGS84);
 
                 break;
@@ -1085,8 +1216,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                     return;
                 }
 
+                clearWgsUI(v);
                 updateWgsUI(coordinateWGS84);
+                clearSpcUIxZone(v);
                 updateSpcsUI(coordinateSPCS);
+                clearUtmUI(v);
                 updateUtmUI(coordinateWGS84);
                 break;
 
@@ -1103,10 +1237,15 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 }
 
                 //display WGS Coordinate
+                clearWgsUI(v);
                 updateWgsUI(coordinateWGS84);
+
                 //Convert to UTM Coordinate and display it
+                clearSpcUIxZone(v);
                 updateSpcsUI(coordinateWGS84);
+
                 //display UTM Coordinate
+                clearUtmUI(v);
                 updateUtmUI(coordinateUTM);
                 break;
 
@@ -1119,12 +1258,15 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                     return;
                 }
 
+                clearWgsUI(v);
                 updateWgsUI(coordinateWGS84);
 
                 //Convert the WGS84 to UTM, and display the UTM coordinate
+                clearUtmUI(v);
                 updateUtmUI(coordinateWGS84);
 
                 //Convert to State Plane and display the SPCS coordinate
+                clearSpcUIxZone(v);
                 updateSpcsUI(coordinateWGS84);
 
                 break;
@@ -1160,47 +1302,52 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         if (v == null)return null;
 
         //Time
-        //EditText gpsWgs84TimeOutput      = (EditText) v.findViewById(gpsWgs84TimeOutput);
-        TextView gpsWgs84TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
+        //EditText TimeOutput      = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
+        TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText gpsWgs84LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        EditText gpsWgs84LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        EditText gpsWgs84LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        EditText gpsWgs84LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
 
         //GPS Longitude
-        EditText gpsWgs84LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        EditText gpsWgs84LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        EditText gpsWgs84LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        EditText gpsWgs84LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        EditText LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        EditText LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        EditText LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        EditText LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
 
         //Elevation
-        EditText gpsWgs84ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        EditText gpsWgs84GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        EditText gpsWgs84ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        EditText gpsWgs84GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+        EditText ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        EditText GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        EditText ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        EditText GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
 
 
-        TextView gpsWgs84ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceOutput);
-        TextView gpsWgs84ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
 
         long timeStamp = GBUtilities.getDateTimeFromString(getActivity(),
-                gpsWgs84TimeStampOutput.getText().toString());
+                TimeStampOutput.getText().toString());
         GBCoordinateWGS84 coordinateWGS84 = new GBCoordinateWGS84(
-                timeStamp,
-                gpsWgs84LatitudeInput.getText().toString(),
-                gpsWgs84LatDegreesInput.getText().toString(),
-                gpsWgs84LatMinutesInput.getText().toString(),
-                gpsWgs84LatSecondsInput.getText().toString(),
-                gpsWgs84LongitudeInput.getText().toString(),
-                gpsWgs84LongDegreesInput.getText().toString(),
-                gpsWgs84LongMinutesInput.getText().toString(),
-                gpsWgs84LongSecondsInput.getText().toString(),
-                gpsWgs84ElevationMetersInput.getText().toString(),
-                gpsWgs84ElevationFeetInput.getText().toString(),
-                gpsWgs84GeoidHeightMetersInput.getText().toString(),
-                gpsWgs84GeoidHeightFeetInput.getText().toString());
+                                                timeStamp,
+                                                LatitudeInput.getText().toString(),
+                                                LatDegreesInput.getText().toString(),
+                                                LatMinutesInput.getText().toString(),
+                                                LatSecondsInput.getText().toString(),
+                                                LongitudeInput.getText().toString(),
+                                                LongDegreesInput.getText().toString(),
+                                                LongMinutesInput.getText().toString(),
+                                                LongSecondsInput.getText().toString(),
+                                                ElevationMetersInput.getText().toString(),
+                                                ElevationFeetInput.getText().toString(),
+                                                GeoidHeightMetersInput.getText().toString(),
+                                                GeoidHeightFeetInput.getText().toString());
         if (!coordinateWGS84.isValidCoordinate()){
 
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_try_again);
@@ -1209,27 +1356,36 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
 
         String timeStampString = GBUtilities.getDateTimeString(coordinateWGS84.getTime());
-        gpsWgs84TimeStampOutput.setText(timeStampString);
-        //gpsWgs84TimeOutput.setText(String.valueOf(timeStamp));
+        TimeStampOutput.setText(timeStampString);
+        //TimeOutput.setText(String.valueOf(timeStamp));
         //display the coordinate values in the UI
-        gpsWgs84LatitudeInput  .setText(String.valueOf(coordinateWGS84.getLatitude()));
-        gpsWgs84LatDegreesInput.setText(String.valueOf(coordinateWGS84.getLatitudeDegree()));
-        gpsWgs84LatMinutesInput.setText(String.valueOf(coordinateWGS84.getLatitudeMinute()));
-        gpsWgs84LatSecondsInput.setText(String.valueOf(coordinateWGS84.getLatitudeSecond()));
+        LatitudeInput  .setText(String.valueOf(coordinateWGS84.getLatitude()));
+        LatDegreesInput.setText(String.valueOf(coordinateWGS84.getLatitudeDegree()));
+        LatMinutesInput.setText(String.valueOf(coordinateWGS84.getLatitudeMinute()));
+        LatSecondsInput.setText(String.valueOf(coordinateWGS84.getLatitudeSecond()));
 
-        gpsWgs84LongitudeInput  .setText(String.valueOf(coordinateWGS84.getLongitude()));
-        gpsWgs84LongDegreesInput.setText(String.valueOf(coordinateWGS84.getLongitudeDegree()));
-        gpsWgs84LongMinutesInput.setText(String.valueOf(coordinateWGS84.getLongitudeMinute()));
-        gpsWgs84LongSecondsInput.setText(String.valueOf(coordinateWGS84.getLongitudeSecond()));
+        LongitudeInput  .setText(String.valueOf(coordinateWGS84.getLongitude()));
+        LongDegreesInput.setText(String.valueOf(coordinateWGS84.getLongitudeDegree()));
+        LongMinutesInput.setText(String.valueOf(coordinateWGS84.getLongitudeMinute()));
+        LongSecondsInput.setText(String.valueOf(coordinateWGS84.getLongitudeSecond()));
 
-        gpsWgs84ElevationMetersInput.setText(String.valueOf(coordinateWGS84.getElevation()));
-        gpsWgs84ElevationFeetInput  .setText(String.valueOf(coordinateWGS84.getElevationFeet()));
-        gpsWgs84GeoidHeightMetersInput.setText(String.valueOf(coordinateWGS84.getGeoid()));
-        gpsWgs84GeoidHeightFeetInput  .setText(String.valueOf(coordinateWGS84.getGeoidFeet()));
+        ElevationMetersInput.setText(String.valueOf(coordinateWGS84.getElevation()));
+        ElevationFeetInput  .setText(String.valueOf(coordinateWGS84.getElevationFeet()));
+        GeoidHeightMetersInput.setText(String.valueOf(coordinateWGS84.getGeoid()));
+        GeoidHeightFeetInput  .setText(String.valueOf(coordinateWGS84.getGeoidFeet()));
 
 
-        gpsWgs84ConvergenceAngleInput.setText(String.valueOf(coordinateWGS84.getConvergenceAngle()));
-        gpsWgs84ScaleFactorInput     .setText(String.valueOf(coordinateWGS84.getScaleFactor()));
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                ConvergenceAngleInput,
+                CAdegInput,
+                CAminInput,
+                CAsecInput,
+                isCA,
+                false);
+
+
+        ScaleFactorInput     .setText(String.valueOf(coordinateWGS84.getScaleFactor()));
 
         setColor(coordinateWGS84);
 
@@ -1256,24 +1412,28 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView spcConvergenceOutput    = (TextView) v.findViewById(R.id.spcConvergenceOutput);
-        TextView spcScaleFactorOutput    = (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+        TextView ConvergenceOutput      = (TextView) v.findViewById(R.id.spcConvergenceOutput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(spcScaleFactorOutput);
+
 
 
 
         GBCoordinateSPCS coordinateSPCS = new GBCoordinateSPCS(
-                spcZoneInput.getText().toString(),
-                spcStateOutput.getText().toString(),
-                spcEastingMetersOutput.getText().toString(),
-                spcEastingFeetOutput.getText().toString(),
-                spcNorthingMetersOutput.getText().toString(),
-                spcNorthingFeetOutput.getText().toString(),
-                spcsElevationMetersInput.getText().toString(),
-                spcsElevationFeetInput.getText().toString(),
-                spcsGeoidHeightMetersInput.getText().toString(),
-                spcsGeoidHeightFeetInput.getText().toString(),
-                spcConvergenceOutput.getText().toString(),
-                spcScaleFactorOutput.getText().toString());
+                                                    spcZoneInput.getText().toString(),
+                                                    spcStateOutput.getText().toString(),
+                                                    spcEastingMetersOutput.getText().toString(),
+                                                    spcEastingFeetOutput.getText().toString(),
+                                                    spcNorthingMetersOutput.getText().toString(),
+                                                    spcNorthingFeetOutput.getText().toString(),
+                                                    spcsElevationMetersInput.getText().toString(),
+                                                    spcsElevationFeetInput.getText().toString(),
+                                                    spcsGeoidHeightMetersInput.getText().toString(),
+                                                    spcsGeoidHeightFeetInput.getText().toString(),
+                                                    ConvergenceOutput.getText().toString(),
+                                                    ScaleFactorOutput.getText().toString());
         if (!coordinateSPCS.isValidCoordinate()){
 
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_try_again);
@@ -1297,8 +1457,17 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         spcsGeoidHeightMetersInput  .setText(String.valueOf(coordinateSPCS.getGeoid()));
         spcsGeoidHeightFeetInput.setText(String.valueOf(coordinateSPCS.getGeoidFeet()));
 
-        spcConvergenceOutput.setText(String.valueOf(coordinateSPCS.getConvergenceAngle()));
-        spcScaleFactorOutput.setText(String.valueOf(coordinateSPCS.getScaleFactor()));
+        ConvergenceOutput.setText(String.valueOf(coordinateSPCS.getConvergenceAngle()));
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceOutput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        false);
+
+        ScaleFactorOutput.setText(String.valueOf(coordinateSPCS.getScaleFactor()));
 
 
 
@@ -1328,24 +1497,27 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmElevationFeetInput     = (TextView) v.findViewById(R.id.utmElevationFeetInput);
         TextView utmGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput);
 
-        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergence);
-        TextView utmScaleFactorOutput    = (TextView) v.findViewById(R.id.utmScaleFactor);
+        TextView ConvergenceOutput      = (TextView) v.findViewById(R.id.utmConvergence);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.utmConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.utmConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.utmConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.utmScaleFactor);
 
 
         GBCoordinateUTM coordinateUTM = new GBCoordinateUTM(
-                utmZoneOutput.getText().toString(),
-                utmLatbandOutput.getText().toString(),
-                utmHemisphereOutput.getText().toString(),
-                utmEastingMetersOutput.getText().toString(),
-                utmEastingFeetOutput.getText().toString(),
-                utmNorthingMetersOutput.getText().toString(),
-                utmNorthingFeetOutput.getText().toString(),
-                utmElevationMetersInput.getText().toString(),
-                utmElevationFeetInput.getText().toString(),
-                utmGeoidHeightMetersInput.getText().toString(),
-                utmGeoidHeightFeetInput.getText().toString(),
-                utmConvergenceOutput.getText().toString(),
-                utmScaleFactorOutput.getText().toString());
+                                                    utmZoneOutput.getText().toString(),
+                                                    utmLatbandOutput.getText().toString(),
+                                                    utmHemisphereOutput.getText().toString(),
+                                                    utmEastingMetersOutput.getText().toString(),
+                                                    utmEastingFeetOutput.getText().toString(),
+                                                    utmNorthingMetersOutput.getText().toString(),
+                                                    utmNorthingFeetOutput.getText().toString(),
+                                                    utmElevationMetersInput.getText().toString(),
+                                                    utmElevationFeetInput.getText().toString(),
+                                                    utmGeoidHeightMetersInput.getText().toString(),
+                                                    utmGeoidHeightFeetInput.getText().toString(),
+                                                    ConvergenceOutput.getText().toString(),
+                                                    ScaleFactorOutput.getText().toString());
         if (!coordinateUTM.isValidCoordinate()){
 
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_try_again);
@@ -1368,15 +1540,21 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         utmGeoidHeightMetersInput.setText(String.valueOf(coordinateUTM.getGeoid()));
         utmGeoidHeightMetersInput.setText(String.valueOf(coordinateUTM.getGeoidFeet()));
 
-        utmConvergenceOutput.setText(String.valueOf(coordinateUTM.getConvergenceAngle()));
-        utmScaleFactorOutput.setText(String.valueOf(coordinateUTM.getScaleFactor()));
+        ConvergenceOutput.setText(String.valueOf(coordinateUTM.getConvergenceAngle()));
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                        ConvergenceOutput,
+                        CAdegInput,
+                        CAminInput,
+                        CAsecInput,
+                        isCA,
+                        false);
 
-
+        ScaleFactorOutput.setText(String.valueOf(coordinateUTM.getScaleFactor()));
 
         setColor(coordinateUTM);
 
         return coordinateUTM;
-
     }
 
 
@@ -1390,51 +1568,57 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         if (v == null)return;
 
         //Time
-        // EditText gpsWgs84TimeOutput   = (EditText) v.findViewById(gpsWgs84TimeOutput);
-        TextView gpsWgs84TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
+        // EditText TimeOutput   = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
+        TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText gpsWgs84LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        EditText gpsWgs84LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        EditText gpsWgs84LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        EditText gpsWgs84LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
 
         //GPS Longitude
-        EditText gpsWgs84LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        EditText gpsWgs84LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        EditText gpsWgs84LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        EditText gpsWgs84LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        EditText LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        EditText LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        EditText LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        EditText LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
 
         //Elevation
-        EditText gpsWgs84ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        EditText gpsWgs84GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        EditText gpsWgs84ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        EditText gpsWgs84GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+        EditText ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        EditText GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        EditText ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        EditText GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
 
 
-        TextView gpsWgs84ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceOutput);
-        TextView gpsWgs84ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
-        //gpsWgs84TimeOutput     .setEnabled(enableFlag);
-        gpsWgs84TimeStampOutput.setEnabled(enableFlag);
+        //TimeOutput     .setEnabled(enableFlag);
+        TimeStampOutput.setEnabled(enableFlag);
 
-        gpsWgs84LatitudeInput  .setEnabled(enableFlag);
-        gpsWgs84LatDegreesInput.setEnabled(enableFlag);
-        gpsWgs84LatMinutesInput.setEnabled(enableFlag);
-        gpsWgs84LatSecondsInput.setEnabled(enableFlag);
+        LatitudeInput  .setEnabled(enableFlag);
+        LatDegreesInput.setEnabled(enableFlag);
+        LatMinutesInput.setEnabled(enableFlag);
+        LatSecondsInput.setEnabled(enableFlag);
 
-        gpsWgs84LongitudeInput  .setEnabled(enableFlag);
-        gpsWgs84LongDegreesInput.setEnabled(enableFlag);
-        gpsWgs84LongMinutesInput.setEnabled(enableFlag);
-        gpsWgs84LongSecondsInput.setEnabled(enableFlag);
+        LongitudeInput  .setEnabled(enableFlag);
+        LongDegreesInput.setEnabled(enableFlag);
+        LongMinutesInput.setEnabled(enableFlag);
+        LongSecondsInput.setEnabled(enableFlag);
 
-        gpsWgs84ElevationMetersInput  .setEnabled(enableFlag);
-        gpsWgs84ElevationFeetInput    .setEnabled(enableFlag);
-        gpsWgs84GeoidHeightMetersInput.setEnabled(enableFlag);
-        gpsWgs84GeoidHeightFeetInput  .setEnabled(enableFlag);
+        ElevationMetersInput  .setEnabled(enableFlag);
+        ElevationFeetInput    .setEnabled(enableFlag);
+        GeoidHeightMetersInput.setEnabled(enableFlag);
+        GeoidHeightFeetInput  .setEnabled(enableFlag);
 
-        gpsWgs84ConvergenceAngleInput.setEnabled(enableFlag);
-        gpsWgs84ScaleFactorInput.setEnabled(enableFlag);
-
+        ConvergenceAngleInput.setEnabled(enableFlag);
+        CAdegInput           .setEnabled(enableFlag);
+        CAminInput           .setEnabled(enableFlag);
+        CAsecInput           .setEnabled(enableFlag);
+        ScaleFactorOutput    .setEnabled(enableFlag);
 
     }
 
@@ -1457,8 +1641,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView spcConvergenceOutput    = (TextView) v.findViewById(R.id.spcConvergenceOutput);
-        TextView spcScaleFactorOutput    = (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
 
         spcZoneInput           .setEnabled(true);//always enabled for input, regardless
 
@@ -1468,8 +1658,17 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         spcEastingFeetOutput   .setEnabled(enableFlag);
         spcNorthingFeetOutput  .setEnabled(enableFlag);
 
-        spcConvergenceOutput.setEnabled(enableFlag);
-        spcScaleFactorOutput.setEnabled(enableFlag);
+        spcsElevationMetersInput  .setEnabled(enableFlag);
+        spcsGeoidHeightMetersInput.setEnabled(enableFlag);
+        spcsElevationFeetInput    .setEnabled(enableFlag);
+        spcsGeoidHeightFeetInput  .setEnabled(enableFlag);
+
+
+        ConvergenceAngleInput.setEnabled(enableFlag);
+        CAdegInput.setEnabled(enableFlag);
+        CAminInput.setEnabled(enableFlag);
+        CAsecInput.setEnabled(enableFlag);
+        ScaleFactorOutput.setEnabled(enableFlag);
 
     }
 
@@ -1485,8 +1684,19 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmEastingFeetOutput    = (TextView) v.findViewById(R.id.utmEastingFeetOutput);
         TextView utmNorthingFeetOutput   = (TextView) v.findViewById(R.id.utmNorthingFeetOutput);
 
-        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergence);
-        TextView utmScaleFactorOutput    = (TextView) v.findViewById(R.id.utmScaleFactor);
+        //Elevation
+        TextView utmElevationMetersInput   = (TextView) v.findViewById(R.id.utmElevationMetersInput);
+        TextView utmGeoidHeightMetersInput = (TextView) v.findViewById(R.id.utmGeoidHeightMetersInput);
+        TextView utmElevationFeetInput     = (TextView) v.findViewById(R.id.utmElevationFeetInput);
+        TextView utmGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
 
         utmZoneOutput          .setEnabled(enableFlag);
 
@@ -1495,10 +1705,19 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         utmEastingMetersOutput .setEnabled(enableFlag);
         utmNorthingMetersOutput.setEnabled(enableFlag);
 
+        utmElevationMetersInput. setEnabled(enableFlag);
+        utmElevationFeetInput   .setEnabled(enableFlag);
+        utmGeoidHeightMetersInput.setEnabled(enableFlag);
+        utmGeoidHeightFeetInput. setEnabled(enableFlag);
+
         utmEastingFeetOutput   .setEnabled(enableFlag);
         utmNorthingFeetOutput  .setEnabled(enableFlag);
-        utmConvergenceOutput   .setEnabled(enableFlag);
-        utmScaleFactorOutput   .setEnabled(enableFlag);
+
+        ConvergenceAngleInput.setEnabled(enableFlag);
+        CAdegInput.setEnabled(enableFlag);
+        CAminInput.setEnabled(enableFlag);
+        CAsecInput.setEnabled(enableFlag);
+        ScaleFactorOutput   .setEnabled(enableFlag);
 
     }
 
@@ -1507,20 +1726,76 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         View v = getView();
         if (v == null)return;
 
-        clearGPSUI(v);
+        clearWgsUI(v);
 
         clearMeanUI(v);
 
-        clearSPCSUI(v);
+        clearSpcUI(v);
 
         clearUtmUI(v);
 
         //clearNadUI(v);
+    }
 
+    private void clearWgsUI(View v){
+
+        //Timestamp
+        TextView TimestampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
+
+        //GPS Latitude
+        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+
+        //GPS Longitude
+        TextView LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        TextView LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        TextView LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        TextView LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+
+        //Elevation
+        TextView ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        TextView GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        TextView ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        TextView GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
+
+
+        TimestampOutput   .setText("");
+
+        LatitudeInput     .setText("");
+        LatDegreesInput   .setText("");
+        LatMinutesInput   .setText("");
+        LatSecondsInput   .setText("");
+
+        LongitudeInput     .setText("");
+        LongDegreesInput   .setText("");
+        LongMinutesInput   .setText("");
+        LongSecondsInput   .setText("");
+
+        ElevationMetersInput  .setText("");
+        ElevationFeetInput    .setText("");
+        GeoidHeightMetersInput.setText("");
+        GeoidHeightFeetInput  .setText("");
+
+        ConvergenceAngleInput.setText("");
+        CAdegInput.setText("");
+        CAminInput.setText("");
+        CAsecInput.setText("");
+        ScaleFactorOutput.setText("");
 
     }
 
     private void clearMeanUI(View v){
+
+        mMeanToken = null;
 
         //Mean Parameters
         //TextView meanWgs84StartTimeOutput    = (TextView)v.findViewById(meanWgs84StartTimeOutput);
@@ -1587,44 +1862,6 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     }
 
-    private void clearGPSUI(View v){
-
-        //GPS Latitude
-        TextView gpsWgs84LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        TextView gpsWgs84LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        TextView gpsWgs84LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        TextView gpsWgs84LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
-
-        //GPS Longitude
-        TextView gpsWgs84LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        TextView gpsWgs84LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        TextView gpsWgs84LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        TextView gpsWgs84LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
-
-        //Elevation
-        TextView gpsWgs84ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        TextView gpsWgs84GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        TextView gpsWgs84ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        TextView gpsWgs84GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
-
-
-        gpsWgs84LatitudeInput     .setText("");
-        gpsWgs84LatDegreesInput   .setText("");
-        gpsWgs84LatMinutesInput   .setText("");
-        gpsWgs84LatSecondsInput   .setText("");
-
-        gpsWgs84LongitudeInput     .setText("");
-        gpsWgs84LongDegreesInput   .setText("");
-        gpsWgs84LongMinutesInput   .setText("");
-        gpsWgs84LongSecondsInput   .setText("");
-
-        gpsWgs84ElevationMetersInput  .setText("");
-        gpsWgs84ElevationFeetInput    .setText("");
-        gpsWgs84GeoidHeightMetersInput.setText("");
-        gpsWgs84GeoidHeightFeetInput  .setText("");
-
-    }
-
     private void clearUtmUI(View v){
         TextView utmZoneOutput           = (TextView) v.findViewById(R.id.utmZoneOutput);
 
@@ -1643,8 +1880,13 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput);
 
 
-        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergence);
-        TextView utmScaleFactorOutput    = (TextView) v.findViewById(R.id.utmScaleFactor);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
 
         utmZoneOutput.          setText("");
@@ -1661,13 +1903,21 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         utmGeoidHeightMetersInput.setText("");
         utmGeoidHeightFeetInput. setText("");
 
-        utmConvergenceOutput.   setText("");
-        utmScaleFactorOutput.   setText("");
+        ConvergenceAngleInput.   setText("");
+        CAdegInput.setText("");
+        CAminInput.setText("");
+        CAsecInput.setText("");
+        ScaleFactorOutput.   setText("");
 
     }
 
-
-    private void clearSPCSUI(View v){
+    private void clearSpcUIxZone(View v) {
+        TextView spcZoneOutput = (TextView) v.findViewById(R.id.spcZoneOutput);
+        String zone = spcZoneOutput.getText().toString().trim();
+        clearSpcUI(v);
+        spcZoneOutput.setText(zone);
+    }
+    private void clearSpcUI(View v){
 
         //SPC
         TextView spcZoneOutput           = (TextView) v.findViewById(R.id.spcZoneOutput);
@@ -1684,8 +1934,13 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView spcConvergenceOutput    = (TextView) v.findViewById(R.id.spcConvergenceOutput);
-        TextView spcScaleFactorOutput    = (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
 
         spcZoneOutput          .setText("");
@@ -1701,8 +1956,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         spcsGeoidHeightMetersInput.setText("");
         spcsGeoidHeightFeetInput. setText("");
 
-        spcConvergenceOutput   .setText("");
-        spcScaleFactorOutput   .setText("");
+        ConvergenceAngleInput.   setText("");
+        CAdegInput.setText("");
+        CAminInput.setText("");
+        CAsecInput.setText("");
+        ScaleFactorOutput.   setText("");
 
 
     }
@@ -1713,29 +1971,34 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         if (v == null)return;
 
         //Time
-        //EditText gpsWgs84TimeOutput      = (EditText) v.findViewById(gpsWgs84TimeOutput);
-        TextView gpsWgs84TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
+        //EditText TimeOutput      = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
+        TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText gpsWgs84LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
-        EditText gpsWgs84LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
-        EditText gpsWgs84LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
-        EditText gpsWgs84LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
 
         //GPS Longitude
-        EditText gpsWgs84LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
-        EditText gpsWgs84LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
-        EditText gpsWgs84LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
-        EditText gpsWgs84LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        EditText LongitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        EditText LongDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        EditText LongMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        EditText LongSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
 
         //Elevation
-        EditText gpsWgs84ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
-        EditText gpsWgs84GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
-        EditText gpsWgs84ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
-        EditText gpsWgs84GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+        EditText ElevationMetersInput   = (EditText) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        EditText GeoidHeightMetersInput = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        EditText ElevationFeetInput     = (EditText) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        EditText GeoidHeightFeetInput   = (EditText) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
 
 
-        TextView gpsWgs84ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceOutput);
-        TextView gpsWgs84ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
         int uiColor;
         if (coordinateWGS84.getLatitude() >= 0.0) {
@@ -1746,10 +2009,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         }
 
 
-        gpsWgs84LatitudeInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LatDegreesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LatMinutesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LatSecondsInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LatitudeInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LatDegreesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LatMinutesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LatSecondsInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
         if (coordinateWGS84.getLongitude() >= 0.0) {
             uiColor = colorPosNumber;
@@ -1758,10 +2021,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        gpsWgs84LongitudeInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LongDegreesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LongMinutesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84LongSecondsInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LongitudeInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LongDegreesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LongMinutesInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        LongSecondsInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
         if (coordinateWGS84.getElevation() >= 0.0) {
             uiColor = colorPosNumber;
@@ -1770,8 +2033,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        gpsWgs84ElevationMetersInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84ElevationFeetInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        ElevationMetersInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        ElevationFeetInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
 
         if (coordinateWGS84.getGeoid() >= 0.0) {
@@ -1781,8 +2044,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        gpsWgs84GeoidHeightMetersInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
-        gpsWgs84GeoidHeightFeetInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        GeoidHeightMetersInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        GeoidHeightFeetInput  .setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
         if (coordinateWGS84.getConvergenceAngle() >= 0.0) {
             uiColor = colorPosNumber;
@@ -1791,7 +2054,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        gpsWgs84ConvergenceAngleInput.setTextColor(ContextCompat.getColor(getActivity(),uiColor));
+        ConvergenceAngleInput.setTextColor(ContextCompat.getColor(getActivity(),uiColor));
+        CAdegInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        CAminInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        CAsecInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
         if (coordinateWGS84.getScaleFactor() >= 0.0) {
             uiColor = colorPosNumber;
@@ -1800,7 +2066,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        gpsWgs84ScaleFactorInput     .setTextColor(ContextCompat.getColor(getActivity(),uiColor));
+        ScaleFactorInput     .setTextColor(ContextCompat.getColor(getActivity(),uiColor));
 
     }
 
@@ -1823,8 +2089,13 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView spcConvergenceOutput    = (TextView) v.findViewById(R.id.spcConvergenceOutput);
-        TextView spcScaleFactorOutput    = (TextView) v.findViewById(R.id.spcScaleFactorOutput);
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+
+        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.spcScaleFactor);
 
         int uiColor;
         if (coordinateSPCS.getEasting() >= 0.0) {
@@ -1878,7 +2149,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        spcConvergenceOutput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        ConvergenceAngleInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        CAdegInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        CAminInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        CAsecInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
         if (coordinateSPCS.getScaleFactor() >= 0.0) {
             uiColor = colorPosNumber;
@@ -1887,7 +2161,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             uiColor = colorNegNumber;
         }
 
-        spcScaleFactorOutput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
+        ScaleFactorInput.setTextColor(ContextCompat.getColor(getActivity(), uiColor));
 
     }
 

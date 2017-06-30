@@ -165,7 +165,7 @@ abstract class GBCoordinate {
         //I know that one does not have to initialize int's etc, but
         //to be explicit about the initialization, do it anyway
 
-        mCoordinateID = GBCoordinate.getNextCoordinateID();
+        mCoordinateID = GBUtilities.ID_DOES_NOT_EXIST;
 
         mProjectID = 0; //assume does not describe a point
         mPointID = 0;

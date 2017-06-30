@@ -284,6 +284,19 @@ public class GBActivity extends AppCompatActivity {
             case R.id.action_home :
                 switchToHomeScreen();
                 return true;
+            case  R.id.action_project_open:
+                switchToProjectOpenScreen();
+                //switchToProjectListProjectsScreen(new GBPath(GBPath.sOpenTag));
+                return true;
+            case  R.id.action_project_create:
+                switchToProjectOpenScreen();
+                return true;
+
+            case  R.id.action_project_edit:
+                switchToProjectEditScreen();
+                //switchToProjectListProjectsScreen(new GBPath(GBPath.sEditTag));
+                return true;
+
 /*
  case  R.id.action_project:
  switchToTopProjectScreen();
@@ -473,7 +486,6 @@ public class GBActivity extends AppCompatActivity {
         }
 
     }
-
     private void switchScreen(Fragment fragment, String tag, int subtitle) {
         switchScreen(fragment, tag);
 

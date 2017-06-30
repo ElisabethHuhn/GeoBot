@@ -311,21 +311,30 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     private void convertInverseLambert(GBCoordinateSPCS coordinateSPCS,
                                        GBCoordinateConstants constants){
 
-        double N1  = coordinateSPCS.getNorthing() - constants.getFalseNorthing();
+        //Equ A) 	N1 	=  N – No
+        double N1  = coordinateSPCS.getNorthing() - constants.getFalseNorthing2();
+
+        //Equ B) 	E1	=  E – Eo
         double E1  = coordinateSPCS.getEasting()  - constants.getFalseEasting();
 
-        double R1  = constants.getMappingRadiusAtLat() - N1;
+        //Equ C) 	R1   	=  Ro – N1
+        double R1  = constants.getRoMappingRadiusAtLat() - N1;
 
         double radER = Math.toRadians(E1 / R1);
 
+        //Equ D) 	Y 	=  tan-1 (E1/R1)
         double convergenceAngle = Math.atan(radER);
 
         double radB0 = Math.toRadians(constants.getCentralParallel());
         double sinB0 = Math.sin(radB0);
 
+        //Equ E) 	λ 	=  λo (Lo) – Y/sin Bo
+        // TODO: 6/30/2017 This is not implemented properly. Get the correct interpretation from Robert
         double longitude = constants.getCentralMeridian() - (convergenceAngle / sinB0);
 
         double tanCA = Math.tan(Math.toRadians(convergenceAngle / 2.));
+
+        //Equ F) 	u	=  N1 – E1 tan (Y/2)
         double u = N1 - (E1 * tanCA);
         double u2 = u*u;
         double u3 = u*u2;
@@ -337,14 +346,17 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         double G5 = constants.getG5();
 
 
+        //Equ G) 	Δ Φ 	=  u[G1 + uG2 + uG3 + uG4 +G5u]
         double deltaLat = (G1*u) + (G2*u2) + (G3 *u2) + (G4*u2) + (G5*u2);
 
+        //Equ H) 	Φ 	=  Bo + Δ Φ
         double latitude = constants.getCentralParallel() + deltaLat;
 
         double F1 = constants.getF1();
         double F2 = constants.getF2();
         double F3 = constants.getF3();
 
+        //Equ I) 	k 	=   F1  +  F2u2  +  F3u3
         double scaleFactor = F1 + (F2 * u2) + (F3 * u3);
 
 

@@ -1653,9 +1653,7 @@ public class GBPointEditFragment extends Fragment  {
         GBPointManager pointManager = GBPointManager.getInstance();
         boolean addToDBToo = true;
         if (!pointManager.addPointsToProject(project, mPointBeingMaintained, addToDBToo)){
-            Toast.makeText(getActivity(),
-                            getString(R.string.error_adding_point),
-                            Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),  getString(R.string.error_adding_point));
         }
 
         //from now on we are editing the point, not creating it

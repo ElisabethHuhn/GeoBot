@@ -848,7 +848,7 @@
 
                 <!-- Convergence -->
                 <TextView
-                    android:text="@string/spc_convergence_label"
+                    android:text="@string/convergence_label"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="25"
@@ -861,7 +861,7 @@
                     />
                 <TextView
                     android:id="@+id/spcConvergenceOutput"
-                    android:hint="@string/spc_convergence_label"
+                    android:hint="@string/convergence_label"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
@@ -878,7 +878,7 @@
 
                 <!-- Scale Factor -->
                 <TextView
-                    android:text="@string/spc_scale_factor_label"
+                    android:text="@string/scale_factor_label"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="25"
@@ -891,7 +891,7 @@
                     />
                 <TextView
                     android:id="@+id/spcScaleFactorOutput"
-                    android:hint="@string/spc_scale_factor_label"
+                    android:hint="@string/scale_factor_label"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"

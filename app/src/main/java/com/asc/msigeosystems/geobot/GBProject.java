@@ -44,6 +44,41 @@ public class GBProject {
 
     static final long   sFirstPointID   = 10001;
 
+    static final int    sMeters         = 0;//values for Distance Units
+    static final int    sFeet           = 1;
+    static final String sMetersString = "Meters";
+    static final String sFeetString   = "Feet";
+
+
+    static final int    sEN             = 0;//values for EN v NE
+    static final int    sNE             = 1;
+    static final String sENString       = "Easting / Northing";
+    static final String sNEString       = "Northing / Easting";
+
+
+    static final int    sLatLng         = 0;//values for LatLng v LngLat
+    static final int    sLngLat         = 1;
+    static final String sLatLngString   = "Latitude / Longitude";
+    static final String sLngLatString   = "Longitude / Latitude";
+
+
+    static final int    sRMS            = 0;//values for RMS v StdDev
+    static final int    sStdDev         = 1;
+    static final String sRMSString      = "RMS";
+    static final String sStdDevString   = "Standard Deviation";
+
+
+    static final int    sDD             = 0;//values for DD v DMS
+    static final int    sDMS            = 1;
+    static final String sDDString       = "Digital Degrees";
+    static final String sDMSString      = "Degrees Minutes Seconds";
+
+
+    static final int    sDirections         = 0;//values for Directions v PlusMinus
+    static final int    sPlusMinus          = 1;
+    static final String sDirectionsString   = "Directions (N/S and E/W";
+    static final String sPlusMinusString    = "Plus for N & E, Minus for S & W";
+
     //************************************/
     /*    Static (class) Variables       */
     //************************************/
@@ -65,7 +100,16 @@ public class GBProject {
 
     //The coordinate type governs the type for all the points in the project
     //Once the first point is saved, this can no longer be saved.
+    private int          mNextPointNumber; //next available point number within the project
+    private int          mNumMean;      // number of raw points in a mean calculation
     private CharSequence mCoordinateType;
+    private int          mDistanceUnits; //0= Meters, 1=Feet
+    private int          mEnVNe;        //order of presentation on a screen
+    private int          mRMSvStD;      //Does the user prefer RMS notation or Standard Deviation
+    private int          mDDvDMS;       //Digital Degrees vs Degrees Minutes Seconds
+    private int          mDIRvPlusMinus;//Are Lat/Lng  in directions or plus/minus
+    private int          mLocPrecision; //number of digits of precision in UI
+    private int          mStdDevPrecision;
     private ArrayList<GBPoint>   mPoints;
     private ArrayList<GBPicture> mPictures;
 
@@ -149,7 +193,7 @@ public class GBProject {
 
 
     private void initializeDefaultVariables(GBActivity activity){
-        this.mProjectID    = GBProject.getNextProjectID(activity);
+        this.mProjectID    = GBUtilities.ID_DOES_NOT_EXIST;
         initializeNoID();
         //mSettings.setProjectID(mProjectID);
     }
@@ -176,12 +220,12 @@ public class GBProject {
 
 
     CharSequence getProjectName() {  return mName;    }
-    void setProjectName(CharSequence name) {
+    void         setProjectName(CharSequence name) {
         this.mName = name;
     }
 
     long  getProjectID()        { return mProjectID; }
-    void setProjectID(long id) {
+    void  setProjectID(long id) {
         this.mProjectID = id;
         GBProjectSettings projectSettings = this.getSettings();
         if (projectSettings != null) {
@@ -205,6 +249,70 @@ public class GBProject {
 
     CharSequence getProjectCoordinateType() { return mCoordinateType;   }
     void setProjectCoordinateType(CharSequence coordinateType){mCoordinateType = coordinateType;}
+
+
+    int getDistanceUnits() {
+        return mDistanceUnits;
+    }
+    void setDistanceUnits(int distanceUnits) {
+        mDistanceUnits = distanceUnits;
+    }
+
+    int getNumMean() {
+        return mNumMean;
+    }
+    void setNumMean(int numMean) {
+        mNumMean = numMean;
+    }
+
+    int getEnVNe() {
+        return mEnVNe;
+    }
+    void setEnVNe(int enVNe) {
+        mEnVNe = enVNe;
+    }
+
+    int getNextPointNumber() {
+        return mNextPointNumber;
+    }
+    void setNextPointNumber(int nextPointNumber) {
+        mNextPointNumber = nextPointNumber;
+    }
+
+    int getLocPrecision() {
+        return mLocPrecision;
+    }
+    void setLocPrecision(int locPrecision) {
+        mLocPrecision = locPrecision;
+    }
+
+    int getStdDevPrecision() {
+        return mStdDevPrecision;
+    }
+    void setStdDevPrecision(int stdDevPrecision) {
+        mStdDevPrecision = stdDevPrecision;
+    }
+
+    int getRMSvStD() {
+        return mRMSvStD;
+    }
+    void setRMSvStD(int RMSvStD) {
+        mRMSvStD = RMSvStD;
+    }
+
+    int getDDvDMS() {
+        return mDDvDMS;
+    }
+    void setDDvDMS(int DDvDMS) {
+        mDDvDMS = DDvDMS;
+    }
+
+    int getDIRvPlusMinus() {
+        return mDIRvPlusMinus;
+    }
+    void setDIRvPlusMinus(int dIRvPlusMinus) {
+        mDIRvPlusMinus = dIRvPlusMinus;
+    }
 
     //The cascade objects aren't pulled from the DB unless they are explicityly asked for
     //Creating a Project Object from the DB is not enough to populate the cascading objects

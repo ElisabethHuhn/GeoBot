@@ -30,46 +30,7 @@
                 <!-- Row: Point Screen Label -->
 
 
-                <!-- Row: Project ID -->
-                <TableRow
-
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    >
-                    <TextView
-                        android:labelFor="@+id/pointProjectIDInput"
-                        android:text="@string/point_project_id_label"
-                        android:layout_height="wrap_content"
-                        android:layout_width="0dp"
-                        android:layout_weight="25"
-                        android:gravity="end"
-
-                        android:textColor="@color/colorTextBlack"
-                        android:background="@color/colorScreenBackground"
-                        />
-                    <EditText
-                        android:id="@id/pointProjectIDInput"
-
-                        android:layout_height="wrap_content"
-                        android:layout_width="0dp"
-                        android:layout_weight="75"
-
-                        android:inputType="text"
-                        android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
-
-                        android:enabled="false"
-
-                        android:textColor="@color/colorTextBlack"
-                        android:background="@color/colorGray"
-                        />
-
-
-                </TableRow>
-
-                <!-- Row: Project Name -->
+                <!-- Row: Project ID Name -->
                 <TableRow
 
                     android:layout_height="wrap_content"
@@ -89,15 +50,33 @@
                         android:background="@color/colorScreenBackground"
                         />
                     <EditText
+                        android:id="@+id/pointProjectIDInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="center"
+
+                        android:inputType="text"
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="4dp"
+
+                        android:enabled="false"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorGray"
+                        />
+                    <EditText
                         android:id="@id/pointProjectNameInput"
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
                         android:layout_weight="75"
+                        android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -105,10 +84,9 @@
                         android:background="@color/colorGray"
                         />
 
-
                 </TableRow>
 
-                <!-- Row: Point ID -->
+                <!-- Row: Point ID point Number -->
                 <TableRow
 
                     android:layout_height="wrap_content"
@@ -132,16 +110,32 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="25"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorGray"
+                        />
+                    <EditText
+                        android:id="@+id/pointNumInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="75"
+
+                        android:inputType="text"
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="8dp"
+
+                        android:enabled="false"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorWhite"
                         />
 
 
@@ -178,12 +172,11 @@
                         android:scrollbars="horizontal"
 
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
                         />
-
 
                 </TableRow>
 
@@ -221,16 +214,15 @@
                         android:scrollbars="horizontal"
 
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
                         />
 
-
                 </TableRow>
 
-                <!-- Row: Quality: HDOP -->
+                <!-- Row: Quality: HDOP / VDOP -->
                 <TableRow
 
                     android:layout_height="wrap_content"
@@ -254,11 +246,11 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
@@ -266,18 +258,6 @@
                         android:background="@color/colorGray"
                         />
 
-
-                </TableRow>
-
-
-                <!-- Row: Quality: VDOP -->
-                <TableRow
-
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    >
                     <TextView
                         android:labelFor="@+id/pointVdopInput"
                         android:text="@string/vdop_label"
@@ -294,11 +274,11 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -306,11 +286,13 @@
                         android:background="@color/colorGray"
                         />
 
-
                 </TableRow>
 
 
-                <!-- Row: Quality: TDOP -->
+
+
+
+                <!-- Row: Quality: TDOP / PDOP-->
                 <TableRow
 
                     android:layout_height="wrap_content"
@@ -334,11 +316,11 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
@@ -346,18 +328,6 @@
                         android:background="@color/colorGray"
                         />
 
-
-                </TableRow>
-
-
-                <!-- Row: Quality: PDOP -->
-                <TableRow
-
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    >
                     <TextView
                         android:labelFor="@+id/pointPdopInput"
                         android:text="@string/pdop_label"
@@ -374,11 +344,11 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
@@ -386,11 +356,13 @@
                         android:background="@color/colorGray"
                         />
 
-
                 </TableRow>
 
 
-                <!-- Row: Quality: HRMS -->
+                <!-- Row: Quality:  -->
+
+
+                <!-- Row: Quality: HRMS / VRMS -->
                 <TableRow
 
                     android:layout_height="wrap_content"
@@ -414,11 +386,11 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
@@ -426,18 +398,6 @@
                         android:background="@color/colorGray"
                         />
 
-
-                </TableRow>
-
-
-                <!-- Row: Quality: VRMS -->
-                <TableRow
-
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    >
                     <TextView
                         android:labelFor="@+id/pointVrmsInput"
                         android:text="@string/vrms_label"
@@ -454,20 +414,21 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="35"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="4dp"
 
                         android:enabled="false"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorGray"
                         />
-
-
                 </TableRow>
+
+
+
 
 
                 <!-- Row 7: Exit, View Existing Points, Save Changes Buttons -->
@@ -493,7 +454,7 @@
                         android:layout_weight="1"
 
                         android:layout_marginStart="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -510,7 +471,7 @@
                         android:layout_gravity="start"
                         android:layout_weight="1"
 
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
 
                         android:background="@color/colorGrayer"
@@ -529,7 +490,7 @@
                         android:layout_weight="1"
 
                         android:layout_marginStart="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -566,7 +527,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -605,7 +566,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -644,7 +605,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -683,7 +644,7 @@
 
                         android:inputType="numberDecimal"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="8dp"
 
                         android:enabled="false"
 
@@ -693,8 +654,6 @@
 
 
                 </TableRow>
-
-
 
             </TableLayout>
 
