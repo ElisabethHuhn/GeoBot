@@ -12,9 +12,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,12 +36,6 @@ import java.util.Date;
 public class GBPointEditFragment extends Fragment  {
 
     private static final String TAG = "EDIT_POINT_FRAGMENT";
-
-
-
-
-
-
 
 
     //**********************************************************/
@@ -132,11 +126,11 @@ public class GBPointEditFragment extends Fragment  {
     //*********  Lifecycle Methods                   ***********/
     //**********************************************************/
 
-    public static GBPointEditFragment newInstance(long      projectID,
-                                                  GBPath    pointPath,
+    public static GBPointEditFragment newInstance(GBPath    pointPath,
                                                   GBPoint   point) {
 
-        Bundle args = GBPoint.putPointInArguments(new Bundle(), projectID, point);
+        Bundle args = new Bundle();
+        args = GBPoint.putPointInArguments(args, point);
         args = GBPath.putPathInArguments(args, pointPath);
 
         GBPointEditFragment fragment = new GBPointEditFragment();
@@ -152,9 +146,21 @@ public class GBPointEditFragment extends Fragment  {
         super.onCreate(savedInstanceState);
 
         GBPath path = GBPath.getPathFromArguments(getArguments());
-        mPointPath       = path.getPath();
+        mPointPath  = path.getPath();
 
-        mPointBeingMaintained = GBPoint.getPointFromArguments(getActivity(), getArguments());
+        mPointBeingMaintained = GBPoint.getPointFromArguments((GBActivity)getActivity(), getArguments());
+        if (mPointBeingMaintained == null){
+            mPointBeingMaintained = new GBPoint();
+            //Theoretically the project id might be null,
+            // but you can't really get this far if the project does not exist and is not open
+            mPointBeingMaintained.setForProjectID(GBUtilities.getInstance().
+                                                getOpenProjectID((GBActivity)getActivity()));
+        }
+        long projectID = mPointBeingMaintained.getForProjectID();
+        if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
+            projectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+            mPointBeingMaintained.setForProjectID(projectID);
+        }
 
     }
 
@@ -163,10 +169,7 @@ public class GBPointEditFragment extends Fragment  {
                              Bundle savedInstanceState) {
 
         //Inflate the layout for this fragment
-        View v = inflater.inflate(
-                R.layout.fragment_point_edit_gb,
-                container,
-                false);
+        View v = inflater.inflate(R.layout.fragment_point_edit_gb, container, false);
 
 
         //Wire up the UI widgets so they can handle events later
@@ -174,37 +177,12 @@ public class GBPointEditFragment extends Fragment  {
         //      for the real screen we'll have to actually fill the fields
         wireWidgets(v);
 
+        int coordinateWidgetType = wireCoordinateWidgets(v);
 
-        //Need to add widgets for the coordinates, but there are different widgets
-        //depending upon the type of coordinate: Latitude/Longitude or Easting/Northing
-
-        //Regardless, we need the inflater and the LinearLayout container for the coordinates
-        //Get an inflater
-        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-        //Get the LinearLayout which will contain the coordinates
-        LinearLayout   coordinatesContainer    = (LinearLayout) v.findViewById(R.id.point_coordinate_container);
-
-        //get the coordinate type out of the project
-        int coordinateWidgetType = getCoordinateTypeFromProject();
-
-        if (coordinateWidgetType == GBCoordinate.sLLWidgets){
-            //inflate the coordinates and
-            // attach the coordinates to the LinearLayout which exists to contain the coordinates
-            layoutInflater.inflate(R.layout.element_ll_coordinate, coordinatesContainer, true);
-            //then wire up the appropriate widgets for this type of coordinate
-            wireLLCoordinateWidgets(v);
-        } else if (coordinateWidgetType == GBCoordinate.sENWidgets) {
-            //inflate the coordinates, and
-            // attach the coordinates to the LinearLayout which exists to contain the coordinates
-            layoutInflater.inflate(R.layout.element_en_coordinate, coordinatesContainer, true);
-
-            //then wire up the appropriate widgets for this type of coordinat
-            wireENCoordinateWidgets(v);
-        }
 
         initializeUI(v);
 
-        initializeRecyclerView(v);
+        //initializeRecyclerView(v);
 
         if (coordinateWidgetType == GBCoordinate.sLLWidgets){
             saveLLFieldsAsOldValues();
@@ -235,6 +213,29 @@ public class GBPointEditFragment extends Fragment  {
     }
 
     private void wireWidgets(View v){
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                //This tells you that text is about to change.
+                // Starting at character "start", the next "count" characters
+                // will be changed with "after" number of characters
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                //This tells you where the text has changed
+                //Starting at character "start", the "before" number of characters
+                // has been replaced with "count" number of characters
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //This tells you that somewhere within editable, it's text has changed
+                setPointChangedFlags();
+            }
+        };
 
         //Project ID
         EditText pointProjectIDInput = (EditText) v.findViewById(R.id.pointProjectIDInput);
@@ -252,172 +253,97 @@ public class GBPointEditFragment extends Fragment  {
         EditText pointIDInput = (EditText) v.findViewById(R.id.pointIDInput);
         pointIDInput.setFocusable(false);
 
+        //Point Number
+        EditText pointNumberInput = (EditText) v.findViewById(R.id.pointNumInput);
+        pointNumberInput.setFocusable(true);
+        pointNumberInput.setEnabled(true);
+
 
         //Point Description
         EditText pointFeatureCodeInput = (EditText) v.findViewById(R.id.pointFeatureCodeInput);
-        pointFeatureCodeInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        pointFeatureCodeInput.addTextChangedListener(textWatcher);
 
-                setPointChangedFlags();
-                return false;
-            }
-        });
 
 
         //Point Notes
         EditText pointNotesInput = (EditText) v.findViewById(R.id.pointNotesInput);
-        pointNotesInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointNotesInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality HDOP
         EditText pointHdopInput = (EditText) v.findViewById(R.id.pointHdopInput);
-        pointHdopInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointHdopInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality VDOP
         EditText pointVdopInput = (EditText) v.findViewById(R.id.pointVdopInput);
-        pointVdopInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointVdopInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality TDOP
         EditText pointTdopInput = (EditText) v.findViewById(R.id.pointTdopInput);
-        pointTdopInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointTdopInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality PDOP
         EditText pointPdopInput = (EditText) v.findViewById(R.id.pointPdopInput);
-        pointPdopInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointPdopInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality HRMS
         EditText pointHrmsInput = (EditText) v.findViewById(R.id.pointHrmsInput);
-        pointHrmsInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointHrmsInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality VRMS
         EditText pointVrmsInput = (EditText) v.findViewById(R.id.pointVrmsInput);
-        pointVrmsInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointVrmsInput.addTextChangedListener(textWatcher);
 
 
 
         //Point Offset Distance
         EditText pointOffsetDistInput = (EditText) v.findViewById(R.id.pointOffDistInput);
-        pointOffsetDistInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointOffsetDistInput.addTextChangedListener(textWatcher);
 
 
         //Point Offset Heading
         EditText pointOffsetHeadInput = (EditText) v.findViewById(R.id.pointOffHeadInput);
-        pointOffsetHeadInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointOffsetHeadInput.addTextChangedListener(textWatcher);
 
 
         //Point Offset Elevation
         EditText pointOffsetEleInput = (EditText) v.findViewById(R.id.pointOffEleInput);
-        pointOffsetEleInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointOffsetEleInput.addTextChangedListener(textWatcher);
 
 
         //Point Height
         EditText pointHeightInput = (EditText) v.findViewById(R.id.pointHeightInput);
-        pointHeightInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                setPointChangedFlags();
-                return false;
-            }
-        });
+        pointHeightInput.addTextChangedListener(textWatcher);
 
 
         //Coordinate type
         //TextView pointCoordinateTypeLabel = (TextView)v.findViewById(R.id.coordinate_label);
 
 
-        //Exit Button
-        Button pointExitButton = (Button) v.findViewById(R.id.pointExitButton);
-        pointExitButton.setOnClickListener(new View.OnClickListener() {
+        //Measure Button
+        Button pointMeasureButton = (Button) v.findViewById(R.id.pointMeasureButton);
+        //Before initial save, this button is disabled, but it is enabled after save
+        if (mPointBeingMaintained.getPointID() == GBUtilities.ID_DOES_NOT_EXIST) {
+            pointMeasureButton.setEnabled(false);
+            pointMeasureButton.setTextColor(Color.GRAY);
+        }
+        pointMeasureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                //hide the keyboard if it is visable
-                GBUtilities constantsAndUtilities =
-                                                        GBUtilities.getInstance();
-                constantsAndUtilities.hideKeyboard(getActivity());
+                //hide the keyboard if it is visible
+                GBUtilities utilities = GBUtilities.getInstance();
+                utilities.hideKeyboard(getActivity());
 
                 if (mPointPath.equals(GBPath.sEditFromMaps)){
                     //pop back to the Collect Points Screen
-                    ((GBActivity)getActivity()).
-                                                popToScreen(GBActivity.sCollectPointsTag);
+                    ((GBActivity)getActivity()).popToScreen(GBActivity.sCollectPointsTag);
                 } else {
-                    ((GBActivity) getActivity()).popToTopCogoScreen();
+                    ((GBActivity) getActivity()).switchToMeasureScreen(mPointBeingMaintained);
                 }
             }
         });
@@ -462,9 +388,38 @@ public class GBPointEditFragment extends Fragment  {
             }
         });
 
-        mPictureImage = (ImageView) v.findViewById(R.id.pictureImage);
+        //mPictureImage = (ImageView) v.findViewById(R.id.pictureImage);
+    }
 
+    private int wireCoordinateWidgets(View v){
 
+        //Need to add widgets for the coordinates, but there are different widgets
+        //depending upon the type of coordinate: Latitude/Longitude or Easting/Northing
+
+        //Regardless, we need the inflater and the LinearLayout container for the coordinates
+        //Get an inflater
+        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+        //Get the LinearLayout which will contain the coordinates
+        LinearLayout   coordinatesContainer    = (LinearLayout) v.findViewById(R.id.point_coordinate_container);
+
+        //get the coordinate type out of the project
+        int coordinateWidgetType = getCoordinateTypeFromProject();
+
+        if (coordinateWidgetType == GBCoordinate.sLLWidgets){
+            //inflate the coordinates and
+            // attach the coordinates to the LinearLayout which exists to contain the coordinates
+            layoutInflater.inflate(R.layout.element_ll_coordinate, coordinatesContainer, true);
+            //then wire up the appropriate widgets for this type of coordinate
+            wireLLCoordinateWidgets(v);
+        } else if (coordinateWidgetType == GBCoordinate.sENWidgets) {
+            //inflate the coordinates, and
+            // attach the coordinates to the LinearLayout which exists to contain the coordinates
+            layoutInflater.inflate(R.layout.element_en_coordinate, coordinatesContainer, true);
+
+            //then wire up the appropriate widgets for this type of coordinat
+            wireENCoordinateWidgets(v);
+        }
+        return coordinateWidgetType;
     }
 
     private void wireLLCoordinateWidgets(View v){
@@ -1156,6 +1111,217 @@ public class GBPointEditFragment extends Fragment  {
     }
 
 
+    private void initializeLLCoordinateWidgets(View v, GBCoordinateLL coordinateLL){
+        //***************************************************************************/
+        //*******             Latitude                                       ********/
+        //***************************************************************************/
+        View field_container;
+
+        //set up the UI widgets for the latitude/longetude coordinates
+        field_container = v.findViewById(R.id.latitudeContainer);
+
+        //Digital Degrees
+        EditText pointLatitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
+
+        //Degrees Minutes Seconds
+        EditText pointLatitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
+        EditText pointLatitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
+        EditText pointLatitudeSInput  = (EditText) field_container.findViewById(R.id.ll_s_Input) ;
+
+        String latitudeString = String.valueOf(coordinateLL.getLatitude());
+        pointLatitudeDDInput.setText(latitudeString);
+
+        // so convert Latitude DD to DMS
+        boolean isLatitude = true;
+        GBCoordinateLL.convertDDtoDMS( getActivity(),
+                                        pointLatitudeDDInput,
+                                        pointLatitudeDInput,
+                                        pointLatitudeMInput,
+                                        pointLatitudeSInput,
+                                        isLatitude);
+        mPointLatitudeDOld = pointLatitudeDInput.getText().toString();
+        mPointLatitudeMOld = pointLatitudeMInput.getText().toString();
+        mPointLatitudeSOld = pointLatitudeSInput.getText().toString();
+
+        mPointLatitudeDDOld = latitudeString;
+
+        //***************************************************************************/
+        //*******             Longitude                                      ********/
+        //***************************************************************************/
+
+
+        field_container = v.findViewById(R.id.longitudeContainer);
+
+        EditText pointLongitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
+
+
+        EditText pointLongitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
+        EditText pointLongitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
+        EditText pointLongitudeSInput  = (EditText) field_container.findViewById(R.id.ll_s_Input) ;
+
+        String longitudeString = String.valueOf(coordinateLL.getLongitude());
+        pointLongitudeDDInput.setText(longitudeString);
+
+        // so convert Longitude DD to DMS
+        isLatitude = false;
+        GBCoordinateLL.convertDDtoDMS( getActivity(),
+                pointLongitudeDDInput,
+                pointLongitudeDInput,
+                pointLongitudeMInput,
+                pointLongitudeSInput,
+                isLatitude);
+        mPointLongitudeDOld = pointLongitudeDInput.getText().toString();
+        mPointLongitudeMOld = pointLongitudeMInput.getText().toString();
+        mPointLongitudeSOld = pointLongitudeSInput.getText().toString();
+
+        mPointLongitudeDDOld = longitudeString;
+
+
+        //***************************************************************************/
+        //*******             Elevation                                      ********/
+        //***************************************************************************/
+
+        field_container = v.findViewById(R.id.elevationGeoidContainer);
+        EditText pointElevationMetersInput = (EditText) field_container.findViewById(R.id.elevationMetersInput);
+        EditText pointElevationFeetInput   = (EditText) field_container.findViewById(R.id.elevationFeetInput) ;
+
+        String elevationString = String.valueOf(coordinateLL.getElevation());
+        pointElevationMetersInput.setText(elevationString);
+
+        GBUtilities.convertMetersToFeet(getActivity(),
+                                        pointElevationMetersInput,
+                                        pointElevationFeetInput);
+        mPointElevationMetersOld = elevationString;
+        mPointElevationFeetOld = pointElevationFeetInput.getText().toString();
+
+        //***************************************************************************/
+        //*******             Geoid                                          ********/
+        //***************************************************************************/
+        EditText pointGeoidMetersInput =
+                               (EditText) field_container.findViewById(R.id.geoidHeightMetersInput);
+        EditText pointGeoidFeetInput   =
+                                (EditText) field_container.findViewById(R.id.geoidHeightFeetInput);
+
+        String geoidString = String.valueOf(coordinateLL.getGeoid());
+
+        //convert Feet to Meters
+        GBUtilities.convertMetersToFeet(getActivity(),
+                                        pointGeoidMetersInput,
+                                        pointGeoidFeetInput);
+        mPointGeoidMetersOld = geoidString;
+        mPointGeoidFeetOld = pointGeoidFeetInput.getText().toString();
+
+
+    }
+
+
+    private void initializeENCoordinateWidgets(View v, GBCoordinateEN coordinateEN){
+
+        View field_container;
+
+        GBActivity myActivity = (GBActivity)getActivity();
+
+
+        //***************************************************************************/
+        //*******             Easting                                        ********/
+        //***************************************************************************/
+        //set up the widgets for the easting/northing coordinate
+
+        field_container = v.findViewById(R.id.eastingContainer);
+
+        final EditText pointEastingMetersInput =
+                                        (EditText)field_container.findViewById(R.id.metersOutput);
+        final EditText pointEastingFeetInput   =
+                                        (EditText) field_container.findViewById(R.id.feetOutput);
+
+        String eastingString = String.valueOf(coordinateEN.getEasting());
+        pointEastingMetersInput.setText(eastingString);
+        GBUtilities.convertMetersToFeet(getActivity(),
+                                        pointEastingMetersInput,
+                                        pointEastingFeetInput);
+        mPointEastingMetersOld = eastingString;
+        mPointEastingFeetOld = pointEastingFeetInput.getText().toString();
+
+
+        //***************************************************************************/
+        //*******             Northing                                       ********/
+        //***************************************************************************/
+
+        field_container = v.findViewById(R.id.northingContainer);
+
+        final EditText pointNorthingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
+        final EditText pointNorthingFeetInput   = (EditText)field_container.findViewById(R.id.feetOutput);
+
+        String northingString = String.valueOf(coordinateEN.getNorthing());
+
+        //convert Meters to Feet
+        GBUtilities.convertMetersToFeet(getActivity(),
+                                        pointNorthingMetersInput,
+                                        pointNorthingFeetInput);
+        mPointNorthingMetersOld = northingString;
+        mPointNorthingFeetOld = pointNorthingFeetInput.getText().toString();
+
+
+
+        //***************************************************************************/
+        //*******             Elevation                                      ********/
+        //***************************************************************************/
+
+        field_container = v.findViewById(R.id.elevationContainer);
+        final EditText pointENElevationMetersInput = (EditText)field_container.findViewById(R.id.elevationMetersInput);
+        final EditText pointENElevationFeetInput   = (EditText)field_container.findViewById(R.id.elevationFeetInput);
+
+        String elevationString = String.valueOf(coordinateEN.getElevation());
+        GBUtilities.convertMetersToFeet(getActivity(),
+                                pointENElevationMetersInput,
+                                pointENElevationFeetInput);
+        mPointENElevationMetersOld = elevationString;
+        mPointENElevationFeetOld = pointENElevationFeetInput.getText().toString();
+
+
+        //***************************************************************************/
+        //*******             Zone, Hemi, Latband                            ********/
+        //*******             Datum, Convergence, ScaleFactor                ********/
+        //***************************************************************************/
+
+        field_container = v.findViewById(R.id.zhlContainer);
+        EditText pointZoneInput       = (EditText) field_container.findViewById(R.id.zoneOutput);
+        EditText pointHemisphereInput = (EditText) field_container.findViewById(R.id.hemisphereOutput);
+        EditText pointLatbandInput    = (EditText) field_container.findViewById(R.id.latbandOutput);
+
+
+
+        field_container = v.findViewById(R.id.convergenceContainer);
+        EditText pointDatumInput       = (EditText) field_container.findViewById(R.id.datumOutput);
+        EditText pointConvergenceInput = (EditText) field_container.findViewById(R.id.convergenceOutput);
+        EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
+
+        if (mPointPath.equals(GBPath.sEditFromMaps)) {
+
+            pointZoneInput.setFocusable(false);
+            pointZoneInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+            pointHemisphereInput.setFocusable(false);
+            pointHemisphereInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+            pointLatbandInput.setFocusable(false);
+            pointLatbandInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+            pointDatumInput.setFocusable(false);
+            pointDatumInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+            pointConvergenceInput.setFocusable(false);
+            pointConvergenceInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+            pointScaleFactorInput.setFocusable(false);
+            pointScaleFactorInput.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+        }
+
+    }
+
+
     private void initializeRecyclerView(View v){
 
        /*
@@ -1229,6 +1395,7 @@ public class GBPointEditFragment extends Fragment  {
         if (mPointBeingMaintained == null) return 0;
         //show the data that came out of the input arguments bundle
         long projectID = mPointBeingMaintained.getForProjectID();
+
         return GBCoordinate.getCoordinateTypeFromProjectID(projectID);
     }
 
@@ -1239,6 +1406,13 @@ public class GBPointEditFragment extends Fragment  {
         //show the data that came out of the input arguments bundle
         long projectID = mPointBeingMaintained.getForProjectID();
 
+        if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
+            projectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+            mPointBeingMaintained.setForProjectID(projectID);
+            if (projectID == GBUtilities.ID_DOES_NOT_EXIST)return null;
+        }
+
+
         GBProjectManager projectManager = GBProjectManager.getInstance();
         GBProject project = projectManager.getProject(projectID);
 
@@ -1246,7 +1420,11 @@ public class GBPointEditFragment extends Fragment  {
 
     }
 
-
+    private void initializeUI(){
+        View v = getView();
+        if (v == null)return;
+        initializeUI(v);
+    }
     private void initializeUI(View v) {
         if (mPointBeingMaintained == null)return;
         //show the data that came out of the input arguments bundle
@@ -1269,7 +1447,7 @@ public class GBPointEditFragment extends Fragment  {
 
         //point ID
         if (mPointBeingMaintained.getPointID() != GBUtilities.ID_DOES_NOT_EXIST){
-
+            pointIDInput.setText(String.valueOf(mPointBeingMaintained.getPointID()));
             pointFeatureCodeInput.setText(mPointBeingMaintained.getPointFeatureCode());
             pointNotesInput.setText(mPointBeingMaintained.getPointNotes());
         }
@@ -1561,7 +1739,6 @@ public class GBPointEditFragment extends Fragment  {
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.pictureList);
         GBPictureAdapter adapter = (GBPictureAdapter)recyclerView.getAdapter();
 
-        //Toast.makeText(getActivity(), "Picture Selected", Toast.LENGTH_SHORT).show();
         GBPicture picture = adapter.getPicture(position);
         String pathToPicture = picture.getPathName();
         Bitmap bitmap = BitmapFactory.decodeFile(pathToPicture);
@@ -1575,7 +1752,7 @@ public class GBPointEditFragment extends Fragment  {
             recyclerView.invalidate();
         } else {
             String msg = getString(R.string.missing_picture_file)+ " " + pathToPicture;
-            Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(), msg);
         }
 
     }
@@ -1584,6 +1761,10 @@ public class GBPointEditFragment extends Fragment  {
     //**********************************************************/
     //*********     Called from Button Listeners     ***********/
     //**********************************************************/
+    void onExit() {
+        ((GBActivity) getActivity()).switchToProjectEditScreen();
+    }
+
 
     private boolean onSave(){
         if (mPointBeingMaintained == null)return false;
@@ -1594,23 +1775,12 @@ public class GBPointEditFragment extends Fragment  {
             //saveChanges();
 
             //What happens here depends upon the path
-            if (mPointPath.equals(GBPath.sCreateTag)){
+            if ((mPointPath.equals(GBPath.sCreateTag)) || (mPointPath.equals(GBPath.sEditTag))){
                 returnCode = addNewPoint();
-
-            } else if (mPointPath.equals(GBPath.sEditTag)){
-
-                returnCode = updatePointFromUI(mPointBeingMaintained);
-
-                if (returnCode) {
-                    //update the stored point
-                    GBProject project = GBUtilities.getInstance().getOpenProject();
-                    boolean addToDB = true;
-                    GBPointManager pointManager = GBPointManager.getInstance();
-                    pointManager.addPointsToProject(project, mPointBeingMaintained, addToDB);
-                }
             }
             //all other paths do nothing
 
+            initializeUI();
             if (returnCode) setPointSavedFlags();
         }
         return returnCode;
@@ -1624,16 +1794,6 @@ public class GBPointEditFragment extends Fragment  {
 
         boolean returnCode = true;
 
-        long pointID, projectID;
-        //assign a new point ID
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        projectID = mPointBeingMaintained.getForProjectID();
-        GBProject project = projectManager.getProject(projectID);
-
-        //Notice that this is the potential next id. The ID is not incremented yet
-        //The ID will be assigned when the point is first saved to the DB
-        pointID = GBUtilities.ID_DOES_NOT_EXIST;
-        mPointBeingMaintained.setPointID(pointID);
 
         returnCode = updatePointFromUI(mPointBeingMaintained);
 
@@ -1652,7 +1812,11 @@ public class GBPointEditFragment extends Fragment  {
         //now add the point to memory and db
         GBPointManager pointManager = GBPointManager.getInstance();
         boolean addToDBToo = true;
-        if (!pointManager.addPointsToProject(project, mPointBeingMaintained, addToDBToo)){
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        //This does not update the coordinate or the MeanToken in the DB,
+        // but this fragment does not explicitly update either of these objects
+        //If you see this comment and disagree with that statement, correct the situation
+        if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)){
             GBUtilities.getInstance().showStatus(getActivity(),  getString(R.string.error_adding_point));
         }
 
@@ -1677,7 +1841,8 @@ public class GBPointEditFragment extends Fragment  {
 
 
         boolean returnCode = true;
-
+// TODO: 7/2/2017 remove updating the coordinate from this screen. Must use convert screen
+        /*
         //Create a coordinate of the proper type with the attributes from the screen
         CharSequence coordType = getFullCoordTypeFromProject();
         if (coordType.equals(GBCoordinate.sCoordinateTypeWGS84)){
@@ -1698,12 +1863,32 @@ public class GBPointEditFragment extends Fragment  {
             GBCoordinateSPCS newCoordinate = new GBCoordinateSPCS();
             returnCode = updateENCoordinateFromUI(v, point, newCoordinate);
         }
-
+*/
         if (returnCode) {
-            //Project ID
+
+            EditText pointNumberInput = (EditText) v.findViewById(R.id.pointNumInput);
             EditText pointFeatureCodeInput = (EditText) v.findViewById(R.id.pointFeatureCodeInput);
             EditText pointNotesInput       = (EditText) v.findViewById(R.id.pointNotesInput);
+            EditText pointHeightInput      = (EditText) v.findViewById(R.id.pointHeightInput);
+            EditText pointOffsetEleInput   = (EditText) v.findViewById(R.id.pointOffEleInput);
+            EditText pointOffsetDistInput  = (EditText) v.findViewById(R.id.pointOffDistInput);
+            EditText pointOffsetHeadInput  = (EditText) v.findViewById(R.id.pointOffHeadInput);
+            EditText pointHdopInput = (EditText) v.findViewById(R.id.pointHdopInput);
+            EditText pointVdopInput = (EditText) v.findViewById(R.id.pointVdopInput);
+            EditText pointTdopInput = (EditText) v.findViewById(R.id.pointTdopInput);
+            EditText pointPdopInput = (EditText) v.findViewById(R.id.pointPdopInput);
+            EditText pointHrmsInput = (EditText) v.findViewById(R.id.pointHrmsInput);
+            EditText pointVrmsInput = (EditText) v.findViewById(R.id.pointVrmsInput);
 
+
+            String pointNumberString = pointNumberInput.getText().toString();
+            int pointNumber;
+            if (GBUtilities.isEmpty(pointNumberString)){
+                pointNumber = 0;
+            } else {
+                pointNumber = Integer.valueOf(pointNumberString);
+            }
+            point.setPointNumber(pointNumber);
             point.setPointFeatureCode(pointFeatureCodeInput.getText().toString().trim());
             point.setPointNotes(pointNotesInput.getText().toString().trim());
 
@@ -1712,9 +1897,7 @@ public class GBPointEditFragment extends Fragment  {
             return true;
         } else {
             //Coordinate not valid
-            Toast.makeText(getActivity(),
-                    getString(R.string.coordinate_not_valid),
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.coordinate_not_valid));
 
             return returnCode;
         }
@@ -1727,6 +1910,7 @@ public class GBPointEditFragment extends Fragment  {
         if (mPointBeingMaintained == null)return false;
         long pointID = point.getPointID();
         long projectID = point.getForProjectID();
+
 
         View field_container = v.findViewById(R.id.latitudeContainer);
 
@@ -1801,7 +1985,6 @@ public class GBPointEditFragment extends Fragment  {
             coordinate.setElevation(Double.parseDouble(eleString));
             coordinate.setGeoid(Double.parseDouble(geoidString));
 
-            mPointBeingMaintained.setHasACoordinateID(coordinate.getCoordinateID());
             mPointBeingMaintained.setCoordinate(coordinate);
             return true;
         }else {
@@ -1889,7 +2072,6 @@ public class GBPointEditFragment extends Fragment  {
             coordinate.setScaleFactor(Double.parseDouble(scaleString));
             coordinate.setValidCoordinate(true);
 
-            mPointBeingMaintained.setHasACoordinateID(coordinate.getCoordinateID());
             mPointBeingMaintained.setCoordinate(coordinate);
             return true;
         }else {
@@ -1903,9 +2085,8 @@ public class GBPointEditFragment extends Fragment  {
         //what this button does depends upon the path  {create, open, copy, edit, show}
         //**************** CREATE ************************************************/
         if (mPointPath.equals(GBPath.sCreateTag)){
-            Toast.makeText(getActivity(),
-                    R.string.cant_view_points,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),
+                    R.string.cant_view_points);
             maybeAskFirstListPoints();
 
         //************************** OPEN / COPY / EDIT / SHOW **************************************/
@@ -1919,9 +2100,8 @@ public class GBPointEditFragment extends Fragment  {
 
         //************************************* UNKNOWN *************************/
         } else {
-            Toast.makeText(getActivity(),
-                    R.string.unrecognized_path_encountered,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),
+                    R.string.unrecognized_path_encountered);
 
             //Don't really know what to do here, but switch path to show and continue
             mPointPath = GBPath.sShowTag;
@@ -1936,12 +2116,8 @@ public class GBPointEditFragment extends Fragment  {
             areYouSureListPoints();
 
         } else {
-            Toast.makeText(getActivity(),
-                    R.string.point_unchanged,
-                    Toast.LENGTH_SHORT).show();
-
-
-                switchToListPoints();
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.point_unchanged);
+            switchToListPoints();
         }
     }
 
@@ -1955,9 +2131,7 @@ public class GBPointEditFragment extends Fragment  {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though point has chaged
-                                Toast.makeText(getActivity(),
-                                        R.string.continue_abandon_changes,
-                                        Toast.LENGTH_SHORT).show();
+                                GBUtilities.getInstance().showStatus(getActivity(),R.string.continue_abandon_changes);
 
                                 switchToListPoints();
                             }
@@ -1965,9 +2139,7 @@ public class GBPointEditFragment extends Fragment  {
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(), "Pressed Cancel");
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)
@@ -1977,8 +2149,7 @@ public class GBPointEditFragment extends Fragment  {
     private void switchToListPoints(){
         if (mPointBeingMaintained == null)return;
         GBActivity myActivity = (GBActivity) getActivity();
-        myActivity.switchToListPointsScreen(mPointBeingMaintained.getForProjectID(),
-                new GBPath(mPointPath));
+        myActivity.switchToPointsListScreen( new GBPath(mPointPath));
     }
 
 
@@ -1991,6 +2162,7 @@ public class GBPointEditFragment extends Fragment  {
         if (v == null)return;
 
         Button pointSaveChangesButton = (Button)v.findViewById(R.id.pointSaveChangesButton);
+        Button pointMeasureButton     = (Button) v.findViewById(R.id.pointMeasureButton);
 
         mPointChanged = true;
         //enable the enter button as the default is NOT enabled/grayed out
@@ -2001,6 +2173,9 @@ public class GBPointEditFragment extends Fragment  {
             (mPointPath.equals(GBPath.sEditTag))) {
             pointSaveChangesButton.setEnabled(true);
             pointSaveChangesButton.setTextColor(Color.BLACK);
+
+            pointMeasureButton.setEnabled(false);
+            pointMeasureButton.setTextColor(Color.GRAY);
         }
     }
 
@@ -2009,12 +2184,16 @@ public class GBPointEditFragment extends Fragment  {
         if (v == null)return;
 
         Button pointSaveChangesButton = (Button)v.findViewById(R.id.pointSaveChangesButton);
+        Button pointMeasureButton     = (Button) v.findViewById(R.id.pointMeasureButton);
 
         mPointChanged = false;
 
-        //enable the save changes button too
+        //disable the save and measure buttons
         pointSaveChangesButton.setEnabled(false);
         pointSaveChangesButton.setTextColor(Color.GRAY);
+
+        pointMeasureButton.setEnabled(true);
+        pointMeasureButton.setTextColor(Color.BLACK);
     }
 
 

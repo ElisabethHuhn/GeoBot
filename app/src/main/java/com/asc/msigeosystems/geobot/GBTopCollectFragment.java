@@ -49,7 +49,7 @@ public class GBTopCollectFragment extends Fragment {
     private void wireWidgets(View v){
         //Tell the user which project is open
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
-        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
+        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage((GBActivity)getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
 
@@ -66,7 +66,7 @@ public class GBTopCollectFragment extends Fragment {
                 // TODO: 12/2/2016 define how location source will be identified in configurations
                 //Can only collect points if a project is open
                 GBActivity myActivity = (GBActivity) getActivity();
-                GBProject openProject = GBUtilities.getInstance().getOpenProject();
+                GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
                 if (openProject != null) {
                     //Switch the fragment to the collect with maps fragment.
                     // But the switching happens on the container Activity

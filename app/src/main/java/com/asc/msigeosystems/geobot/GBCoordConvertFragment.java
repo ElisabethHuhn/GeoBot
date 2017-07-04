@@ -59,7 +59,9 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             int     counter = 0;
 
     //Contains all raw data and current results of meaning such data
-    private GBNmeaMeanToken mMeanToken;
+    private GBMeanToken mMeanToken;
+
+    private GBPoint mPointBeingMaintained;
 
 
      private boolean isGpsOn            = true;
@@ -74,11 +76,55 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     private int    mCurDataSource;
 
+    //**********************************************************/
+    //*****      Static Methods                       **********/
+    //**********************************************************/
+    public static GBCoordConvertFragment newInstance(GBPoint point) {
+
+        Bundle args = GBPoint.putPointInArguments(new Bundle(), point);
+
+        GBCoordConvertFragment fragment = new GBCoordConvertFragment();
+
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    //**********************************************************/
+    //*****  Constructor                              **********/
+    //**********************************************************/
 
     public GBCoordConvertFragment() {
         //for now, we don't need to initialize anything when the fragment
         //  is first created
     }
+
+
+    //**********************************************************/
+    //*****  Lifecycle Methods                        **********/
+    //**********************************************************/
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+
+        super.onCreate(savedInstanceState);
+
+
+        mPointBeingMaintained = GBPoint.getPointFromArguments((GBActivity)getActivity(), getArguments());
+        if (mPointBeingMaintained == null){
+            mPointBeingMaintained = new GBPoint();
+            //Theoretically the project id might be null,
+            // but you can't really get this far if the project does not exist and is not open
+            mPointBeingMaintained.setForProjectID(GBUtilities.getInstance().
+                    getOpenProjectID((GBActivity)getActivity()));
+        }
+        long projectID = mPointBeingMaintained.getForProjectID();
+        if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
+            projectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+            mPointBeingMaintained.setForProjectID(projectID);
+        }
+
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -141,7 +187,23 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
                 GBUtilities.getInstance().showStatus(getActivity(), R.string.save_label);
 
-                onSave();
+                //if we don't succeed in saving, and GPS was on, we need to turn it back on
+                boolean gpsIsRunning = isGpsOn;
+                if (isGpsOn) {
+                    stopGps();
+                }
+                boolean saveCode = onSave();
+
+                if (saveCode) {
+                    ((GBActivity) getActivity()).switchToPointEditScreen(new GBPath(GBPath.sEditTag),
+                            mPointBeingMaintained);
+                } else {
+                    if (gpsIsRunning){
+                        startGps();;
+                    }
+                }
+
+
             }//End on Click
         });
 
@@ -429,22 +491,31 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //******************************************************************//
     //            Button Handlers                                       //
     //******************************************************************//
-    private void onSave(){
-         if (isMeanInProgress()){
+    void onExit() {
+        ((GBActivity) getActivity()).switchToPointEditScreen(new GBPath(GBPath.sEditTag),
+                                                             mPointBeingMaintained);
+    }
+
+
+    private boolean onSave(){
+        if (isGpsOn){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.gps_off_before_save);
+            return false;
+        }
+        if (isMeanInProgress()){
             GBUtilities.getInstance().showStatus(getActivity(), R.string.save_not_available);
-            return;
+            return false ;
         }
 
-        long projectID = GBUtilities.getInstance().getOpenProjectID();
-        if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST){
             GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
-            return;
+            return false;
         }
 
-        GBProject    project        = GBUtilities.getInstance().getOpenProject();
-        GBPoint point = null;
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
 
-        CharSequence coordinateType = project.getProjectCoordinateType();
+        CharSequence coordinateType = openProject.getProjectCoordinateType();
 
         GBCoordinate coordinate = null;
 
@@ -452,7 +523,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
             if ((mMeanToken != null) && (mMeanToken.getCoordinateSize() > 0)){
                 //Use the meaned result to generate coordinate
-                coordinate = new GBCoordinateWGS84( mMeanToken.getMeanCoordinate());
+                coordinate = new GBCoordinateWGS84((GBActivity)getActivity(),
+                                                    mMeanToken.getMeanCoordinate());
             } else {
                 //use the raw WGS input to generate the coordinate
                 coordinate = convertWgsInputs();
@@ -465,34 +537,70 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             coordinate = convertSpcsInputs();
 
         }
-        coordinate.setProjectID(projectID);
+        coordinate.setProjectID(openProjectID);
 
         if (coordinate.isValidCoordinate()) {
-            // TODO: 6/28/2017 Point may already exist
-            point = new GBPoint(project);
-            point.setCoordinate(coordinate);
-            //now add the point to memory and db
-            GBPointManager pointManager = GBPointManager.getInstance();
-            boolean addToDBToo = true;
-            if (!pointManager.addPointsToProject(project, point, addToDBToo)) {
-                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
-                return;
+            //store the mean token
+            GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
+            long returnCode = GBUtilities.ID_DOES_NOT_EXIST + 1;
+            if (mMeanToken != null) {
+                returnCode = tokenManager.addMeanToDB(mMeanToken);
+            }
+            if (returnCode != GBUtilities.ID_DOES_NOT_EXIST) {
+                //when here, know the coordinate is valid, and
+                // the mean token has been successfully saved to the DB
+                if (mPointBeingMaintained == null) {
+                    //Create the new point and put it on the project
+                    mPointBeingMaintained = new GBPoint();
+                    mPointBeingMaintained.setForProjectID(openProjectID);
+                }
+                //now add the point to memory and db
+                //Have to make sure the point is in the DB before the coordinate
+                // TODO: 7/2/2017 do we really need to write point to DB twice???
+                GBPointManager pointManager = GBPointManager.getInstance();
+                boolean addToDBToo = true;
+                if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
+                    //This will NOT do a cascade add of coordinate, meanToken
+                    GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
+                    return false;
+                }
+                //The setCoordinate() and setMeanToken() routines updatae the DB as well as the local point object
+                //update the coordinate with the point id
+                coordinate.setPointID(mPointBeingMaintained.getPointID());
+                coordinate.setProjectID(openProjectID);
+                mPointBeingMaintained.setCoordinate(coordinate);
+                if (mMeanToken != null) {
+                    //record it in DB an on the point
+                    //Writing to the DB results in the ID being assigned
+                    mPointBeingMaintained.setMeanToken(mMeanToken);
+                    mPointBeingMaintained.setMeanTokenID(mMeanToken.getMeanTokenID());
+                }
+                //If the coordinate was changed, we need to update it in the DB again.
+                if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
+                    //This will NOT do a cascade add of coordinate, meanToken
+                    GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
+                    return false;
+                }
+
+
             }
         } else {
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_not_valid);
-            return;
+            return false;
         }
-        ((GBActivity)getActivity()).switchToEditPointScreen(projectID, new GBPath(GBPath.sEditTag), point);
+        return true;
 
     }
 
-
-    //******************************************************************//
+     //******************************************************************//
     //            Process the received NMEA sentence                    //
     //******************************************************************//
     void handleNmeaReceived(long timestamp, String nmea) {
-        //todo maybe need to do something with the timestamp
+
         try {
+            //no need to process the sentence if no longer attached to the activity
+            if (getActivity() == null)return;
+
             //create an object with all the fields from the string
             if (mNmeaParser == null)mNmeaParser = new GBNmeaParser();
             GBNmea nmeaData = mNmeaParser.parse(nmea);
@@ -515,7 +623,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 }
 
                 //Fold the new nmea sentence into the ongoing mean
-                GBCoordinateMean meanCoordinate = mMeanToken.updateMean(mNmeaData);
+                GBCoordinateMean meanCoordinate = mMeanToken.updateMean((GBActivity)getActivity(),
+                                                                         mNmeaData);
                 if (meanCoordinate != null) {
                     //Is this the first point we have processed?
                     if (isFirstMeanPoint()) {
@@ -534,7 +643,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                     mMeanToken.setLastPointInMean(false);
                     // TODO: 6/27/2017 sound a tone indicating the mean is complete
                 }
-                coordinateWGS84 = new GBCoordinateWGS84(nmeaData);
+                coordinateWGS84 = new GBCoordinateWGS84((GBActivity)getActivity(), nmeaData);
 
                 //update the UI from the coordinate
                 updateNmeaUI(coordinateWGS84, nmeaData);
@@ -594,7 +703,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     }
 
     private void initializeMeanToken(){
-        if (mMeanToken == null)mMeanToken = new GBNmeaMeanToken();
+        if (mMeanToken == null)mMeanToken = new GBMeanToken();
         mMeanToken.setMeanInProgress(false);
         mMeanToken.setFirstPointInMean(false);
         mMeanToken.setLastPointInMean(false);
@@ -691,7 +800,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         return true;
     }
 
-    private boolean updateMeanUI(GBCoordinateMean meanCoordinate, GBNmeaMeanToken meanToken){
+    private boolean updateMeanUI(GBCoordinateMean meanCoordinate, GBMeanToken meanToken){
 
 
         View v = getView();
@@ -1292,7 +1401,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             return null;
         } else {
             //convert the meaned coordinate
-            coordinateWGS84 = new GBCoordinateWGS84(mMeanToken.getMeanCoordinate(true));
+            coordinateWGS84 = new GBCoordinateWGS84((GBActivity)getActivity(),
+                                                    mMeanToken.getMeanCoordinate(true));
         }
         return coordinateWGS84;
     }

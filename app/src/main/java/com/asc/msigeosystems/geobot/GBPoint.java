@@ -1,6 +1,5 @@
 package com.asc.msigeosystems.geobot;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -55,11 +54,9 @@ class GBPoint {
 
     //Actual location of point is given by Coordinate
     private long         mHasACoordinateID;
-    // TODO: 6/10/2017 Coordinate should not be stored on Point, only the CoordinateID. But have to know the type as well as the ID
-    // TODO: 6/11/2017 The coordinate type is on the project, is this sufficient??? 
-    private GBCoordinate mCoordinate;
 
     private int          mPointNumber;
+    private long         mMeanTokenID;
 
     //The original offset. The Coordinate has this offset calculated into it
     private double       mOffsetDistance;
@@ -92,12 +89,11 @@ class GBPoint {
     /*               Static Methods                                 */
     /* **************************************************************/
 
-    static Bundle putPointInArguments(Bundle args, long projectID, GBPoint point) {
+    static Bundle putPointInArguments(Bundle args, GBPoint point) {
 
-        args.putLong         (GBPoint.sPointProjectIDTag, projectID);
         if (point == null){
             //This  happens when the point is being created by this fragment on save
-            args.putLong(GBPoint.sPointIDTag,0);
+            args.putLong(GBPoint.sPointIDTag,GBUtilities.ID_DOES_NOT_EXIST);
         } else {
             args.putLong(GBPoint.sPointIDTag, point.getPointID());
         }
@@ -106,16 +102,15 @@ class GBPoint {
     }
 
 
-    static GBPoint getPointFromArguments(Context activity, Bundle args) {
+    static GBPoint getPointFromArguments(GBActivity activity, Bundle args) {
         GBPoint point = null;
-        long projectID = args.getLong (GBPoint.sPointProjectIDTag);
         long pointID   = args.getLong (GBPoint.sPointIDTag);
+
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID(activity);
 
         //If we are on the Create Path, we won't have a point here
         if (pointID != GBUtilities.ID_DOES_NOT_EXIST) {
-
-            point = GBPointManager.getInstance().getPoint(projectID, pointID);
-
+            point = GBPointManager.getInstance().getPoint(openProjectID, pointID);
 
         } else {
             //there is no existing point, it is being created
@@ -125,7 +120,7 @@ class GBPoint {
             //set the bogus point ID
             point.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
             //save the project ID
-            point.setForProjectID(projectID);
+            point.setForProjectID(openProjectID);
         }
 
         return point;
@@ -180,11 +175,42 @@ class GBPoint {
     long getHasACoordinateID()                    {return mHasACoordinateID; }
     void setHasACoordinateID(long isACoordinateID) { mHasACoordinateID = isACoordinateID; }
 
-    GBCoordinate getCoordinate()                { return mCoordinate;  }
-    void setCoordinate(GBCoordinate coordinate) { mCoordinate = coordinate; }
+    GBCoordinate getCoordinate()                {
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        return databaseManager.getCoordinateFromDB(getHasACoordinateID(), getForProjectID());
+    }
+    long setCoordinate(GBCoordinate coordinate) {
+        if (coordinate != null){
+
+            GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
+            coordinateManager.addCoordinate(coordinate);
+            long coordinateID = coordinate.getCoordinateID();
+            setHasACoordinateID(coordinateID);
+            return coordinateID;
+        }
+        return GBUtilities.ID_DOES_NOT_EXIST;
+     }
 
     int getPointNumber() {  return mPointNumber;   }
     void setPointNumber(int pointNumber) {  mPointNumber = pointNumber; }
+
+    long getMeanTokenID() {  return mMeanTokenID;   }
+    void setMeanTokenID(long meanTokenID) {  mMeanTokenID = meanTokenID; }
+
+    GBMeanToken getMeanToken()                {
+        GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
+        return tokenManager.getMeanTokenFromDB(getMeanTokenID());
+    }
+    long setMeanToken(GBMeanToken token) {
+        if (token != null) {
+            GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
+            tokenManager.addMeanToDB(token);
+            long tokenID = token.getMeanTokenID();
+            setMeanTokenID(tokenID);
+            return  tokenID;
+        }
+        return GBUtilities.ID_DOES_NOT_EXIST;
+    }
 
     double getOffsetDistance() {  return mOffsetDistance;   }
     void setOffsetDistance(double offsetDistance) {  mOffsetDistance = offsetDistance; }
@@ -284,7 +310,7 @@ class GBPoint {
         this.mPointID          = GBUtilities.ID_DOES_NOT_EXIST;
         this.mHasACoordinateID = GBUtilities.ID_DOES_NOT_EXIST;
         this.mPointNumber      = 0;
-        this.mCoordinate       = null;
+        this.mMeanTokenID      = GBUtilities.ID_DOES_NOT_EXIST;
 
         this.mOffsetDistance   = 0d;
         this.mOffsetHeading    = 0d;
@@ -309,6 +335,7 @@ class GBPoint {
 
     //Convert point to comma delimited file for exchange
     String convertToCDF() {
+        // TODO: 7/2/2017 routine needs to be updated
         return String.valueOf(this.getPointID()) + ", " +
                 this.getPointFeatureCode()       + ", " +
                 this.getPointNotes()             + ", " +

@@ -186,10 +186,10 @@ class GBDatabaseManager {
         long returnCode = sDB_ERROR_CODE;
         GBProjectManager projectManager = GBProjectManager.getInstance();
         returnCode = mDatabaseHelper.add(mDatabase,                //database to add to
-                GBDatabaseSqliteHelper.TABLE_PROJECT,   //table to add to
-                projectManager.getCVFromProject(project),//Content Values of the project
-                getProjectWhereClause(project.getProjectID()),
-                GBDatabaseSqliteHelper.PROJECT_ID);
+                            GBDatabaseSqliteHelper.TABLE_PROJECT,   //table to add to
+                            projectManager.getCVFromProject(project),//Content Values of the project
+                            getProjectWhereClause(project.getProjectID()),
+                            GBDatabaseSqliteHelper.PROJECT_ID);
         if (returnCode == sDB_ERROR_CODE) return returnCode;
 
         //Cascade add happens at the manager level
@@ -385,12 +385,13 @@ class GBDatabaseManager {
         long returnCode = sDB_ERROR_CODE;
 
         //first add/update the point
+        String whereClause = getPointWhereClause(point.getForProjectID(), point.getPointID());
         GBPointManager pointManager = GBPointManager.getInstance();
         returnCode = mDatabaseHelper.add(mDatabase,
-                                GBDatabaseSqliteHelper.TABLE_POINT,
-                                pointManager.getCVFromPoint(point),
-                                getPointWhereClause(point.getForProjectID(), point.getPointID()),
-                                GBDatabaseSqliteHelper.POINT_ID);
+                                         GBDatabaseSqliteHelper.TABLE_POINT,
+                                         pointManager.getCVFromPoint(point),
+                                         whereClause,
+                                         GBDatabaseSqliteHelper.POINT_ID);
         if (returnCode == sDB_ERROR_CODE) return returnCode;
 
         //Cascade add happens at the manager level, not here
@@ -436,14 +437,7 @@ class GBDatabaseManager {
             //add the point to the project
             pointsList.add(point);
 
-            //get the coordinate
-            long coordinateID = point.getHasACoordinateID();
-            if (coordinateID > 0) {
-                //and set it on the point
-                point.setCoordinate(getCoordinateFromDB(coordinateID, projectID));
-            }
-
-            //cascading objects are not pulled from the DB until explitly requested
+            //cascading objects are not pulled from the DB until explicitly requested
 
             position++;
         }
@@ -485,8 +479,8 @@ class GBDatabaseManager {
     //This only gets the one point related to this project
     private String getPointWhereClause(long pointID, long projectID) {
         return GBDatabaseSqliteHelper.POINT_ID + " = '" + String.valueOf(pointID) + "' AND " +
-                GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID + " = '" +
-                String.valueOf(projectID) + "'";
+               GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID + " = '" +
+                                                          String.valueOf(projectID) + "'";
 
     }
 
@@ -625,9 +619,9 @@ class GBDatabaseManager {
     //This only gets the one coordinate related to this project
     private String getCoordinateWhereClause(long coordinateID, long projectID) {
         return GBDatabaseSqliteHelper.COORDINATE_ID + " = '" +
-                String.valueOf(coordinateID) + "' AND " +
+                                                        String.valueOf(coordinateID) + "' AND " +
                 GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID + " = '" +
-                String.valueOf(projectID) + "'";
+                                                        String.valueOf(projectID) + "'";
 
     }
     //This only gets the one coordinate related to this project
@@ -816,7 +810,7 @@ class GBDatabaseManager {
     // ***********************************************/
     /*         MeanToken CRUD methods                */
     // ***********************************************/
-    long addToken(GBNmeaMeanToken token){
+    long addToken(GBMeanToken token){
         if (token == null) return sDB_ERROR_CODE;
 
         long projectID = token.getProjectID();
@@ -827,19 +821,18 @@ class GBDatabaseManager {
         if (project == null) return sDB_ERROR_CODE;
 
 
-        GBNmeaMeanTokenManager tokenManager = GBNmeaMeanTokenManager.getInstance();
+        GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
         ContentValues cv = tokenManager.getCVFromToken(token);
 
         long returnCode = sDB_ERROR_CODE;
 
         //first add/update the coordinate
-        String whereClause =
-                getTokenWhereClause(token.getMeanTokenID());
+        String whereClause = getTokenWhereClause(token.getMeanTokenID());
         returnCode = mDatabaseHelper.add(mDatabase,
-                GBDatabaseSqliteHelper.TABLE_MEAN_TOKEN,
-                cv,
-                whereClause,
-                GBDatabaseSqliteHelper.MEAN_TOKEN_ID);
+                                         GBDatabaseSqliteHelper.TABLE_MEAN_TOKEN,
+                                         cv,
+                                         whereClause,
+                                         GBDatabaseSqliteHelper.MEAN_TOKEN_ID);
         if (returnCode == sDB_ERROR_CODE) return returnCode;
 
         //Cascade add happens at the manager level, not here
@@ -853,10 +846,30 @@ class GBDatabaseManager {
     }
 
 
+    //just returns the single coordinateMean object that corresponds to the coordinateID
+    GBMeanToken getMeanTokenFromDB(long tokenID) {
+        if (tokenID == GBUtilities.ID_DOES_NOT_EXIST) return null;
+
+        //get the coordinate row from the DB
+        Cursor cursor = mDatabaseHelper.getObject(mDatabase,     //the db to access
+                                    GBDatabaseSqliteHelper.TABLE_MEAN_TOKEN,  //table name
+                                    null,          //get the whole coordinate
+                                    getTokenWhereClause(tokenID), //where clause
+                                    null, null, null, null);//args, group, row grouping, order
+
+        //create a coordinate object from the Cursor object
+        GBMeanTokenManager meanTokenManager = GBMeanTokenManager.getInstance();
+
+        //get the first row in the cursor
+        GBMeanToken token = meanTokenManager.getMeanTokenFromCursor(cursor, 0);
+        cursor.close();
+        return token;
+    }
+
+
     //This gets all the pictures related to this project
     String getTokenWhereClause(long tokenID) {
-        return
-                GBDatabaseSqliteHelper.MEAN_TOKEN_ID + " = '" + String.valueOf(tokenID) + "'";
+        return GBDatabaseSqliteHelper.MEAN_TOKEN_ID + " = '" + String.valueOf(tokenID) + "'";
     }
 
 
@@ -935,7 +948,7 @@ class GBDatabaseManager {
 
     boolean addPointPicturesToDB(GBPoint point) {
         ArrayList<GBPicture> pictures = point.getPictures();
-        if (pictures == null) return true;
+        if ((pictures == null) || (pictures.size() == 0)) return true;
 
         String whereClause = getPictureWhereClause(point.getForProjectID(), point.getPointID());
 

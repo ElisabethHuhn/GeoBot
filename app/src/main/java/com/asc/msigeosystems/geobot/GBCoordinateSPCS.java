@@ -248,8 +248,11 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double oneMinusn2      = 1. - n2;
         double onePlus9n2Over4 = (1. + ((9.*n2)/4.));
         double two25n4Over64   = ((225.*n4)/64.) ;
-        double radiusOfRectifyingSphere = ( major * oneMinusn * oneMinusn2 * (onePlus9n2Over4 + two25n4Over64));
+        double r = ( major * oneMinusn * oneMinusn2 * (onePlus9n2Over4 + two25n4Over64));
                 //(1. - n) *(1. - n2) *(1. + ((9.*n2)/4.) + ((225.*n4)/64.) ));
+        double radiusOfRectifyingSphere = constants.getRadiusOfRectifyingSphere();
+        //radiusOfRectifyingSphere should be equal to r
+        // TODO: 7/3/2017 double check that r = radiusOfRectifyingSphere
 
 
         //Equ #14)	ωo 	= Φo + sin Φo cos Φo (Uo + U2cos2 Φo + U4cos4 Φo + U6cos6 Φo)

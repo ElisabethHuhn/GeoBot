@@ -32,26 +32,25 @@
                 >
 
 
-            <!-- A text field for any info the fragment wants to put there - - >
-            <!-   -->
-            <TableRow
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
+        <!-- A text field for any info the fragment wants to put there -->
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+
+            >
+            <TextView
+                android:id=            "@+id/matrix_screen_label"
+                android:layout_height= "wrap_content"
+                android:layout_width = "wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:paddingTop="10dp"
+                android:gravity=       "center_horizontal"
 
-                >
-                <TextView
-                    android:id=            "@+id/matrix_screen_label"
-                    android:layout_height= "wrap_content"
-                    android:layout_width = "wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity=       "center_horizontal"
-
-                    android:textColor=    "@color/colorTextBlack"
-                    android:background=   "@color/colorScreenBackground"
-                    />
-            </TableRow>
+                android:textColor=    "@color/colorTextBlack"
+                android:background=   "@color/colorScreenBackground"
+                />
+        </TableRow>
 
 
             <!-- Row 1 with 3 columns for buttons - - >

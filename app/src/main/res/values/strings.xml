@@ -2,7 +2,7 @@
     <string name="app_name"                 >GeoBot</string>
     <string name="snackbar_example"         >Snackbar example</string>
 
-    <string name="ygps_app_name"            >Prism4D YGPS Skyplot</string>
+    <string name="ygps_app_name"            >GeoBot YGPS Skyplot</string>
     <string name="gps_app_name"             >GPS Skyplot</string>
     <string name="title_activity_gb_collect_points_maps">Map</string>
 
@@ -72,10 +72,15 @@
     <!-- Main Home Screen Strings -->
     <!-- Menu Items -->
     <string name="action_home"              >Home</string>
+    <string name="action_splash"            >GeoBot</string>
     <string name="action_project"           >Project</string>
     <string name="action_project_create"    >Project Create</string>
     <string name="action_project_edit"      >Project Edit</string>
     <string name="action_project_open"      >Project Open</string>
+    <string name="action_project_list"      >Project List</string>
+    <string name="action_point_list"        >Point List</string>
+    <string name="action_map_points"        >Map Points</string>
+    <string name="action_project_export"    >Export Project</string>
     <string name="action_collect"           >Collect</string>
     <string name="action_stakeout"          >Stakeout</string>
     <string name="action_cogo"              >COGO</string>
@@ -129,6 +134,8 @@
     <string name="subtitle_workflow"                >Coordinate Workflow</string>
     <string name="subtitle_convert"                 >Coordinate Conversion</string>
 
+    <string name="subtitle_measure"                 >Measure</string>
+
 
     <string name="subtitle_unknown_error"           >Unknown Error</string>
 
@@ -152,6 +159,15 @@
     <string name="coordinate_try_again">Coordinates not valid, please input again</string>
 
 
+
+    <string name="splash_opened_proj"       >Proceed to open project</string>
+    <string name="splash_product_version" formatted="false"   >GeoBot version: %s</string>
+    <string name="splash_db_version" formatted="false"        >DB Schema %s Version: %d</string>
+    <string name="splash_constants_version" formatted="false" >Conversion version: %s</string>
+
+
+
+    <!-- Top level Matrix buttons -->
     <!-- Button Labels -->
     <string name="projects_button_label"    >Project</string>
     <string name="collect_button_label"     >Collect</string>
@@ -210,18 +226,24 @@
     <!-- Button Labels -->
     <string name="project_view_existing_label"      >View Projects</string>
     <string name="project_create_button_label"      >Create Project</string>
+    <string name="project_edit_button_label"        >Edit Project</string>
     <string name="project_settings_button_label"    >View Settings</string>
+    <string name="project_map_button_label"         >Map Points</string>
+    <string name="project_export_button_label"      >Export Points</string>
+    <string name="project_measure_button_label"     >Measure</string>
 
 
     <!-- Text View Labels (initial text displayed) -->
-    <string name="project_screen_label">Project Attributes</string>
-    <string name="project_name_label">Name: </string>
-    <string name="project_id_label">ID: </string>
-    <string name="project_id_will_be_label">ID will be:</string>
-    <string name="project_creation_date_label">Created: </string>
-    <string name="project_last_modified_date_label">Modified: </string>
+    <string name="project_screen_label"     >Project Attributes</string>
+    <string name="project_name_label"       >Name: </string>
+    <string name="project_num_points"       >Num Points:</string>
+    <string name="project_id_label"         >ID: </string>
+    <string name="project_id_will_be_label" >ID will be:</string>
+    <string name="project_creation_date_label"      >Created: </string>
+    <string name="project_last_modified_date_label" >Modified: </string>
     <string name="project_description_label">Description: </string>
-    <string name="project_coord_label">Coord Type</string>
+    <string name="project_coord_label"      >Coord Type</string>
+    <string name="project_can_not_change"   >Can not make this change after points created</string>
 
 
     <!-- Prompts -->
@@ -300,7 +322,7 @@
     <string name="cant_view_projects">Can not view projects on create path</string>
     <string name="cant_view_points">Can not view points on create path</string>
     <string name="point_unchanged">Point unchanged, exit without saving</string>
-    <string name="point_no_selection">Point Has NOT been selected yet</string>
+    <string name="point_no_selection">Point does not exist</string>
     <string name="point_view_existing_label">View Existing Points</string>
 
     <string name="save_new_project">New Project saved to Permanent Storage</string>
@@ -314,6 +336,7 @@
     <string name="list_points_label">List Points</string>
     <string name="save_changes_button_label">Save Changes</string>
     <string name="exit_button_label">Exit</string>
+    <string name="measure_button_label">Measure</string>
 
 
     <!--      NEW SCREEN                  -->
@@ -807,6 +830,7 @@
     <!--Input error Message-->
     <string name="input_double_format_error_string" >Not in correct decimal Format</string>
     <string name="input_wrong_range_error"          >Not within range, (see prompt)</string>
+    <string name="gps_off_before_save"          >GPS must be off to save coordinate</string>
 
     <!-- Stubs -->
     <string name="conversion_stub"                  >Coordinates Converted</string>
@@ -816,12 +840,13 @@
 
 
     <!-- Alert Dialog Strings -->
-    <string name="are_you_sure">Are You Sure?</string>
-    <string name="continue_delete_dont_save">Permanently Delete</string>
-    <string name="delete_title">Delete Prism 4D Project</string>
-    <string name="abandon_title">Prism 4D Project Changes Could Be Lost</string>
-    <string name="continue_abandon_changes">Abandon Changes</string>
-    <string name="cancel">Cancel</string>
+    <string name="are_you_sure"                 >Are You Sure?</string>
+    <string name="continue_delete_dont_save"    >Permanently Delete</string>
+    <string name="delete_title"                 >Delete Project</string>
+    <string name="abandon_title"                >Project Changes Could Be Lost</string>
+    <string name="continue_abandon_changes"     >Abandon Changes</string>
+    <string name="cancel"                       >Cancel</string>
+    <string name="cancel_pressed"               >Pressed Cancel</string>
 
 
     <!-- Collect Points Info Window  -->

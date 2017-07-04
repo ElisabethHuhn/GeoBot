@@ -113,31 +113,6 @@ class GBProjectManager {
         return true;
     }
 
-    boolean cascadePoints(GBProject project){
-        boolean returnCode = true;
-        boolean addToDBToo = true;
-        ArrayList<GBPoint> points = project.getPoints();
-        if (points != null) {
-            //point manager will cascade contained objects too
-            GBPointManager pointManager = GBPointManager.getInstance();
-            //write the points out to the DB
-            int last = points.size();
-            int pointPosition = 0;
-
-            while ( pointPosition < last ) {
-                returnCode = pointManager.addPointsToProject(project,
-                                                             points.get(pointPosition),
-                                                             addToDBToo);
-                if (!returnCode) {
-                    return false;
-                }
-                pointPosition++;
-            }
-
-        }
-        return returnCode;
-    }
-
 
 
     //Updates the Project Object in the DB and the Picture Object in the DB
@@ -443,7 +418,7 @@ class GBProjectManager {
             toPoint.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
 
             //add the new point to the list on the project AND to the db
-            //pointManager.addPointsToProject(toProject, toPoint, true);
+            //pointManager.addPointToProject(toProject, toPoint, true);
 
             //  give the coordinate on the point a new ID
             int toCoordinateID = GBCoordinate.getNextCoordinateID();
@@ -468,7 +443,7 @@ class GBProjectManager {
             
             //add the new picture to the list on the project AND to the db
             // TODO: 12/29/2016 make sure the project has already added pictures in the getP'rojectFromDB() 
-            //pictureManager.addPointsToProject(toProject, toPicture, true);
+            //pictureManager.addPointToProject(toProject, toPicture, true);
             
         }
 

@@ -1,10 +1,8 @@
 package com.asc.msigeosystems.geobot;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,11 +13,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -30,27 +23,7 @@ import java.util.Locale;
 public class GBPointListFragment extends Fragment {
 
     private static final String TAG = "LIST_POINTS_FRAGMENT";
-    /**
-     * Create variables for widgets
-     *
-     */
 
-
-
-    private List<GBPoint>  mPointList = new ArrayList<>();
-
-
-    private int                 mCoordinateWidgetType;
-
-
-
-    private int          mProjectID;
-    private GBPoint mPoint;
-
-
-
-    private GBPoint mSelectedPoint;
-    private int          mSelectedPosition;
 
     private CharSequence mPointPath;
 
@@ -71,12 +44,9 @@ public class GBPointListFragment extends Fragment {
     /*-********************************************************/
 
 
-    public static GBPointListFragment newInstance(long   projectID,
-                                                  GBPath pointPath){
+    public static GBPointListFragment newInstance(GBPath pointPath){
 
         Bundle args = new Bundle();
-        //don't need the entire project object, just it's id
-        args.putLong         (GBProject.sProjectIDTag,    projectID);
         GBPath.putPathInArguments(args, pointPath);
 
         GBPointListFragment fragment = new GBPointListFragment();
@@ -90,8 +60,7 @@ public class GBPointListFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
-        mProjectID   = getArguments().getInt(GBProject.sProjectIDTag);
-
+        //This only works for the open project
         GBPath path  = GBPath.getPathFromArguments(getArguments());
         mPointPath   = path.getPath();
     }
@@ -127,9 +96,9 @@ public class GBPointListFragment extends Fragment {
     private void wireWidgets(View v){
          //Need a header line for the list, but attributes of coordinate are different
         //depending upon the type of coordinate: Latitude/Longitude or Easting/Northing
-        mCoordinateWidgetType = getCoordinateTypeFromProject();
+        int coordinateWidgetType = getCoordinateTypeFromProject();
 
-        if (mCoordinateWidgetType == GBCoordinate.sLLWidgets) {
+        if (coordinateWidgetType == GBCoordinate.sLLWidgets) {
             TextView eastingLabel = (TextView) v.findViewById(R.id.easting_label);
             TextView northingLabel = (TextView) v.findViewById(R.id.northing_label);
 
@@ -140,19 +109,20 @@ public class GBPointListFragment extends Fragment {
     }
 
     private int getCoordinateTypeFromProject(){
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        GBProject project = projectManager.getProject(mProjectID);
 
-        CharSequence coordinateType = project.getProjectCoordinateType();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (openProject == null)return GBCoordinate.sUNKWidgets;
+
+        CharSequence coordinateType = openProject.getProjectCoordinateType();
 
         int returnCode = GBCoordinate.sUNKWidgets;
 
         if (!GBUtilities.isEmpty(coordinateType)){
-            if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84) ||
-                    coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83) ){
+            if (       coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84) ||
+                       coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83) ){
                 returnCode = GBCoordinate.sLLWidgets;
             } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM) ||
-                    coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS) ){
+                       coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS) ){
                 returnCode = GBCoordinate.sENWidgets;
             }
         }
@@ -187,17 +157,13 @@ public class GBPointListFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager  = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        //4) create some dummy data and tell the adapter about it
-        //  this is done in the singleton container
+        //4) Get points from the open Project
 
-        //      get our singleton list container
-        GBPointManager pointsManager = GBPointManager.getInstance();
-        //Get this projects points
-        mPointList = pointsManager.getProjectPointsList(mProjectID);
-
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (openProject == null)return;
 
         //5) Use the data to Create and set out points Adapter
-        GBPointAdapter adapter = new GBPointAdapter(mPointList);
+        GBPointAdapter adapter = new GBPointAdapter(openProject.getPoints());
         recyclerView.setAdapter(adapter);
 
         //6) create and set the itemAnimator
@@ -222,8 +188,6 @@ public class GBPointListFragment extends Fragment {
                         //for now, ignore the long click
                     }
                 }));
-
-        //No FOOTER on this screen
 
     }
 
@@ -261,103 +225,30 @@ public class GBPointListFragment extends Fragment {
 
     //executed when an item in the list is selected
     private void onSelect(int position){
-        mSelectedPosition = position;
-        mSelectedPoint = mPointList.get(position);
-        Toast.makeText(getActivity().getApplicationContext(),
-                String.valueOf(mSelectedPoint.getPointID()) + " is selected!",
-                Toast.LENGTH_SHORT).show();
+        View v = getView();
+        if (v == null)return;
+
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.pointsList);
+        GBPointAdapter adapter    = (GBPointAdapter) recyclerView.getAdapter();
+
+        GBPoint selectedPoint = adapter.getPointList().get(position);
+
+        GBUtilities.getInstance().showStatus(getActivity(),
+                String.valueOf(selectedPoint.getPointID()) + " is selected!");
 
 
-        processSelect();
-
-    }
-
-    //executed when enter is selected
-    private void processSelect(){
         //Point has to have been selected to do anything here
         GBActivity myActivity = (GBActivity) getActivity();
 
-        if (myActivity != null){
-            if (mSelectedPoint != null) {
+        if (mPointPath.equals(GBPath.sEditTag)){
 
-                //We'll need to pass the path forward
-
-                //What happens depends upon the path
-                //But as of 11/11/2016 the only path we should see is EDIT
-                if (mPointPath.equals(GBPath.sEditTag)){
-
-                    //if the path is edit, open the selected point
-                    myActivity.switchToEditPointScreen( mProjectID,
-                                                        new GBPath(mPointPath),
-                                                        mSelectedPoint );
-
-                }
-
-
-            } else {
-                //user hasn't selected anything yet
-                //for now, just put up a toast that nothing has been pressed yet
-                Toast.makeText(getActivity(),
-                        R.string.point_no_selection,
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-
-    }
-
-    //Build and display the alert dialog
-    private void areYouSureDelete(){
-        final View v = getView();
-        if (v == null)return;
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.delete_title)
-                .setIcon(R.drawable.ground_station_icon)
-                .setMessage(R.string.are_you_sure)
-                .setPositiveButton(R.string.continue_delete_dont_save, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                        String message = String.format(Locale.getDefault(),
-                                         getString(R.string.point_deleted),
-                                         String.valueOf(mSelectedPoint.getPointID()));
-
-
-                        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.pointsList);
-                        GBPointAdapter adapter    = (GBPointAdapter) recyclerView.getAdapter();
-
-                        //Need the project to remove the point
-                        adapter.removeItem(mSelectedPosition, mProjectID);
-
-                        Toast.makeText(getActivity(),
-                                message,
-                                Toast.LENGTH_SHORT).show();
-
-                        //delete the point and return to list points
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setIcon(R.drawable.ground_station_icon)
-                .show();
-    }
-
-    private GBProject getOurProject (int projectID){
-        //get the project list
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        //      then go get our project out of the list
-        GBProject ourProject = projectManager.getProject(projectID);
-        if (ourProject == null){
-            Toast.makeText(getActivity(),R.string.project_missing_exception,Toast.LENGTH_SHORT).show();
-            throw new RuntimeException(getString(R.string.project_missing_exception));
-            //todo really need to throw an exception here?
+            //if the path is edit, open the selected point
+            long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+            myActivity.switchToPointEditScreen(new GBPath(mPointPath),
+                                               selectedPoint );
 
         }
-        return ourProject;
+
     }
 
     //Add some code to improve the recycler view

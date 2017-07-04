@@ -72,7 +72,7 @@ public class GBTopProjectFragment extends Fragment {
     private void wireWidgets(View v){
         //Tell the user which project is open
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
-        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
+        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage((GBActivity)getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
 
@@ -173,10 +173,9 @@ public class GBTopProjectFragment extends Fragment {
             public void onClick(View v){
 
                 GBActivity myActivity = (GBActivity) getActivity();
-                GBProject openProject = GBUtilities.getInstance().getOpenProject();
+                GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
                 if (openProject != null){
-                    myActivity.switchToListPointsScreen(openProject,
-                            new GBPath(GBPath.sEditTag));
+                    myActivity.switchToPointsListScreen(new GBPath(GBPath.sEditTag));
                 }
 
                 GBUtilities.getInstance().showStatus(getActivity(),
@@ -217,7 +216,7 @@ public class GBTopProjectFragment extends Fragment {
     }
 
     private void onExchange(){
-        GBProject openProject = GBUtilities.getInstance().getOpenProject();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         if (openProject == null){
             GBUtilities.getInstance().showStatus(getActivity(),R.string.no_project_open);
             return;

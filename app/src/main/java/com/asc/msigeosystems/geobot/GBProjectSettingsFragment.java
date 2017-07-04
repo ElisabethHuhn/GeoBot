@@ -298,7 +298,7 @@ public class GBProjectSettingsFragment extends Fragment {
         //Project Name
         TextView projectNameOutput = (TextView) v.findViewById(R.id.projectNameOutput);
 
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         if (project != null) {
             projectIDOutput.setText(String.valueOf(project.getProjectID()));
             projectNameOutput.setText(String.valueOf(project.getProjectName()));
@@ -336,12 +336,12 @@ public class GBProjectSettingsFragment extends Fragment {
 
 
     GBProjectSettings getPSBeingMaintained (){
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         if (project == null)return null;
         GBProjectSettings psSettings = project.getSettings();
         if (psSettings == null){
             psSettings = new GBProjectSettings(); //filled with default values
-            project = GBUtilities.getInstance().getOpenProject();
+            project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
             project.setSettings(psSettings);
 
         }

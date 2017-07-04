@@ -38,7 +38,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
             int     counter = 0;
 
     //Contains all raw data and current results of meaning such data
-    private GBNmeaMeanToken mMeanToken;
+    private GBMeanToken mMeanToken;
 
 
      private boolean isGpsOn            = true;
@@ -315,7 +315,8 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
                 //The UTM constructor performs the conversion from WGS84
                 //make sure the mean is up to date
-                GBCoordinateWGS84 meanedWGS84 = new GBCoordinateWGS84(mMeanToken.getMeanCoordinate(true));
+                GBCoordinateWGS84 meanedWGS84 = new GBCoordinateWGS84((GBActivity)getActivity(),
+                                                            mMeanToken.getMeanCoordinate(true));
                 GBCoordinateUTM utmCoordinate = new GBCoordinateUTM(meanedWGS84);
                 updateUtmUI(utmCoordinate);
 
@@ -441,7 +442,8 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
                 if (mMeanToken == null)initializeMeanToken();
 
                 //Fold the new nmea sentence into the ongoing mean
-                GBCoordinateMean meanCoordinate = mMeanToken.updateMean(mNmeaData);
+                GBCoordinateMean meanCoordinate = mMeanToken.updateMean((GBActivity)getActivity(),
+                                                                         mNmeaData);
                 if (meanCoordinate != null) {
                     //Is this the first point we have processed?
                     if (isFirstMeanPoint()) {
@@ -459,7 +461,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
                     updateMeanUI(mMeanToken.getMeanCoordinate(false), mMeanToken);
                     mMeanToken.setLastPointInMean(false);
                 }
-                coordinateWGS84 = new GBCoordinateWGS84(nmeaData);
+                coordinateWGS84 = new GBCoordinateWGS84((GBActivity)getActivity(), nmeaData);
 
                 //update the UI from the Nmea Sentence
                 updateNmeaUI(coordinateWGS84, nmeaData);
@@ -511,7 +513,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
     }
 
     private void initializeMeanToken(){
-        if (mMeanToken == null)mMeanToken = new GBNmeaMeanToken();
+        if (mMeanToken == null)mMeanToken = new GBMeanToken();
         mMeanToken.setMeanInProgress(false);
         mMeanToken.setFirstPointInMean(false);
         mMeanToken.setLastPointInMean(false);
@@ -605,7 +607,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
     }
 
-    private void updateMeanUI(GBCoordinateMean meanCoordinate, GBNmeaMeanToken meanToken){
+    private void updateMeanUI(GBCoordinateMean meanCoordinate, GBMeanToken meanToken){
 
 
         View v = getView();

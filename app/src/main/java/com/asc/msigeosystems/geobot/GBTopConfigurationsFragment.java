@@ -48,7 +48,8 @@ public class GBTopConfigurationsFragment extends Fragment {
     private void wireWidgets(View v){
         //Tell the user which project is open
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
-        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
+        screenLabel.setText(GBUtilities.getInstance().
+                                            getOpenProjectIDMessage((GBActivity) getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
 

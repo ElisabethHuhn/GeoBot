@@ -24,10 +24,10 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //Database Version
-    private static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 1;
 
     //Database Name
-    private static final String DATABASE_NAME = "Prism4D";
+    static final String DATABASE_NAME = "GeoBot";
 
 
     /* ***************************************************/
@@ -176,6 +176,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String POINT_FOR_PROJECT_ID = "point_project_id";
     static final String POINT_ISA_COORDINATE_ID =  "point_coordinate_ID";
     static final String POINT_NUMBER          = "point_number";
+    static final String POINT_MEAN_TOKENID    = "point_mean_tokenID";
     static final String POINT_OFFSET_DISTANCE = "point_offset_distance";
     static final String POINT_OFFSET_HEADING =  "point_offset_heading";
     static final String POINT_OFFSET_ELEVATION = "point_offset_elevation";
@@ -199,6 +200,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             POINT_FOR_PROJECT_ID    + " INTEGER, " +
             POINT_ISA_COORDINATE_ID + " INTEGER, " +
             POINT_NUMBER            + " INTEGER, " +
+            POINT_MEAN_TOKENID      + " INTEGER, " +
             POINT_OFFSET_DISTANCE   + " REAL, "    +
             POINT_OFFSET_HEADING    + " REAL, "    +
             POINT_OFFSET_ELEVATION  + " REAL, "    +
@@ -323,6 +325,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
             COORDINATE_VALID_COORD          + " INTEGER, " +
             COORDINATE_IS_FIXED             + " INTEGER, " +//0 = FALSE, 1 = TRUE
+            COORDINATE_DATUM                + " TEXT, "    +
 
              COORDINATE_LL_LATITUDE          + " REAL, "    +
      /*

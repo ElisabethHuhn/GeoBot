@@ -207,6 +207,8 @@ public class GBProject {
         this.mCoordinateType = GBCoordinate.sCoordinateTypeClassWGS84;
         // TODO: 12/23/2016 Should we add in a default settings object here? 
         //this.mSettings     = new GBProjectSettings();
+        this.mLocPrecision = GBUtilities.sHundredthsDigitsOfPrecision;
+        this.mStdDevPrecision = GBUtilities.sHundredthsDigitsOfPrecision;
         this.mPoints       = new ArrayList<>();
         this.mPictures     = new ArrayList<>();
 
@@ -318,6 +320,8 @@ public class GBProject {
     //Creating a Project Object from the DB is not enough to populate the cascading objects
     //They are not pulled from the DB unless explicitly asked for
     ArrayList<GBPoint> getPoints(){
+        if (getProjectID() == GBUtilities.ID_DOES_NOT_EXIST)return mPoints;
+
         if (!arePointsInMemory()) {
             GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
             mPoints = databaseManager.getPointsForProjectFromDB(mProjectID);
@@ -328,6 +332,10 @@ public class GBProject {
     boolean arePointsInMemory(){
         return (!((mPoints == null) || (mPoints.size()==0))) ;
 
+    }
+    int getSize(){
+
+        return getPoints().size();
     }
 
     GBProjectSettings getSettings(){
@@ -471,10 +479,6 @@ public class GBProject {
         return getPoints().add(point);
     }
 
-    int getSize(){
-
-        return getPoints().size();
-    }
 
     boolean removePoint(GBPoint point){
         GBPointManager pointManager = GBPointManager.getInstance();

@@ -315,7 +315,7 @@ class GBCoordinateMean {
     /*                   Calculate the mean                       */
     /* ************************************************************/
     //called from the nmea event handler when mean is in progress
-    void updateMean(int numSatellites,  GBNmeaMeanToken meanValues){
+    void updateMean(int numSatellites,  GBMeanToken meanValues){
 
         // TODO: 1/21/2017 update the meanCoordinate with quality / fixed data from the nmeaData
 

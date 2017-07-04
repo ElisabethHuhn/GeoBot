@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,22 +33,27 @@ public class GBActivity extends AppCompatActivity {
     /* ********   Static Constants  ****************************************/
     /* *********************************************************************/
 
+    //GeoBot Version
+
+    static final String sGeoBotVersion = "Alpha Release 0.1";
+
     //DEFINE constants / literals
     static final int MY_PERMISSIONS_REQUEST_COURSE_LOCATIONS = 1;
     static final int MY_PERMISSIONS_REQUEST_FINE_LOCATIONS = 2;
 
+    static final String sOpenProjectIDTag      = "OPEN_PROJECT_ID";
+    static final String sOpenPointIDTag        = "OPEN_POINT_ID";
 
     private static final String sHomeTag               = "HOME";//HOME screen fragment
 
-    private static final String sOpenProjectIDTag      = "OPEN_PROJECT_ID";
     private static final String sCurrentFragmentTag    = "CURRENT_FRAGMENT";
 
     private static final String sProjectTopTag         = "PROJECT_TOP";
     private static final String sProjectCreateTag      = "PROJECT_CREATE_TOP";
     private static final String sProjectOpenTag        = "PROJECT_OPEN";
     //private static final String sProjectCopyTag        = "PROJECT_COPY";
-    private static final String sProjectEditTag        = "PROJECT_EDIT";
-    private static final String sProjectUpdateTag      = "PROJECT_UPDATE";
+            static final String sProjectEditTag        = "PROJECT_EDIT";
+    //private static final String sProjectUpdateTag      = "PROJECT_UPDATE";
     //private static final String sProjectDeleteTag      = "PROJECT_DELETE";
     private static final String sProjectSettingsTag    = "PROJECT_SETTINGS";
 
@@ -55,7 +61,7 @@ public class GBActivity extends AppCompatActivity {
     private static final String sPointCreateTag        = "POINT_CREATE_TOP";
     private static final String sPointOpenTag          = "POINT_OPEN";
     private static final String sPointCopyTag          = "POINT_COPY";
-    private static final String sPointEditTag          = "POINT_EDIT";
+            static final String sPointEditTag          = "POINT_EDIT";
     //private static final String sPointUpdateTag        = "POINT_UPDATE";
     private static final String sPointDeleteTag        = "POINT_DELETE";
     private static final String sPointShowTag          = "POINT_SHOW";
@@ -73,6 +79,7 @@ public class GBActivity extends AppCompatActivity {
     private static final String sCogoWorkflowTag       = "COGO_WORKFLOW";
 
     private static final String sMapsTopTag            = "MAPS_TOP";
+    private static final String sMeasureTag            = "MEASURE";
 
     private static final String sSkyplotTopTag         = "SKYPLOT_TOP";
     private static final String sSkyplotListNmeaTag    = "SKYPLOT_LIST_NMEA";
@@ -129,10 +136,11 @@ public class GBActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //initialize the floating action bar here if we add one
+        initializeDB();
 
         initializeFragment();
 
+        //initialize the floating action bar here if we add one
         initializeFAB();
 
         setSubtitle(R.string.subtitle_home);
@@ -141,6 +149,35 @@ public class GBActivity extends AppCompatActivity {
 
         //initialize the database here for the whole application
         //GBatabaseManager.initializeInstance(this);
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+            Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+
+            if (fragment instanceof GBPointEditFragment) {
+                ((GBPointEditFragment) fragment).onExit();
+
+            } else if (fragment instanceof GBCoordConvertFragment) {
+                ((GBCoordConvertFragment) fragment).onExit();
+
+            } else if (fragment instanceof GBProjectEditFragment) {
+                ((GBProjectEditFragment) fragment).onExit();
+
+            } else {
+
+                onBackPressed();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed(); // finish();
     }
 
 
@@ -277,25 +314,35 @@ public class GBActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID(this);
 
-        //Skipping out on lower level processes is probably not a good idea
-        //for now, disallow any navigating on menu except home
         switch (item.getItemId()){
             case R.id.action_home :
                 switchToHomeScreen();
                 return true;
             case  R.id.action_project_open:
                 switchToProjectOpenScreen();
-                //switchToProjectListProjectsScreen(new GBPath(GBPath.sOpenTag));
+                //switchToProjectListScreen(new GBPath(GBPath.sOpenTag));
                 return true;
             case  R.id.action_project_create:
-                switchToProjectOpenScreen();
+                switchToProjectCreateScreen();
                 return true;
 
             case  R.id.action_project_edit:
                 switchToProjectEditScreen();
-                //switchToProjectListProjectsScreen(new GBPath(GBPath.sEditTag));
+                //switchToProjectListScreen(new GBPath(GBPath.sEditTag));
                 return true;
+
+            case  R.id.action_point_list:
+            case  R.id.action_map_points:
+            case  R.id.action_project_export:
+                if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST){
+                    switchToProjectListScreen(new GBPath(GBPath.sShowTag));
+                } else {
+                    switchToProjectEditScreen();
+                }
+                return true;
+
 
 /*
  case  R.id.action_project:
@@ -424,6 +471,13 @@ public class GBActivity extends AppCompatActivity {
     }
 
     ///* ************************************************************/
+    ///* *****************        Initialization        *************/
+    ///* ************************************************************/
+    private void initializeDB(){
+        GBDatabaseManager.getInstance(this);
+    }
+
+    ///* ************************************************************/
     ///* ***************** Routines to switch fragments *************/
     ///* ************************************************************/
 
@@ -437,7 +491,8 @@ public class GBActivity extends AppCompatActivity {
         if (fragment == null) {
             //when we first create the activity, the fragment needs to be the home screen
             //fragment = new GBTopHomeFragment();
-            fragment = new GBTopConversionFragment();
+            //fragment = new GBTopConversionFragment();
+            fragment = new GBSplashFragment();
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();
@@ -461,9 +516,7 @@ public class GBActivity extends AppCompatActivity {
     }
 
     ///* *** Routines to actually switch the screens *******/
-    private void switchScreen(Fragment fragment, String tag) {
-        //clear the back stack
-         clearBackStack();
+    private void switchScreenWithStack(Fragment fragment, String tag) {
 
         //Need the Fragment Manager to do the swap for us
         android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
@@ -485,6 +538,12 @@ public class GBActivity extends AppCompatActivity {
                     .commit();
         }
 
+    }
+    private void switchScreen(Fragment fragment, String tag) {
+        //clear the back stack
+         clearBackStack();
+
+        switchScreenWithStack(fragment, tag);
     }
     private void switchScreen(Fragment fragment, String tag, int subtitle) {
         switchScreen(fragment, tag);
@@ -552,17 +611,26 @@ public class GBActivity extends AppCompatActivity {
     }
 
 
-
-
     void switchToHomeScreen(){
         //replace the fragment with the Home UI
 
         //Fragment fragment    = new GBTopHomeFragment();
-        Fragment fragment    = new GBTopConversionFragment();
+        //Fragment fragment    = new GBTopConversionFragment();
+        Fragment fragment    = new GBSplashFragment();
         String   tag         = sHomeTag;
         int      title       = R.string.subtitle_home;
 
         switchScreen(fragment, tag, title);
+
+    }
+
+
+    void switchToMeasureScreen(GBPoint point){
+
+        Fragment fragment    = GBCoordConvertFragment.newInstance(point);
+        String   tag         = sMeasureTag;
+
+        switchScreen(fragment, tag);
 
     }
 
@@ -577,9 +645,6 @@ public class GBActivity extends AppCompatActivity {
         switchScreen(fragment, tag, title);
 
     }
-
-
-
 
 
 
@@ -604,7 +669,7 @@ public class GBActivity extends AppCompatActivity {
     }
 
 
-    void switchToProjectListProjectsScreen(GBPath projectPath){
+    void switchToProjectListScreen(GBPath projectPath){
 
         Fragment fragment = GBProjectsListFragment.newInstance(projectPath);
         String tag        = sProjectOpenTag;
@@ -623,7 +688,7 @@ public class GBActivity extends AppCompatActivity {
         //set the action for the project to create
         GBPath projectPath = new GBPath(GBPath.sCreateTag);
 
-        Fragment fragment = GBProjectEditFragment.newInstance(null, projectPath);
+        Fragment fragment = GBProjectEditFragment.newInstance(projectPath);
         String tag        = sProjectCreateTag;
         int subTitle      = R.string.subtitle_create_project;
 
@@ -650,40 +715,21 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToProjectEditScreen(){
 
-        GBUtilities constantsAndUtilities = GBUtilities.getInstance();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(this);
+        Fragment fragment;
 
-        GBProject project = constantsAndUtilities.getOpenProject();
-
-        if (project != null) {
+        if (openProject != null) {
             //if a project is open, assume that is the one the user wants to edit
-            switchToProjectEditScreen(project);
-        } else {
-
-            //create the path for Edit
+             //create the path for Edit
             GBPath path = new GBPath(GBPath.sEditTag);
-
-            Fragment fragment = GBProjectsListFragment.newInstance(path);
-            String tag = sProjectEditTag;
-            int subTitle = R.string.action_edit;
-
-            switchScreen(fragment, tag, subTitle);
-
+            fragment = GBProjectEditFragment.newInstance(path);
+        } else {
+            GBPath path = new GBPath(GBPath.sEditTag);
+            fragment = GBProjectsListFragment.newInstance(path);
         }
+        String tag = sProjectEditTag;
 
-    }
-
-
-    void switchToProjectEditScreen( GBProject project){
-        //create the path for Edit
-        GBPath path = new GBPath(GBPath.sEditTag);
-
-        Fragment fragment = GBProjectEditFragment.newInstance(project, path);
-        String tag        = sProjectUpdateTag;
-        int subTitle      = R.string.subtitle_maintain_project;
-
-        switchScreen(fragment, tag, subTitle);
-
-
+        switchScreen(fragment, tag);
     }
 
 
@@ -701,11 +747,6 @@ public class GBActivity extends AppCompatActivity {
 
     }
 
-
-    void popToProjectUpdateScreen(){
-        String tag = sProjectUpdateTag;
-        popToScreen(tag);
-    }
 
 
     void switchToProjectDeleteScreen(){
@@ -755,18 +796,9 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToPointCreateScreen(GBProject project){
 
-
-        //Gets the point which contains the defaults for all other projects
-        //GBPoint newPoint = getPointForCreate();
-        //newPoint.setForProjectID(project.getProjectID());
-        //overwrite the dummy ID with the next ID in the proejct
-        //newPoint.setPointID(project.getNextPointID());
-
         GBPath pointPath = new GBPath(GBPath.sCreateTag);
 
-        Fragment fragment =  GBPointEditFragment.newInstance(project.getProjectID(),
-                pointPath,
-                null);
+        Fragment fragment =  GBPointEditFragment.newInstance(pointPath, null);
         String tag        = sPointCreateTag;
         int subTitle      = R.string.subtitle_create_point;
 
@@ -774,25 +806,12 @@ public class GBActivity extends AppCompatActivity {
 
     }
 
-    void switchToListPointsScreen(long   projectID,
-                                         GBPath pointPath){
+    void switchToPointsListScreen(GBPath pointPath){
 
-
-        Fragment fragment =  GBPointListFragment.newInstance(projectID,
-                pointPath);
+        //lists the points on the currently open project
+        Fragment fragment =  GBPointListFragment.newInstance(pointPath);
         switchScreen(fragment, getPointTag(pointPath));
     }
-
-
-    void switchToListPointsScreen(GBProject project,
-                                         GBPath    pointPath){
-
-
-        Fragment fragment =  GBPointListFragment.newInstance(project.getProjectID(), pointPath);
-
-        switchScreen(fragment, getPointTag(pointPath));
-    }
-
 
     private String getPointTag(GBPath path){
 
@@ -814,26 +833,18 @@ public class GBActivity extends AppCompatActivity {
         return tag;
     }
 
+    void switchToPointEditScreen(GBPath  pointPath,
+                                 GBPoint point){
 
-
-    void switchToEditPointScreen(long      projectID,
-                                        GBPath    pointPath,
-                                        GBPoint   point){
-
-        Fragment fragment =  GBPointEditFragment.newInstance(projectID,
-                pointPath,
-                point);
+        Fragment fragment =  GBPointEditFragment.newInstance(pointPath, point);
         String tag        = sPointEditTag;
-        int subTitle      = R.string.subtitle_maintain_point;
 
-        switchScreen(fragment, tag, subTitle);
+        switchScreen(fragment, tag);
      }
 
     // ******************************************
      // * COLLECT
      // *******************************************/
-
-
 
     void switchToTopCollectScreen(){
 
@@ -859,10 +870,8 @@ public class GBActivity extends AppCompatActivity {
 
 
     // ******************************************
-     // * STACKOUT
-     // *******************************************/
-
-
+    // * STACKOUT
+    // *******************************************/
 
     void switchToTopStakeoutScreen(){
 
@@ -893,13 +902,10 @@ public class GBActivity extends AppCompatActivity {
 
 
 
-    void popToTopCogoScreen(){
-        String tag = sCogoTopTag;
-        popToScreen(tag);
-    }
 
-
-
+    // ******************************************
+    // * Coordinate Conversion Fragments
+    // *******************************************/
 
     void switchToCoordConvert(){
 
@@ -923,9 +929,6 @@ public class GBActivity extends AppCompatActivity {
 
     }
 
-
-
-
     void switchToConvertScreen(){
 
         Fragment fragment = new GBCoordConversionOldFragment();
@@ -944,7 +947,6 @@ public class GBActivity extends AppCompatActivity {
      // * Maps
      // *******************************************/
 
-
     void switchToTopMapsScreen(){
 
         Fragment fragment = new GBTopMapsFragment();
@@ -962,8 +964,6 @@ public class GBActivity extends AppCompatActivity {
     // ******************************************
      // * SKYPLOT
      // *******************************************/
-
-
 
     void switchToTopSkyplotScreen(){
 

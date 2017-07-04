@@ -1,6 +1,5 @@
 package com.asc.msigeosystems.geobot;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -20,11 +19,14 @@ import java.math.RoundingMode;
  */
 
 class GBInfoWindowAdapter implements InfoWindowAdapter {
-    private  View mInfoWindowView;
+    private View       mInfoWindowView;
+    private GBActivity mActivity;
 
-    GBInfoWindowAdapter(Context context){
+    GBInfoWindowAdapter(GBActivity activity){
+        mActivity = activity;
+
         //Get an inflater
-        LayoutInflater layoutInflater =  LayoutInflater.from(context);
+        LayoutInflater layoutInflater =  LayoutInflater.from(activity);
         //LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 
         mInfoWindowView = layoutInflater.inflate(R.layout.info_window_points_collect, null);
@@ -39,7 +41,7 @@ class GBInfoWindowAdapter implements InfoWindowAdapter {
 
         //project has to be open
         int precisionDigits =
-                GBUtilities.getInstance().getOpenProject().getSettings().getLocationPrecision();
+                GBUtilities.getInstance().getOpenProject(mActivity).getSettings().getLocationPrecision();
 
 
         //Point ID
@@ -92,7 +94,7 @@ class GBInfoWindowAdapter implements InfoWindowAdapter {
 
 
         precisionDigits = GBUtilities.getInstance()
-                                            .getOpenProject().getSettings().getStdDevPrecision();
+                                       .getOpenProject(mActivity).getSettings().getStdDevPrecision();
 
 
         //Standard Deviation Latitude

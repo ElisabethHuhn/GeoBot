@@ -88,7 +88,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         }
     }
 
-    GBCoordinateWGS84(GBNmea nmeaData){
+    GBCoordinateWGS84(GBActivity activity, GBNmea nmeaData){
         //GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(nmeaData.getLatitude(),
                                                                 //nmeaData.getLongitude());
         initializeDefaultVariables();
@@ -97,13 +97,13 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         setElevation(nmeaData.getOrthometricElevation());
         setGeoid(nmeaData.getGeoid());
 
-        setProjectID(GBUtilities.getInstance().getOpenProjectID());
+        setProjectID(GBUtilities.getInstance().getOpenProjectID(activity));
         //setTime(System.currentTimeMillis());
 
         setTime(nmeaData.getTimeStamp());
     }
 
-    GBCoordinateWGS84(GBCoordinateMean meanCoordinate){
+    GBCoordinateWGS84(GBActivity activity, GBCoordinateMean meanCoordinate){
        // GBCoordinateWGS84 wgs84Coordinate = new GBCoordinateWGS84(meanCoordinate.getLatitude(),
                                                                   //meanCoordinate.getLongitude());
         initializeDefaultVariables();
@@ -113,7 +113,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         setElevation(meanCoordinate.getElevation());
         setGeoid    (meanCoordinate.getGeoid());
 
-        setProjectID(GBUtilities.getInstance().getOpenProjectID());
+        setProjectID(GBUtilities.getInstance().getOpenProjectID(activity));
         setTime(System.currentTimeMillis());
     }
 

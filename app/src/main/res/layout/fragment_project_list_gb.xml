@@ -20,26 +20,6 @@
             >
 
 
-            <!-- Exit Button -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectExitButton"
-                android:text="@string/exit_button_label"
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="center"
-
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="8dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-
             <!-- rest of the screen -->
             <LinearLayout
                 android:orientation=  "vertical"

@@ -98,8 +98,8 @@ public class GBTopPointFragment extends Fragment {
 
         //Tell the user which project is open
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
-        GBUtilities constantsAndUtilities = GBUtilities.getInstance();
-        screenLabel.setText(constantsAndUtilities.getOpenProjectIDMessage(getActivity()));
+        GBUtilities utilities = GBUtilities.getInstance();
+        screenLabel.setText(utilities.getOpenProjectIDMessage((GBActivity)getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
 
@@ -113,9 +113,7 @@ public class GBTopPointFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 GBActivity activity = (GBActivity)getActivity();
-                activity.switchToListPointsScreen(
-                            GBUtilities.getInstance().getOpenProjectID(),
-                            new GBPath(GBPath.sShowTag));
+                activity.switchToPointsListScreen(new GBPath(GBPath.sShowTag));
 
             }
         });
@@ -130,7 +128,8 @@ public class GBTopPointFragment extends Fragment {
             public void onClick(View v) {
                 //Switch the fragment to the collect with maps fragment.
                 // But the switching happens on the container Activity
-                ((GBActivity)getActivity()).switchToPointCreateScreen(GBUtilities.getInstance().getOpenProject());
+                ((GBActivity)getActivity()).switchToPointCreateScreen(GBUtilities.getInstance().
+                        getOpenProject((GBActivity)getActivity()));
             }
         });
 
@@ -145,7 +144,7 @@ public class GBTopPointFragment extends Fragment {
             public void onClick(View v){
                 GBUtilities.getInstance().showStatus(getActivity(), R.string.point_no_copy);
                 /*
-                ((GBActivity)getActivity()).switchToListPointsScreen(
+                ((GBActivity)getActivity()).switchToPointsListScreen(
                             mProject.getProjectID(),
                             new GBPath(GBPath.sCopyTag));
                  */
@@ -163,8 +162,7 @@ public class GBTopPointFragment extends Fragment {
                 GBUtilities.getInstance().showStatus(getActivity(), R.string.edit_button_label);
 
                 GBPath pointPath = new GBPath(GBPath.sEditTag) ;
-                ((GBActivity)getActivity()).switchToListPointsScreen(GBUtilities.getInstance().
-                                                                    getOpenProjectID(),pointPath);
+                ((GBActivity)getActivity()).switchToPointsListScreen(pointPath);
 
             }
         });
@@ -177,9 +175,7 @@ public class GBTopPointFragment extends Fragment {
             @Override
             public void onClick(View v){
 
-                ((GBActivity)getActivity()).switchToListPointsScreen(GBUtilities.getInstance()
-                                                                    .getOpenProjectID(),
-                                                                    new GBPath(GBPath.sDeleteTag));
+                ((GBActivity)getActivity()).switchToPointsListScreen(new GBPath(GBPath.sDeleteTag));
             }
         });
 

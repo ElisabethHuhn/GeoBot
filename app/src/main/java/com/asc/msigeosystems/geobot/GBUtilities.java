@@ -2,11 +2,16 @@ package com.asc.msigeosystems.geobot;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -31,16 +36,22 @@ public class GBUtilities {
     //******** Static Constants *********/
     //***********************************/
 
-
+    //Use this before an object gets saved to the DB
     public static final long ID_DOES_NOT_EXIST = -1;
 
 
+    public static final boolean BUTTON_DISABLE = false;
+    public static final boolean BUTTON_ENABLE  = true;
 
     static final int sHundredthsDigitsOfPrecision = 2;
     static final int sMicrometerDigitsOfPrecision = 6;
     static final int sNanometerDigitsOfPrecision = 9;
     static final int sPicometerDigitsOfPrecision = 12;
 
+
+    //************************************************************************************
+
+    // TODO: 7/1/2017 These constants need to be moved to the GBCoordConstants object
     static final double sEquatorialRadiusA = 6378137.0; //equatorial radius in meters
     static final double sSemiMajorRadius   = sEquatorialRadiusA;
     static final double sPolarRadiusB      = 6356752.314245; //polar semi axis
@@ -123,6 +134,9 @@ public class GBUtilities {
     static final double Nb     = 500000.0000;  //meters northing of the grid base
     static final double Nbfeet = 1640416.667; //feet
 
+
+    //********************************************************************************
+
     static final double feetPerMeter   = 3.280833333;
     static final double inchesPerMeter = feetPerMeter*12.;   //39.37
     static final double cmPerInch      = 100. / (feetPerMeter * 12.); //2.54
@@ -138,8 +152,6 @@ public class GBUtilities {
     //***********************************/
     //******** Member Variables *********/
     //***********************************/
-
-    private GBProject mOpenProject;
 
 
 
@@ -241,23 +253,6 @@ public class GBUtilities {
         }
 
         return true;
-    }
-
-
-    void hideKeyboard(Activity activity) {
-        if (activity != null) {
-            Window window = activity.getWindow();
-            if (window != null) {
-                View v = window.getCurrentFocus();
-                if (v != null) {
-                    InputMethodManager imm = (InputMethodManager) activity.
-                                                    getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm!=null){
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                }
-            }
-        }
     }
 
 
@@ -380,28 +375,79 @@ public class GBUtilities {
     //***********************************/
 
 
-    GBProject getOpenProject() {return mOpenProject; }
-    void           setOpenProject(GBProject openProject) {mOpenProject = openProject; }
+    GBProject getOpenProject(GBActivity activity) {
+        long openProjectID = getOpenProjectID(activity);
+        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST)return null;
 
-    long  getOpenProjectID() {
-        if (mOpenProject != null) {
-            return mOpenProject.getProjectID();
-        }
-        return GBUtilities.ID_DOES_NOT_EXIST;
+        return GBProjectManager.getInstance().getProject(openProjectID);
     }
 
-    String getOpenProjectIDMessage(Context context){
-        if (mOpenProject != null){
+    void  setOpenProject(GBActivity activity, GBProject openProject) {
+        if (activity == null){
+            return;
+        }
+        //Store the PersonID for the next time
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putLong(GBActivity.sOpenProjectIDTag, openProject.getProjectID());
+        editor.apply();
+
+    }
+
+    long  getOpenProjectID(GBActivity activity) {
+        if (activity == null){
+            return GBUtilities.ID_DOES_NOT_EXIST;
+        }
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        long defaultValue = GBUtilities.ID_DOES_NOT_EXIST;
+        return sharedPref.getLong(GBActivity.sOpenProjectIDTag, defaultValue);
+    }
+
+    String getOpenProjectIDMessage(GBActivity activity){
+        if (activity == null){
+            return "Programming Error, Activity is null";
+        }
+        GBProject openProject = getOpenProject(activity);
+        if (openProject != null){
             //A project is open
-            return context.getString(R.string.project_opened_1) + " " +
-                    String.valueOf(getOpenProjectID())  + " " +
-                    getOpenProject().getProjectName()   + " " +
-                    context.getString(R.string.project_opened_2);
+            return activity.getString(R.string.project_opened_1) + " " +
+                    String.valueOf(openProject.getProjectID())  + " " +
+                    openProject.getProjectName()                + " " +
+                    activity.getString(R.string.project_opened_2);
         } else {
-            return context.getString(R.string.no_project_open);
+            return activity.getString(R.string.no_project_open);
         }
 
     }
+
+    GBPoint getOpenPoint(GBActivity activity) {
+        long openPointID = getOpenPointID(activity);
+        if (openPointID == GBUtilities.ID_DOES_NOT_EXIST)return null;
+
+        return GBPointManager.getInstance().getPoint(getOpenProjectID(activity), openPointID);
+    }
+
+    void  setOpenPoint(GBActivity activity, GBPoint openPoint) {
+        if (activity == null){
+            return;
+        }
+        //Store the PersonID for the next time
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putLong(GBActivity.sOpenPointIDTag, openPoint.getPointID());
+        editor.apply();
+
+    }
+
+    long  getOpenPointID(GBActivity activity) {
+        if (activity == null){
+            return GBUtilities.ID_DOES_NOT_EXIST;
+        }
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        long defaultValue = GBUtilities.ID_DOES_NOT_EXIST;
+        return sharedPref.getLong(GBActivity.sOpenPointIDTag, defaultValue);
+    }
+
 
 
     //***********************************/
@@ -425,6 +471,101 @@ public class GBUtilities {
         showStatus(context, context.getString(messageResource));
     }
 
+
+    //***********************************/
+    //******** Member Methods   *********/
+    //***********************************/
+
+    public int getOrientation(Context activity){
+        int orientation = Configuration.ORIENTATION_PORTRAIT;
+        if (activity.getResources().getDisplayMetrics().widthPixels >
+            activity.getResources().getDisplayMetrics().heightPixels) {
+
+            orientation = Configuration.ORIENTATION_LANDSCAPE;
+        }
+        return orientation;
+    }
+
+
+    //************************************/
+    /*         Widget Utilities          */
+    //************************************/
+    public  void enableButton(Context context, Button button, boolean enable){
+        button.setEnabled(enable);
+        if (enable == BUTTON_ENABLE) {
+            button.setTextColor(ContextCompat.getColor(context, R.color.colorTextBlack));
+        } else {
+            button.setTextColor(ContextCompat.getColor(context, R.color.colorGray));
+        }
+    }
+
+    public  void showSoftKeyboard(FragmentActivity context, EditText textField){
+        //Give the view the focus, then show the keyboard
+
+        textField.requestFocus();
+        InputMethodManager imm =
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        //second parameter is flags. We don't need any of them
+        imm.showSoftInput(textField, InputMethodManager.SHOW_FORCED);
+
+    }
+
+    public  void hideSoftKeyboard(FragmentActivity context){
+        // Check if no view has focus:
+        View view = context.getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+            InputMethodManager imm =
+                    (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            //second parameter is flags. We don't need any of them
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+
+        }
+        //close the keyboard
+        context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+
+    public  void toggleSoftKeyboard(FragmentActivity context){
+        //hide the soft keyboard
+        // Check if no view has focus:
+        View view = context.getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+            InputMethodManager imm =
+                    (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            //second parameter is flags. We don't need any of them
+            imm.toggleSoftInputFromWindow(view.getWindowToken(),0, 0);
+        }
+
+    }
+
+
+    public  void clearFocus(FragmentActivity context){
+        //hide the soft keyboard
+        // Check if no view has focus:
+        View view = context.getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+        }
+    }
+
+
+    void hideKeyboard(Activity activity) {
+        if (activity != null) {
+            Window window = activity.getWindow();
+            if (window != null) {
+                View v = window.getCurrentFocus();
+                if (v != null) {
+                    InputMethodManager imm = (InputMethodManager) activity.
+                            getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm!=null){
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+    }
 
 
 }

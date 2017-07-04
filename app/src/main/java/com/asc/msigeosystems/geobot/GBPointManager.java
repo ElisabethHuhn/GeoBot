@@ -89,16 +89,16 @@ public class GBPointManager {
     //returns FALSE if for any reason the point can not be added
     //ALSO deals with the coordinate on the point
     //Use this if you already have the Project object in hand
-    boolean addPointsToProject(GBProject project, GBPoint newPoint, boolean addToDB){
-        boolean returnCode = false;
+    boolean addPointToProject(GBProject project, GBPoint newPoint, boolean addToDB){
+
         //  Can not add a point to a project that does not exist
-        if ((project == null) || (newPoint == null)) return returnCode;
+        if ((project == null) || (newPoint == null)) return false;
 
         //Find the project the point is for
         long medProjectID = newPoint.getForProjectID();
         long projectID    = project.getProjectID();
         //The point and the project must point at each other
-        if (medProjectID != projectID) return returnCode;
+        if (medProjectID != projectID) return false;
 
         //determine if the point already is associated with this project
         ArrayList<GBPoint> pointList = project.getPoints();
@@ -119,19 +119,21 @@ public class GBPointManager {
             pointList.add(newPoint);
         } else {
             //overwrite the existing point
-            pointList.add(atPosition, newPoint);
+            pointList.set(atPosition, newPoint);
         }
+        boolean returnCode = true;
         if (addToDB) {
+            // TODO: 7/2/2017 The problem with cascade add is that if some fail, should back out earlier successes
             //  Add the point and it's coordinate to the DB
-            if  (databaseManager.addPoint(newPoint) == GBDatabaseManager.sDB_ERROR_CODE) return returnCode;
-
-            if (!databaseManager.addPointPicturesToDB(newPoint)) return returnCode;
-            if ((databaseManager.addCoordinate(newPoint.getCoordinate()) ==
-                                                                GBDatabaseManager.sDB_ERROR_CODE)){
-                return returnCode;
+            if  (databaseManager.addPoint(newPoint) == GBDatabaseManager.sDB_ERROR_CODE) {
+                returnCode = false ;
             }
-        }
-        returnCode = true;
+            if (!databaseManager.addPointPicturesToDB(newPoint)) returnCode = false;
+            //Coordinate must be explicitly stored by the caller
+            //MeanToken must be explicitly added by the caller
+         }
+        // TODO: 7/2/2017 need to do a better job with cascade add, or we've corrupted the DB
+        //returncode just means that something, we don't know what, failed and the DB is corrupt
         return returnCode;
     }
 
@@ -272,6 +274,7 @@ public class GBPointManager {
         values.put(GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID,   point.getForProjectID());
         values.put(GBDatabaseSqliteHelper.POINT_ISA_COORDINATE_ID,point.getHasACoordinateID());
         values.put(GBDatabaseSqliteHelper.POINT_NUMBER,           point.getPointNumber());
+        values.put(GBDatabaseSqliteHelper.POINT_MEAN_TOKENID,     point.getMeanTokenID());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_DISTANCE,  point.getOffsetDistance());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_HEADING,   point.getOffsetHeading());
         values.put(GBDatabaseSqliteHelper.POINT_OFFSET_ELEVATION, point.getOffsetElevation());
@@ -307,14 +310,17 @@ public class GBPointManager {
 
         cursor.moveToPosition(position);
         point.setPointID         (cursor.getLong   (
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_ID)));
         point.setForProjectID    (cursor.getLong   (
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_FOR_PROJECT_ID)));
         point.setHasACoordinateID(cursor.getLong   (
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_ISA_COORDINATE_ID)));
 
         point.setPointNumber     (cursor.getInt(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_NUMBER)));
+        point.setMeanTokenID     (cursor.getLong(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_MEAN_TOKENID)));
+
         point.setOffsetDistance  (cursor.getDouble(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_DISTANCE)));
         point.setOffsetHeading   (cursor.getDouble(
@@ -323,25 +329,25 @@ public class GBPointManager {
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_OFFSET_ELEVATION)));
 
         point.setHeight          (cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HEIGHT)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HEIGHT)));
 
         point.setPointFeatureCode(cursor.getString(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_FEATURE_CODE)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_FEATURE_CODE)));
         point.setPointNotes      (cursor.getString(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_NOTES)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_NOTES)));
 
         point.setHdop            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HDOP)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HDOP)));
         point.setVdop            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_VDOP)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_VDOP)));
         point.setTdop            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_TDOP)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_TDOP)));
         point.setPdop            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_PDOP)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_PDOP)));
         point.setHrms            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HRMS)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HRMS)));
         point.setVrms            (cursor.getDouble(
-                                  cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_VRMS)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_VRMS)));
 
 
         return point;

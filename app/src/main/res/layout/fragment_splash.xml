@@ -1,0 +1,191 @@
+<HorizontalScrollView
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools =   "http://schemas.android.com/tools"
+    tools:context = "com.asc.msigeosystems.geobot.GBActivity"
+    android:layout_width  = "match_parent"
+    android:layout_height = "match_parent"
+    android:background    = "@color/colorScreenBackground"
+    android:orientation   = "vertical"
+    android:weightSum     = "1"
+    android:fillViewport  = "true"
+    >
+    <!-- This layout is for splash screen -->
+
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                >
+                <!-- Page Title -->
+                <TextView
+                    android:text="@string/action_splash"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_horizontal"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+
+                <!-- Open Project and versioning -->
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="20dp"
+                    android:orientation="vertical"
+
+                    >
+                    <!-- Open Project -->
+                    <TextView
+                        android:id=            "@+id/matrix_screen_label"
+                        android:layout_height= "wrap_content"
+                        android:layout_width = "match_parent"
+
+                        android:gravity=       "center"
+
+                        android:layout_marginBottom="20dp"
+
+                        android:textColor=    "@color/colorTextBlack"
+                        android:background=   "@color/colorScreenBackground"
+                        />
+
+                    <!-- GeoBot Product Version -->
+                    <TextView
+                        android:id=            "@+id/geobot_version_label"
+                        android:layout_height= "wrap_content"
+                        android:layout_width = "match_parent"
+
+                        android:gravity=       "center"
+
+                        android:textColor=    "@color/colorTextBlack"
+                        android:background=   "@color/colorScreenBackground"
+                        />
+
+                    <!-- GeoBot DB Version -->
+                    <TextView
+                        android:id=            "@+id/geobot_db_version_label"
+                        android:layout_height= "wrap_content"
+                        android:layout_width = "match_parent"
+
+                        android:gravity=       "center"
+
+                        android:textColor=    "@color/colorTextBlack"
+                        android:background=   "@color/colorScreenBackground"
+                        />
+
+                    <!-- GeoBot Conversion Constants Version -->
+                    <TextView
+                        android:id=            "@+id/geobot_constants_version_label"
+                        android:layout_height= "wrap_content"
+                        android:layout_width = "match_parent"
+
+                        android:gravity=       "center"
+
+                        android:textColor=    "@color/colorTextBlack"
+                        android:background=   "@color/colorScreenBackground"
+                        />
+
+                </LinearLayout>
+
+
+                <!-- Buttons -->
+                <!-- open, create, edit -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp"
+                    >
+                    <!-- Open -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashOpenButton"
+                        android:text="@string/action_project_open"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+
+                        android:layout_weight="25"
+
+                        android:layout_margin="8dp"
+
+
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+                    <!-- Create -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashCreateButton"
+                        android:text="@string/project_create_button_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+
+                        android:layout_weight="25"
+
+                        android:layout_margin="8dp"
+
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+                    <!-- Edit -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashEditButton"
+                        android:text="@string/action_project_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+
+                        android:layout_weight="25"
+
+                        android:layout_margin="8dp"
+
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+
+                </LinearLayout>
+
+                <!-- List -->
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/splashProceedButton"
+                    android:text="@string/splash_opened_proj"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center"
+
+                    android:layout_margin="8dp"
+
+                    android:background="@color/colorGrayer"
+                    android:textColor="@color/colorTextBlack"
+                    />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+</HorizontalScrollView>
+

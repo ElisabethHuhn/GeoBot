@@ -130,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="75"
-                android:layout_gravity="center"
+                android:gravity="center"
 
                 android:inputType="date"
                 android:layout_marginEnd="8dp"
@@ -172,6 +172,43 @@
 
                 android:inputType="date"
                 android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="8dp"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorGray"
+                />
+
+
+        </TableRow>
+
+        <!-- Row : Number of points -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectNumPointsOutput"
+                android:text="@string/project_num_points"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectNumPointsOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
                 android:layout_marginEnd="8dp"
 
                 android:textColor="@color/colorTextBlack"
@@ -530,7 +567,7 @@
 
 
 
-        <!-- Row : View Existing Projects, Settings Button -->
+        <!-- Row : Save, List Points, View Existing Projects Buttons -->
         <TableRow
 
             android:layout_height="wrap_content"
@@ -582,6 +619,75 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/projectViewExistingButton"
                 android:text="@string/project_view_existing_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+        </TableRow>
+
+
+        <!-- Row : Map, Export, Measure Buttons -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+
+            <!-- Map -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectMapButton"
+                android:text="@string/project_map_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+            <!-- Export -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectExportButton"
+                android:text="@string/project_export_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="center_horizontal"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+            <!-- Measure -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectMeasureButton"
+                android:text="@string/project_measure_button_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

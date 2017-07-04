@@ -2,7 +2,6 @@ package com.asc.msigeosystems.geobot;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -16,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -183,19 +180,7 @@ public class GBProjectsListFragment extends Fragment {
 
     private void wireWidgets(View v){
 
-        //Exit Button
-        Button projectExitButton = (Button) v.findViewById(R.id.projectExitButton);
-        //button is always enabled
-        projectExitButton.setEnabled(true);
-        projectExitButton.setTextColor(Color.BLACK);
-        projectExitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
 
-                ((GBActivity) getActivity()).popToTopProjectScreen();
-
-            }
-        });
     }
 
 
@@ -229,9 +214,8 @@ public class GBProjectsListFragment extends Fragment {
         //all other maintenance must go through the ProjectManager
         mSelectedProject = mProjectList.get(position);
 
-        Toast.makeText(getActivity().getApplicationContext(),
-                mSelectedProject.getProjectName() + " is selected!",
-                Toast.LENGTH_SHORT).show();
+        GBUtilities.getInstance().showStatus(getActivity(),
+                                            mSelectedProject.getProjectName() + " is selected!");
 
         GBActivity myActivity = (GBActivity) getActivity();
         if (myActivity != null){
@@ -242,15 +226,12 @@ public class GBProjectsListFragment extends Fragment {
 
                 /* *************************  OPEN   ***************************/
                 if (mProjectPath.equals(GBPath.sOpenTag)){
-                    GBUtilities constantsAndUtilities =
-                                                        GBUtilities.getInstance();
 
                     //Save the opened project id up in the Activity
-                    constantsAndUtilities.setOpenProject  (mSelectedProject);
+                    GBUtilities.getInstance().setOpenProject  ((GBActivity)getActivity(), mSelectedProject);
 
-                    Toast.makeText(getActivity(),
-                                   constantsAndUtilities.getOpenProjectIDMessage(getActivity()),
-                                   Toast.LENGTH_SHORT).show();
+                    GBUtilities.getInstance().showStatus(getActivity(),
+                            GBUtilities.getInstance().getOpenProjectIDMessage((GBActivity)getActivity()));
 
                     //switch back to the Home Screen
                     myActivity.switchToHomeScreen();
@@ -265,12 +246,16 @@ public class GBProjectsListFragment extends Fragment {
                     GBProject toProject = projectManager.deepCopyProject((GBActivity) getActivity(),
                                                                           mSelectedProject,
                                                                           assignNextID);
+                    //save the new project
                     boolean addToDBToo = true;
                     boolean cascadeFlag = true;
                     projectManager.addProject(toProject, addToDBToo, cascadeFlag);
 
+                    //Save the opened project id up in the Activity
+                    GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(),toProject);
+
                     //then switch to EDIT project with the new project
-                    myActivity.switchToProjectEditScreen(toProject);
+                    myActivity.switchToProjectEditScreen();
 
                 /* *************************  DELETE   ***************************/
                 }else if (mProjectPath.equals(GBPath.sDeleteTag)){
@@ -281,16 +266,16 @@ public class GBProjectsListFragment extends Fragment {
                 /* *************************  EDIT   ***************************/
                 }else if (mProjectPath.equals(GBPath.sEditTag)){
 
+                    //Save the opened project id up in the Activity
+                    GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(),mSelectedProject);
                     //if the path is Edit, open the selected project for update
-                    myActivity.switchToProjectEditScreen(mSelectedProject);
+                    myActivity.switchToProjectEditScreen();
 
                 /* *************************  UNKNOWN!!!   ***************************/
                 }else {
 
                     //todo need to throw an unrecognized path exception
-                    Toast.makeText(getActivity(),
-                            R.string.unrecognized_path_encountered,
-                            Toast.LENGTH_SHORT).show();
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.unrecognized_path_encountered);
 
                     //for now, go home
                     myActivity.switchToHomeScreen();
@@ -316,9 +301,8 @@ public class GBProjectsListFragment extends Fragment {
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(), R.string.cancel_pressed);
+
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)
@@ -334,21 +318,17 @@ public class GBProjectsListFragment extends Fragment {
         GBProjectAdapter adapter = (GBProjectAdapter) recyclerView.getAdapter();
         adapter.removeItem(mSelectedPosition);
 
-        GBUtilities constantsAndUtilities =
-                                                        GBUtilities.getInstance();
+        GBUtilities utilities = GBUtilities.getInstance();
 
-        long openProjectID = constantsAndUtilities.getOpenProjectID();
+        long openProjectID = utilities.getOpenProjectID((GBActivity)getActivity());
         if (openProjectID == mSelectedProject.getProjectID()){
-
-            constantsAndUtilities.setOpenProject(null);
+            utilities.setOpenProject((GBActivity)getActivity(),null);
         }
 
 
         CharSequence message =
                 "Project " + mSelectedProject.getProjectName() + " is deleted";
-        Toast.makeText(getActivity(),
-                message,
-                Toast.LENGTH_SHORT).show();
+        GBUtilities.getInstance().showStatus(getActivity(), message.toString());
 
         ((GBActivity) getActivity()).popToTopProjectScreen();
 

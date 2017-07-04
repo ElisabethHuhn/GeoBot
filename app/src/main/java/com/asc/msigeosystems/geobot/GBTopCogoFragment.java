@@ -48,7 +48,7 @@ public class GBTopCogoFragment extends Fragment {
     private void wireWidgets(View v){
         //Tell the user which project is open
         TextView screenLabel = (TextView) v.findViewById(R.id.matrix_screen_label);
-        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage(getActivity()));
+        screenLabel.setText(GBUtilities.getInstance().getOpenProjectIDMessage((GBActivity)getActivity()));
         int color = ContextCompat.getColor(getActivity(), R.color.colorWhite);
         screenLabel.setBackgroundColor(color);
 
@@ -64,7 +64,7 @@ public class GBTopCogoFragment extends Fragment {
             public void onClick(View v) {
 
                 //A project must be open to add points to it
-                GBProject project = GBUtilities.getInstance().getOpenProject();
+                GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
                 if (project == null){
                     //Tell the user that a project must be open first
                     GBUtilities.getInstance().showStatus(getActivity(),

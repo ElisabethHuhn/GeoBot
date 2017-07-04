@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 
 
-class GBNmeaMeanToken {
+class GBMeanToken {
 
     // ******************************************************** //
     // **************    Static Constants    ****************** //
@@ -48,11 +48,11 @@ class GBNmeaMeanToken {
     // ******************************************************** //
 
 
-    GBNmeaMeanToken() {
+    GBMeanToken() {
         initializeDefaultValues();
     }
 
-    GBNmeaMeanToken(Bundle savedInstanceState){
+    GBMeanToken(Bundle savedInstanceState){
         //0 = false, 1 = true
         setMeanInProgress(false);
         int tempBoolean = savedInstanceState.getInt(IS_MEANING, 0);
@@ -195,7 +195,7 @@ class GBNmeaMeanToken {
 
 
 
-    GBCoordinateMean updateMean(GBNmea nmeaData){
+    GBCoordinateMean updateMean(GBActivity activity, GBNmea nmeaData){
         //increment the number of raw readings in the mean
         incRawReadings();
         //The reading must be fixed to be used in the meaning
@@ -207,7 +207,7 @@ class GBNmeaMeanToken {
 
         //create a new coordinate for this nmeaData, then
         // add it to the list of locations being meaned.
-        GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(nmeaData);
+        GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(activity, nmeaData);
         addCoordinate(wgsCoordinate);
 
         //there have to be enough values accumulated to perform the mean

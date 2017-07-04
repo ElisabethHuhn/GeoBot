@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * The Update Project Fragment
@@ -38,19 +37,6 @@ import java.util.List;
 public class GBProjectEditFragment extends    Fragment {
 
     private static final String TAG = "EDIT_PROJECT_FRAGMENT";
-
-    //**
-     /* Create variables for all the widgets
-     /*
-     */
-
-
-    //**********************************************************************/
-    //*********   UI Widget Variables  *************************************/
-    //**********************************************************************/
-
-    //Input / Output Fields on screen
-
 
 
     //**********************************************************/
@@ -72,24 +58,16 @@ public class GBProjectEditFragment extends    Fragment {
     private int      mSelectedDirVPlusMinusPosition = GBProject.sDirections;
 
 
-    //**********************************************************/
-    //*****         Recycler View Widgets             **********/
-    //**********************************************************/
-    List<GBPicture>            mPictureList = new ArrayList<>();
-
-
-
 
     //**********************************************************************/
     //*********   Member Variables  ****************************************/
     //**********************************************************************/
-    private GBProject mProjectBeingMaintained;
+
+    // TODO: 7/1/2017 configuration change might be problematic with complex variables like project
+    private GBProject    mProjectBeingMaintained;
 
     private boolean      mProjectChanged = false;
     private CharSequence mProjectPath;
-
-
-
 
     //Constructor
     public GBProjectEditFragment() {
@@ -97,14 +75,10 @@ public class GBProjectEditFragment extends    Fragment {
         //  is first created with this constructor
     }
 
-
-
     //newInstance() stores the passed parameters in the fragments argument bundle
-    public static GBProjectEditFragment newInstance(GBProject project,
-                                                    GBPath projectPath) {
+    public static GBProjectEditFragment newInstance(GBPath projectPath) {
 
-        //Put the project into an arguments bundle
-        Bundle args = GBProject.putProjectInArguments(new Bundle(), project);
+        Bundle args = new Bundle();
 
         //put the path into the same bundle
         args = GBPath.putPathInArguments(args, projectPath);
@@ -127,7 +101,10 @@ public class GBProjectEditFragment extends    Fragment {
 
         super.onCreate(savedInstanceState);
 
-        mProjectBeingMaintained = GBProject.getProjectFromArguments(getArguments());
+        mProjectBeingMaintained = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (mProjectBeingMaintained == null){
+            mProjectBeingMaintained = new GBProject();
+        }
 
         GBPath path             = GBPath.getPathFromArguments(getArguments());
         mProjectPath            = path.getPath();
@@ -150,7 +127,8 @@ public class GBProjectEditFragment extends    Fragment {
         wireCoordinateSpinner(v);
         wireSpinners(v);
 
-        initializeRecyclerView(v);
+        // TODO: 6/30/2017 make this the list of points, not the list of pictures
+        //initializeRecyclerView(v);
 
 
         //If we had any arguments passed, update the screen with them
@@ -231,6 +209,10 @@ public class GBProjectEditFragment extends    Fragment {
             }
         });
         */
+
+        //Project Number of points
+        EditText projectNumPtsOutput = (EditText) v.findViewById(R.id.projectNumPointsOutput);
+        projectNumPtsOutput.setFocusable(false);
 
         //Project Description
         EditText projectDescInput = (EditText) v.findViewById(R.id.projectDescInput);
@@ -319,28 +301,52 @@ public class GBProjectEditFragment extends    Fragment {
             }
         });
 
-        //Exit Button
-        Button projectExitButton = (Button) v.findViewById(R.id.projectExitButton);
+        //Map Button
+        Button projectMapButton = (Button) v.findViewById(R.id.projectMapButton);
         //button is always enabled
-        projectExitButton.setEnabled(true);
-        projectExitButton.setTextColor(Color.BLACK);
-        projectExitButton.setOnClickListener(new View.OnClickListener() {
+        projectMapButton.setEnabled(true);
+        projectMapButton.setTextColor(Color.BLACK);
+        projectMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
 
                //regardless of whether they actually exit, hide the keyboard
                 GBUtilities.getInstance().hideKeyboard(getActivity());
 
-                //If the project changed, ask before exiting
-                if (mProjectChanged) {
-                    areYouSureExit();
-                } else {
-                    switchToExit();
-                }
+                onMap();
             }
         });
 
+        //Measure Button
+        Button projectMeasureButton = (Button) v.findViewById(R.id.projectMeasureButton);
+        //button is always enabled
+        projectMeasureButton.setEnabled(true);
+        projectMeasureButton.setTextColor(Color.BLACK);
+        projectMeasureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
 
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+
+                onMeasure();
+            }
+        });
+        //Export Button
+        Button projectExportButton = (Button) v.findViewById(R.id.projectExportButton);
+        //button is always enabled
+        projectExportButton.setEnabled(true);
+        projectExportButton.setTextColor(Color.BLACK);
+        projectExportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+
+                onExport();
+            }
+        });
     }
 
     private void wireSpinners(View v){
@@ -416,7 +422,9 @@ public class GBProjectEditFragment extends    Fragment {
         distUnitsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedDistUnitPosition = position;
+                if (canMakeChange()) {
+                    mSelectedDistUnitPosition = position;
+                }
             }
 
             @Override
@@ -427,7 +435,9 @@ public class GBProjectEditFragment extends    Fragment {
         enVneSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedENvNEPosition = position;
+                if (canMakeChange()) {
+                    mSelectedENvNEPosition = position;
+                }
             }
 
             @Override
@@ -449,7 +459,9 @@ public class GBProjectEditFragment extends    Fragment {
         ddVdmsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedDDvDMSPosition = position;
+                if (canMakeChange()) {
+                    mSelectedDDvDMSPosition = position;
+                }
             }
 
             @Override
@@ -460,7 +472,9 @@ public class GBProjectEditFragment extends    Fragment {
         dirVplusminusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedDirVPlusMinusPosition = position;
+                if (canMakeChange()) {
+                    mSelectedDirVPlusMinusPosition = position;
+                }
             }
 
             @Override
@@ -472,14 +486,41 @@ public class GBProjectEditFragment extends    Fragment {
 
         //The size of a project is it's number of points
         if (mProjectBeingMaintained.getSize() > 0){
-            //can't change the coordinate type if any points are on the project
+            //can't change if any points are on the project
             distUnitsSpinner.setEnabled(false);
             distUnitsSpinner.setClickable(false);
             distUnitsSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+            enVneSpinner.setEnabled(false);
+            enVneSpinner.setClickable(false);
+            enVneSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+            ddVdmsSpinner.setEnabled(false);
+            ddVdmsSpinner.setClickable(false);
+            ddVdmsSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+            dirVplusminusSpinner.setEnabled(false);
+            dirVplusminusSpinner.setClickable(false);
+            dirVplusminusSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+
         }
 
 
         //mPointCoordinateTypePrompt = (TextView) v.findViewById(R.id.coordinate_prompt);
+
+    }
+
+    private boolean canMakeChange(){
+        long projectID = mProjectBeingMaintained.getProjectID();
+        if (projectID != GBUtilities.ID_DOES_NOT_EXIST){
+            int size = mProjectBeingMaintained.getSize();
+            if (size > 0){
+                //GBUtilities.getInstance().showStatus(getActivity(),R.string.project_can_not_change);
+                return false;
+            }
+        }
+        return true;
 
     }
 
@@ -573,11 +614,11 @@ public class GBProjectEditFragment extends    Fragment {
         //  this is done in the singleton container
 
         //Get this projects points
-        mPictureList = mProjectBeingMaintained.getPictures();
+        ArrayList <GBPicture> pictureList = mProjectBeingMaintained.getPictures();
 
 
         //5) Use the data to Create and set out points Adapter
-        GBPictureAdapter adapter = new GBPictureAdapter(mPictureList);
+        GBPictureAdapter adapter = new GBPictureAdapter(pictureList);
         recyclerView.setAdapter(adapter);
 
         //6) create and set the itemAnimator
@@ -615,7 +656,12 @@ public class GBProjectEditFragment extends    Fragment {
         EditText projectIDInput    = (EditText) v.findViewById(R.id.projectIDInput);
         EditText projectDateInput  = (EditText) v.findViewById(R.id.projectCreationDateInput);
         EditText projectMaintInput = (EditText) v.findViewById(R.id.projectModifiedDateInput);
+        EditText projectNumPtsOutput = (EditText) v.findViewById(R.id.projectNumPointsOutput);
         EditText projectDescInput  = (EditText) v.findViewById(R.id.projectDescInput);
+
+        EditText projectLocPrecisionInput = (EditText) v.findViewById(R.id.projectLocPrecisionInput);
+        EditText projectStdDevPrecisionInput = (EditText) v.findViewById(R.id.projectStdDevPrecisionInput);
+
 
         //a new id is not assigned until the first save
         if (mProjectPath.equals(GBPath.sCreateTag)){
@@ -629,6 +675,10 @@ public class GBProjectEditFragment extends    Fragment {
                                                 mProjectBeingMaintained.getProjectDateCreated()));
         projectMaintInput.setText(mProjectBeingMaintained.getDateString(
                                                 mProjectBeingMaintained.getProjectLastModified()));
+
+        int numberOfPoints = mProjectBeingMaintained.getSize();
+        projectNumPtsOutput.setText(String.valueOf(numberOfPoints));
+
         projectDescInput .setText(mProjectBeingMaintained.getProjectDescription());
         //mProjectCoordTypeOutput.setText(mProjectBeingMaintained.getProjectCoordinateType());
 
@@ -638,29 +688,38 @@ public class GBProjectEditFragment extends    Fragment {
         //IS CREATED. THE ORDERING IS ENFORCED BY THE PROGRAMMER AT CODING TIME
         //THERE IS NOTHING AUTOMATIC ABOUT THIS HARD CODING
         //I'm not proud of it, but it works, so.......... be it
+        String selectedCoordinateType;
+        int    selectedCoordinateTypePosition;
         if (spinnerSelection.equals(GBCoordinate.sCoordinateTypeNAD83)) {
-            mSelectedCoordinateType = GBCoordinate.sCoordinateTypeClassNAD83;
-            mSelectedCoordinateTypePosition = 2;
+            selectedCoordinateType = GBCoordinate.sCoordinateTypeClassNAD83;
+            selectedCoordinateTypePosition = 2;
             coordSpinner.setSelection(2);
         } else if (spinnerSelection == GBCoordinate.sCoordinateTypeUTM) {
-            mSelectedCoordinateType = GBCoordinate.sCoordinateTypeUTM;
-            mSelectedCoordinateTypePosition = 3;
+            selectedCoordinateType = GBCoordinate.sCoordinateTypeUTM;
+            selectedCoordinateTypePosition = 3;
             coordSpinner.setSelection(3);
         } else if (spinnerSelection == GBCoordinate.sCoordinateTypeSPCS){
-            mSelectedCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
-            mSelectedCoordinateTypePosition = 4;
+            selectedCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
+            selectedCoordinateTypePosition = 4;
             coordSpinner.setSelection(4);
         } else  { //Use WGS84 as the default
-            mSelectedCoordinateType = GBCoordinate.sCoordinateTypeWGS84;
-            mSelectedCoordinateTypePosition = 1;
+            selectedCoordinateType = GBCoordinate.sCoordinateTypeWGS84;
+            selectedCoordinateTypePosition = 1;
             coordSpinner.setSelection(1);
 
-            // TODO: 3/14/2017 Shouldn't the next two lines be outside the brackets??? 
-            mProjectBeingMaintained.setProjectCoordinateType(mSelectedCoordinateType);
+            //update the project with this new default
+            mProjectBeingMaintained.setProjectCoordinateType(selectedCoordinateType);
             setProjectChangedFlags();
         }
 
+        mSelectedCoordinateType         = selectedCoordinateType;
+        mSelectedCoordinateTypePosition = selectedCoordinateTypePosition;
+
+
         //mPointCoordinateTypePrompt.setText();
+        projectLocPrecisionInput.setText(String.valueOf(mProjectBeingMaintained.getLocPrecision()));
+        projectStdDevPrecisionInput.setText(String.valueOf(mProjectBeingMaintained.getStdDevPrecision()));
+
     }
 
     private void setSubtitle(){
@@ -719,6 +778,39 @@ public class GBProjectEditFragment extends    Fragment {
     }
 
 
+    private void onMap(){
+
+        //((GBActivity)getActivity()).switchToProjectListScreen(new GBPath(GBPath.sCreateTag));
+        GBUtilities.getInstance().showStatus(getActivity(), "Mapping of project points not yet supported");
+    }
+
+    private void onMeasure(){
+
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (project == null){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+            return;
+        }
+        ((GBActivity)getActivity()).switchToPointCreateScreen(project);
+
+    }
+
+    private void onExport(){
+
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (project == null){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+            return;
+        }
+        //((GBActivity)getActivity()).switchToPointCreateScreen(project);
+        GBUtilities.getInstance().showStatus(getActivity(), "Export of project points not yet supported");
+
+
+    }
+
+    void onExit() {
+        ((GBActivity) getActivity()).switchToHomeScreen();
+    }
 
     //***********************************/
     //****     Save Button        *******/
@@ -733,9 +825,7 @@ public class GBProjectEditFragment extends    Fragment {
 
         //****************** CREATE **************************************/
         if (mProjectPath.equals(GBPath.sCreateTag)){
-            Toast.makeText(getActivity(),
-                    R.string.save_new_project,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.save_new_project);
 
 
             //returns false if there is something wrong with information on the screen and
@@ -773,6 +863,8 @@ public class GBProjectEditFragment extends    Fragment {
                     projectListPointsButton.setTextColor(Color.BLACK);
                 }
 
+                GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(), mProjectBeingMaintained);
+
             }
 
         //************************************* Edit *****************************/
@@ -793,6 +885,9 @@ public class GBProjectEditFragment extends    Fragment {
                 boolean cascadeFlag = true;//cascade to pictures and sesttngs
                 projectManager.addProject(mProjectBeingMaintained, addToDBToo, cascadeFlag);
             }
+
+            GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(), mProjectBeingMaintained);
+
 
             //**************************   COPY **************************************/
         } else if (mProjectPath.equals(GBPath.sCopyTag)){
@@ -816,13 +911,12 @@ public class GBProjectEditFragment extends    Fragment {
                 projectManager.addProject(mProjectBeingMaintained, addToDBToo, cascadeFlag);
             }
 
+            GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(), mProjectBeingMaintained);
+
+
             //************************ UNKNOWN *******************************************/
         } else {
-            Toast.makeText(getActivity(),
-                    R.string.unrecognized_path_encountered,
-                    Toast.LENGTH_SHORT).show();
-            throw new RuntimeException(getString(R.string.unrecognized_path_encountered));
-
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.unrecognized_path_encountered);
         }
 
         //update the Last Maintained field
@@ -842,6 +936,10 @@ public class GBProjectEditFragment extends    Fragment {
         EditText projectIDInput   = (EditText) v.findViewById(R.id.projectIDInput) ;
         EditText projectNameInput = (EditText) v.findViewById(R.id.projectNameInput) ;
         EditText projectDescInput = (EditText) v.findViewById(R.id.projectDescInput) ;
+        EditText projectLocPrecision = (EditText)v.findViewById(R.id.projectLocPrecisionInput);
+        EditText projectStdDevPrecision = (EditText)v.findViewById(R.id.projectStdDevPrecisionInput);
+
+
         //show the data that came out of the input arguments bundle
         project.setProjectID(Integer.valueOf(projectIDInput  .getText().toString().trim()));
         project.setProjectName              (projectNameInput.getText().toString().trim());
@@ -855,6 +953,23 @@ public class GBProjectEditFragment extends    Fragment {
         }else{
             project.setProjectCoordinateType(mSelectedCoordinateType);
         }
+
+        //Project Settings
+        project.setDistanceUnits(mSelectedDistUnitPosition);
+        //// TODO: 6/30/2017 This may be LatLng. Determine if changes need to be made here
+        project.setEnVNe        (mSelectedENvNEPosition);
+        project.setRMSvStD      (mSelectedRMSvStdDevPosition);
+        project.setDDvDMS       (mSelectedDDvDMSPosition);
+        project.setDIRvPlusMinus(mSelectedDirVPlusMinusPosition);
+
+        project.setLocPrecision(Integer.valueOf(projectLocPrecision.getText().toString().trim()));
+        project.setStdDevPrecision(Integer.valueOf(projectStdDevPrecision.getText().toString().trim()));
+
+
+        //Precision digits
+
+
+
         return returnCode;
 
     }
@@ -932,7 +1047,7 @@ public class GBProjectEditFragment extends    Fragment {
 
     private void switchToProjectList(){
         ((GBActivity) getActivity()).
-                switchToProjectListProjectsScreen(new GBPath(mProjectPath));
+                switchToProjectListScreen(new GBPath(mProjectPath));
     }
 
 
@@ -993,9 +1108,8 @@ public class GBProjectEditFragment extends    Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though project has chaged
-                                Toast.makeText(getActivity(),
-                                        R.string.continue_abandon_changes,
-                                        Toast.LENGTH_SHORT).show();
+                                GBUtilities.getInstance().showStatus(getActivity(),
+                                                                R.string.continue_abandon_changes);
                                 switchToListPoints();
                             }
                         })
@@ -1014,12 +1128,12 @@ public class GBProjectEditFragment extends    Fragment {
     private void switchToListPoints(){
         if (mProjectBeingMaintained == null)return;
 
+        // TODO: 7/1/2017 make sure the project is saved before leaving
         //cant't do this if we are creating the project
         //The project must be saved and the path changed to EDIT
         if (!(mProjectPath.equals(GBPath.sCreateTag))) {
             GBActivity myActivity = (GBActivity) getActivity();
-            myActivity.switchToListPointsScreen(mProjectBeingMaintained,
-                                                new GBPath(mProjectPath));
+            myActivity.switchToPointsListScreen(new GBPath(mProjectPath));
         }
 
     }

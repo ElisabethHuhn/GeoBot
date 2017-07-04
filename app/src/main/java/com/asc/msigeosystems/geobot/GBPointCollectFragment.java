@@ -163,7 +163,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //  miss the points that were read while this App is not current
     //this means that if the mean is limited by time, there will be fewer points in
     //  the intervening time period
-    private GBNmeaMeanToken mMeanToken;
+    private GBMeanToken mMeanToken;
 
  
 
@@ -279,7 +279,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //Wire up the other UI widgets so they can handle events later
         wireWidgets(v);
 
-        CharSequence projectName = GBUtilities.getInstance().getOpenProject().getProjectName();
+        CharSequence projectName = GBUtilities.getInstance().
+                                        getOpenProject((GBActivity)getActivity()).getProjectName();
 
         //Inform the user of the name of the open project
         TextView currentProjectField  = (TextView)v.findViewById(R.id.currentProjectField);
@@ -646,7 +647,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             //and include it in the mean
             if (isMeanInProgress()) {
                 //Fold the new nmea sentence into the ongoing mean
-                GBCoordinateMean meanCoordinate = mMeanToken.updateMean(mNmeaData);
+                GBCoordinateMean meanCoordinate = mMeanToken.updateMean((GBActivity)getActivity(),
+                                                                         mNmeaData);
 
                 //Is this the first point we have processed?
                 if (mMeanToken.isFirstPointInMean()){
@@ -703,7 +705,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private boolean updateCoordinateLabels(){
         //*+********* Update the UI coordinate labels ******************/
         //project has to be open
-        long openProjectID = GBUtilities.getInstance().getOpenProjectID();
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
         if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return false;
 
         int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
@@ -737,7 +739,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
         //Get the coordinates type from the open project
-        long openProjectID = GBUtilities.getInstance().getOpenProjectID();
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
         if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
 
         int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
@@ -772,7 +774,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
             int precisionDigits;
-            GBProject openProject = GBUtilities.getInstance().getOpenProject();
+            GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
             if (openProject != null) {
                 precisionDigits = openProject.getSettings().getLocationPrecision();
             } else {
@@ -837,7 +839,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         if (!updateCoordinateLabels())return null;
 
 
-        long openProjectID = GBUtilities.getInstance().getOpenProjectID();
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
         if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
 
         int coordinateType = GBCoordinate.getCoordinateTypeFromProjectID(openProjectID);
@@ -854,7 +856,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
             int precisionDigits;
-            GBProject project = GBUtilities.getInstance().getOpenProject();
+            GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
             if (project != null) {
                 precisionDigits = project.getSettings().getLocationPrecision();
             } else {
@@ -923,12 +925,12 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
 
-    private boolean isMeaningDone(GBNmea nmeaData, GBNmeaMeanToken meanToken){
+    private boolean isMeaningDone(GBNmea nmeaData, GBMeanToken meanToken){
         //if there isn't a mean in progress, by definition we are done
         if (isMeanStopped()) return true;
 
         //Check if this is the last point to be meaned
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         GBProjectSettings settings = project.getSettings();
         boolean endMeaning = false;
 
@@ -1021,7 +1023,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //Make sure we don't zoom in too close
         mMap.setMinZoomPreference(minZoomLevel);
 
-        mMap.setInfoWindowAdapter(new GBInfoWindowAdapter(getActivity()));
+        mMap.setInfoWindowAdapter(new GBInfoWindowAdapter((GBActivity)getActivity()));
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -1042,7 +1044,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 GBCoordinateMean pointMarker = (GBCoordinateMean) marker.getTag();
                 long pointID = pointMarker.getPointID();
                 //get the point corresponding to this pointID
-                GBPoint point = GBUtilities.getInstance().getOpenProject().getPoint(pointID);
+                GBPoint point = GBUtilities.getInstance().
+                                    getOpenProject((GBActivity)getActivity()).getPoint(pointID);
                 if (point == null) {
                     GBUtilities.getInstance().showStatus(getActivity(),  R.string.no_point_at_marker);
                 } else {
@@ -1381,7 +1384,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 //Add the picture to the gallery so the user can see it there
                 galleryAddPic();
 
-                GBProject openProject = GBUtilities.getInstance().getOpenProject();
+                GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
 
                 //create the picture object, The null is for a point ID
                 GBPicture picture = new GBPicture(mCurrentPhotoTimestamp,
@@ -1489,7 +1492,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         // TODO: 6/17/2017 do timestamp format through a Utilities method. Add in Locale considerations
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         String imageFileName = project.getProjectName() + "_" + timeStamp + "_";
         /*
         //getExternalStoragePublicDirectory() //accessible to all apps and the user
@@ -1574,9 +1577,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //when it notices the mean flag is set true
     }
 
-    private GBNmeaMeanToken initializeMeanToken(GBNmeaMeanToken meanToken){
+    private GBMeanToken initializeMeanToken(GBMeanToken meanToken){
         if (meanToken == null) {
-            meanToken = new GBNmeaMeanToken();
+            meanToken = new GBMeanToken();
         }
         //start the meaning process by setting the proper flags
         meanToken.setMeanInProgress  (true);
@@ -1632,7 +1635,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         //step 1 create point from the open project
         //get the open project
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         GBPoint point     = createPoint(project);
 
         //Update the UI with the point id
@@ -1653,10 +1656,10 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //valid coordinate is set automatically based on latitude/longitude
         if (isMeanStopped()) {
             //have to create the meanCoordinate from current position
-            wgs84Coordinate =  new GBCoordinateWGS84(nmeaData);
+            wgs84Coordinate =  new GBCoordinateWGS84((GBActivity)getActivity(), nmeaData);
         } else {
             //creates coordinate from the meaned information
-            wgs84Coordinate = new GBCoordinateWGS84(meanCoordinate);
+            wgs84Coordinate = new GBCoordinateWGS84((GBActivity)getActivity(), meanCoordinate);
         }
 
         //step 2.1 Add the offset position to the location
@@ -1670,7 +1673,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             LatLng toLocation = SphericalUtil.computeOffset(fromLocation, mOffsetDistance, mOffsetHeading);
 
             //update the coordinate
-            int precisionDigits = GBUtilities.getInstance().getOpenProject().getSettings().getLocationPrecision();
+            int precisionDigits = GBUtilities.getInstance()
+                                                .getOpenProject((GBActivity)getActivity())
+                                                .getSettings().getLocationPrecision();
 
             BigDecimal bdTemp = new BigDecimal(toLocation.latitude).setScale(precisionDigits,RoundingMode.HALF_UP);
             wgs84Coordinate.setLatitude(bdTemp.doubleValue());
@@ -1706,21 +1711,25 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 double elevation = wgs84Coordinate.getElevation();
                 elevation = elevation - height;
 
-                int precisionDigits = GBUtilities.getInstance().getOpenProject().getSettings().getLocationPrecision();
+                int precisionDigits = GBUtilities.getInstance().
+                                                    getOpenProject((GBActivity)getActivity()).
+                                                    getSettings().getLocationPrecision();
                 BigDecimal bdTemp = new BigDecimal(elevation).setScale(precisionDigits,RoundingMode.HALF_UP);
                 wgs84Coordinate.setElevation(bdTemp.doubleValue());
             }
         }
 
         //step 3 determine which kind of coordinate, create it, add to point:
-        // TODO: 6/18/2017 need to take into account the project coordinate type
+        // This method updates the DB version of the coordinate as well
         createCoordinateFromWSG(project, point, wgs84Coordinate);
 
 
         //Step 4 add the point to the project
+        //need to explicitly add the coordinate and the meanToken to the point,
+        // as the manager can't do that as a cascade
         GBPointManager pointManager = GBPointManager.getInstance();
         boolean addToDBToo = true;
-        if (!pointManager.addPointsToProject(project, point, addToDBToo)){
+        if (!pointManager.addPointToProject(project, point, addToDBToo)){
             //The DB add failed, recover
             GBUtilities.getInstance().showStatus(getActivity(),  getString(R.string.error_adding_point));
 
@@ -1733,6 +1742,10 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             if (mLastMarkerAdded != null){
                 mLastMarkerAdded.remove();
             }
+        } else {
+
+            //Step 4a, update the mean token as well on the point
+            point.setMeanToken(mMeanToken);
         }
 
 
@@ -1783,9 +1796,12 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         getMarkerByFocus();//It sets the PointID as a side effect
 
         //update the coordinate
-        int precisionDigits = GBUtilities.getInstance().getOpenProject().getSettings().getLocationPrecision();
+        int precisionDigits = GBUtilities.getInstance().
+                                                    getOpenProject((GBActivity)getActivity()).
+                                                    getSettings().getLocationPrecision();
 
-        BigDecimal bdTemp = new BigDecimal(latLng.latitude).setScale(precisionDigits,RoundingMode.HALF_UP);
+        BigDecimal bdTemp = new BigDecimal(latLng.latitude).
+                                                    setScale(precisionDigits,RoundingMode.HALF_UP);
         double latitude = bdTemp.doubleValue();
 
         bdTemp = new BigDecimal(latLng.longitude).setScale(precisionDigits,RoundingMode.HALF_UP);
@@ -1807,12 +1823,14 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         if (!determineFocus())return;
 
         if (isFocusOnPoint){
-            GBPoint point = getPointFromFocus(GBUtilities.getInstance().getOpenProject());
+            GBPoint point = getPointFromFocus(GBUtilities.getInstance().
+                                                    getOpenProject((GBActivity)getActivity()));
             if (point != null) {
                 mNotes = point.getPointNotes();
             }
         } else {
-            mNotes = GBUtilities.getInstance().getOpenProject().getProjectDescription();
+            mNotes = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity()).
+                                                    getProjectDescription();
         }
 
         askNotesText();
@@ -1844,7 +1862,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         //step 1 Get the open project
         //get the open project
-        GBProject project = GBUtilities.getInstance().getOpenProject();
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
 
         ArrayList<GBPoint> points = project.getPoints();
         int last = points.size();
@@ -2159,16 +2177,16 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                                 GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.marker_edit_point));
                                 //Switch to the Edit Point Fragment
                                 GBPath pointPath  = new GBPath(GBPath.sEditFromMaps);
-                                ((GBActivity)getActivity()).switchToEditPointScreen(
-                                                     GBUtilities.getInstance().getOpenProjectID(),
-                                                     pointPath,
-                                                     openPoint);
+                                ((GBActivity)getActivity()).switchToPointEditScreen(pointPath,
+                                                                                    openPoint);
                                 break;
                             case 1:
                                 GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.marker_remove_point));
                                 //Delete the point from the project and from the DB
                                 GBPointManager pointManager = GBPointManager.getInstance();
-                                pointManager.removePoint(GBUtilities.getInstance().getOpenProjectID(), openPoint);
+                                pointManager.removePoint(
+                                        GBUtilities.getInstance().
+                                        getOpenProjectID((GBActivity)getActivity()), openPoint);
 
                                 //remove the marker
                                 mapMarker.remove();
@@ -2208,7 +2226,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
     private void storeNotesOnPointOrProject(CharSequence notes){
 
-        GBProject openProject = GBUtilities.getInstance().getOpenProject();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
 
         //The focus flags tell us where to put the notes
         if (isFocusOnPoint) {
@@ -2244,8 +2262,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             GBPointManager pointManager = GBPointManager.getInstance();
 
             //No need for a cascading update, only update the picture and the point
+            //this routine does not update coordinate or meanToken
             boolean addToDB = true;
-            pointManager.addPointsToProject(openProject, point, addToDB);
+            pointManager.addPointToProject(openProject, point, addToDB);
 
 
         } else {
@@ -2305,25 +2324,22 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             wsg84Coordinate.setPointID(point.getPointID());
 
             //put the new coordinate on the point
-            point.setHasACoordinateID(wsg84Coordinate.getCoordinateID());
             point.setCoordinate(wsg84Coordinate);
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83)){
             GBCoordinateNAD83 newNad83Coordinate = new GBCoordinateNAD83(wsg84Coordinate);
             newNad83Coordinate.setPointID(point.getPointID());
             point.setCoordinate(newNad83Coordinate);
-            point.setHasACoordinateID(newNad83Coordinate.getCoordinateID());
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM)){
             GBCoordinateUTM newUtmCoordinate = new GBCoordinateUTM(wsg84Coordinate);
             newUtmCoordinate.setPointID(point.getPointID());
             point.setCoordinate(newUtmCoordinate);
-            point.setHasACoordinateID(newUtmCoordinate.getCoordinateID());
         } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS)){
             // TODO: 6/20/2017 need zone for creation of spcs coordinate
             /*
             GBCoordinateSPCS newSpcsCoordinate = new GBCoordinateSPCS(wsg84Coordinate);
             newSpcsCoordinate.setPointID(point.getPointID());
             point.setCoordinate(newSpcsCoordinate);
-            point.setHasACoordinateID(newSpcsCoordinate.getCoordinateID());
+
             */
         } else {
             throw new RuntimeException("Something wrong with Coordinate type in Collect Points");

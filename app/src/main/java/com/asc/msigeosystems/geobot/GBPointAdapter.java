@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Elisabeth Huhn on 5/15/2016.
@@ -20,7 +20,7 @@ import java.util.List;
 class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
 
-    private List<GBPoint> mPointList;
+    private ArrayList<GBPoint> mPointList;
 
     //implement the ViewHolder as an inner class
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -41,7 +41,7 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
     } //end inner class MyViewHolder
 
     //Constructor for GBPointAdapter
-    GBPointAdapter(List<GBPoint> pointList){
+    GBPointAdapter(ArrayList<GBPoint> pointList){
         this.mPointList = pointList;
     }
 
@@ -53,7 +53,7 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
     }
 
-    public void removeItem(int position, int projectID) {
+    void removeItem(int position, long projectID) {
         GBPoint point = mPointList.get(position);
 
         //remove the pictures from the point
@@ -68,6 +68,10 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
         notifyItemRemoved(position); //update the UI
 
 
+    }
+
+    ArrayList<GBPoint> getPointList(){
+        return mPointList;
     }
 
     @Override

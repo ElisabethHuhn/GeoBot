@@ -23,6 +23,21 @@
         android:title="@string/action_project_create"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/action_point_list"
+        android:title="@string/action_point_list"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_map_points"
+        android:title="@string/action_map_points"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_project_export"
+        android:title="@string/action_project_export"
+        app:showAsAction="never"
+        />
     <!-- Remove these things from the menu
     <item
         android:id="@+id/action_project"

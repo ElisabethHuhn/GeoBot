@@ -62,6 +62,9 @@ class GBGlobalSettings {
         return nextID;
     }
     long setNextProjectID (GBActivity activity, long projectID){
+        if (activity == null){
+            return GBUtilities.ID_DOES_NOT_EXIST;
+        }
 
         //Store the ProjectID for the next time
         SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
@@ -75,6 +78,9 @@ class GBGlobalSettings {
 
     //No auto-increment. Analogous to Peak at a stack
     long getPotentialNextProjectID (GBActivity activity)  {
+        if (activity == null){
+            return GBUtilities.ID_DOES_NOT_EXIST;
+        }
         SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
         long defaultValue = GBUtilities.ID_DOES_NOT_EXIST;
         return sharedPref.getLong(sNextProjectIDTag, defaultValue);

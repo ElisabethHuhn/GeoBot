@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * If a Coordinate is deleted from memory, it is also deleted from the DB
  *
  */
-class GBNmeaMeanTokenManager {
+class GBMeanTokenManager {
 
     /* **********************************/
     /* ******* Static Constants *********/
@@ -25,7 +25,7 @@ class GBNmeaMeanTokenManager {
     /* **********************************/
     /* ******* Static Variables *********/
     /* **********************************/
-    private static GBNmeaMeanTokenManager ourInstance ;
+    private static GBMeanTokenManager ourInstance ;
 
     /* **********************************/
     /* ******* Member Variables *********/
@@ -35,9 +35,9 @@ class GBNmeaMeanTokenManager {
     /* **********************************/
     /* ******* Static Methods   *********/
     /* **********************************/
-    public static GBNmeaMeanTokenManager getInstance() {
+    public static GBMeanTokenManager getInstance() {
         if (ourInstance == null){
-            ourInstance = new GBNmeaMeanTokenManager();
+            ourInstance = new GBMeanTokenManager();
 
         }
         return ourInstance;
@@ -46,7 +46,7 @@ class GBNmeaMeanTokenManager {
     /* **********************************/
     /* ******* Constructors     *********/
     /* **********************************/
-    private GBNmeaMeanTokenManager() {
+    private GBMeanTokenManager() {
 
         //mCoordinateList = new ArrayList<>();
 
@@ -65,7 +65,9 @@ class GBNmeaMeanTokenManager {
 
     //* ****************  CREATE *******************************************
 
-    long addMeanToDB(GBNmeaMeanToken token){
+    long addMeanToDB(GBMeanToken token){
+        if (token == null)return GBUtilities.ID_DOES_NOT_EXIST;
+
         //add Mean to DB
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         if (databaseManager.addToken(token) == GBDatabaseManager.sDB_ERROR_CODE) {
@@ -105,6 +107,12 @@ class GBNmeaMeanTokenManager {
 
 
     //* ****************  READ *******************************************
+    //just returns the single coordinateMean object that corresponds to the coordinateID
+    GBMeanToken getMeanTokenFromDB(long meanTokenID) {
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        return databaseManager.getMeanTokenFromDB(meanTokenID);
+    }
+
 
 
     //* ****************  UPDATE *******************************************
@@ -123,7 +131,7 @@ class GBNmeaMeanTokenManager {
     /* ******************************************/
 
     //returns the ContentValues object needed to add/update the MEAN_TOKEN to/in the DB
-    ContentValues getCVFromToken(GBNmeaMeanToken token){
+    ContentValues getCVFromToken(GBMeanToken token){
         //convert the GBMeanToken object into a ContentValues object containing a token
         ContentValues cvToken = new ContentValues();
         //put(columnName, value);
@@ -158,7 +166,7 @@ class GBNmeaMeanTokenManager {
     }
 
     //returns the ContentValues object needed to add/update the MEAN_TOKEN_READING to/in the DB
-    ContentValues getCVFromTokenReading(GBNmeaMeanToken token, int position){
+    ContentValues getCVFromTokenReading(GBMeanToken token, int position){
 
         ContentValues cvTokenReading = new ContentValues();
 
@@ -183,12 +191,12 @@ class GBNmeaMeanTokenManager {
     //        If the app becomes multi-threaded, this routine must be made thread safe
     //WARNING The cursor is NOT closed by this routine. It assumes the caller will close the
     //         cursor when it is done with it
-    GBNmeaMeanToken getMeanTokenFromCursor(Cursor cursor, int position){
+    GBMeanToken getMeanTokenFromCursor(Cursor cursor, int position){
 
         int last = cursor.getCount();
         if (position >= last) return null;
 
-        GBNmeaMeanToken meanToken = new GBNmeaMeanToken();
+        GBMeanToken meanToken = new GBMeanToken();
 
         cursor.moveToPosition(position);
 
