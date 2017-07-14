@@ -34,7 +34,7 @@
                 >
                 <!-- Page Title -->
                 <TextView
-                    android:text="@string/coordinate_conversion"
+                    android:text="@string/coordinate_measure"
 
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
                     android:layout_width ="match_parent"
                     android:orientation="horizontal"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="5dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/data_source_spinner"
@@ -61,7 +61,7 @@
                         android:layout_weight="25"
                         android:gravity="end"
 
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/row_cap_margin"
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorScreenBackground"
                         />
@@ -72,7 +72,7 @@
                         android:layout_width  = "0dp"
                         android:layout_height = "wrap_content"
                         android:layout_weight="75"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
                         />
@@ -85,7 +85,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="5dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <!-- Start / Stop Data -->
                     <Button
@@ -99,8 +99,8 @@
 
                         android:layout_weight="25"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="@dimen/row_cap_margin"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -118,7 +118,7 @@
 
                         android:layout_weight="25"
 
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -129,7 +129,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="5dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
 
                     <!-- Save -->
@@ -144,8 +144,8 @@
 
                         android:layout_weight="25"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="@dimen/row_cap_margin"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:background="@color/colorGray"
                         android:textColor="@color/colorTextBlack"
@@ -162,7 +162,7 @@
 
                         android:layout_weight="25"
 
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:background="@color/colorGray"
                         android:textColor="@color/colorTextBlack"
@@ -178,7 +178,7 @@
 
                         android:layout_weight="25"
 
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -186,25 +186,57 @@
 
                 </LinearLayout>
 
-                <!-- UTM Zone Hint -->
-                <TextView
-                    android:text="@string/zone_input_hint"
+
+                <!-- Row: distance units -->
+                <LinearLayout
 
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
+                    android:paddingTop="@dimen/row_between_rows_margin"
+                    >
 
-                    android:textColor="@color/colorTextBlack"
-                    android:background="@color/colorScreenBackground"
-                    />
+                    <TextView
+                        android:labelFor="@+id/measureDistanceUnitsInput"
+                        android:text="@string/distance_units_label"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="end"
 
-                <!-- GPS and Mean Status -->
+                        android:layout_marginStart="@dimen/row_cap_margin"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorScreenBackground"
+                        />
+                    <EditText
+                        android:id="@id/measureDistanceUnitsInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="65"
+                        android:gravity="center"
+
+                        android:inputType="text"
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
+
+                        android:enabled="false"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorGray"
+                        />
+
+                </LinearLayout>
+
+
+                <!-- GPS, autosave, and Mean Status -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
 
                     >
                     <!-- Mean in progress -->
@@ -216,13 +248,13 @@
                         android:gravity="center"
                         android:layout_weight="10"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="@dimen/row_cap_margin"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
+                        android:text="@string/mean_not_in_progress_string"
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
                         />
-
 
                     <!-- GPS on/off indicator -->
                     <TextView
@@ -234,8 +266,26 @@
                         android:gravity="center"
                         android:layout_weight="10"
 
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
+                        android:text="@string/gps_off"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorWhite"
+                        />
+
+                    <!-- autosave on/off indicator -->
+                    <TextView
+                        android:id="@+id/autosave_on_off_output"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center"
+                        android:layout_weight="10"
+
+                        android:layout_marginEnd="@dimen/row_cap_margin"
+
+                        android:text="@string/autosave_off"
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
                         />
@@ -257,7 +307,7 @@
                         android:layout_gravity="center_horizontal"
                         android:gravity="center"
 
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorYellowish"
@@ -271,7 +321,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_gravity="center"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <TextView
@@ -281,7 +331,7 @@
                             android:layout_weight="15"
                             android:gravity="end"
 
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
@@ -296,7 +346,7 @@
                             android:gravity="center"
                             android:enabled="false"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -310,7 +360,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Latitude Label -->
@@ -321,7 +371,7 @@
                             android:layout_weight="15"
                             android:gravity="end"
 
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="@dimen/row_cap_margin"
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
                             />
@@ -338,7 +388,7 @@
                             android:inputType="numberSigned|numberDecimal"
                             android:enabled="false"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorGrayish"
@@ -356,7 +406,7 @@
                             android:enabled="false"
 
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -374,7 +424,7 @@
                             android:inputType="numberSigned|number"
                             android:enabled="false"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -392,7 +442,7 @@
                             android:inputType="numberSigned|numberDecimal"
                             android:enabled="false"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -407,7 +457,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Longitude Label -->
@@ -419,7 +469,7 @@
 
                             android:gravity="end"
 
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="@dimen/row_cap_margin"
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
                             />
@@ -436,7 +486,7 @@
                             android:inputType="numberSigned|numberDecimal"
                             android:enabled="false"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorGrayish"
@@ -453,7 +503,7 @@
                             android:inputType="numberSigned|number"
                             android:enabled="false"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -471,7 +521,7 @@
                             android:inputType="numberSigned|number"
                             android:enabled="false"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -489,7 +539,7 @@
                             android:inputType="numberSigned|numberDecimal"
                             android:enabled="false"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
 
                             android:textColor="@color/colorTextBlack"
@@ -503,7 +553,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Convergence / Scale Factor -->
@@ -523,7 +573,7 @@
                                 android:gravity="end"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
                                 />
@@ -540,7 +590,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -558,7 +608,7 @@
                                 android:enabled="false"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -576,7 +626,7 @@
                                 android:inputType="numberSigned|number"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -594,7 +644,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -607,7 +657,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:paddingTop="5dp"
+                            android:paddingTop="@dimen/row_between_rows_margin"
                             >
 
                             <!-- Scale Factor -->
@@ -618,7 +668,7 @@
                                 android:layout_weight="25"
                                 android:gravity="end"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -631,7 +681,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="125"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
                                 android:inputType="numberSigned|numberDecimal"
 
                                 android:textColor="@color/colorTextBlack"
@@ -647,6 +697,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:paddingTop="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Elevation  -->
@@ -654,7 +705,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginBottom="5dp"
+                            android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                             >
                             <!-- Elevation  -->
@@ -666,7 +717,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -683,7 +734,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -699,7 +750,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -725,7 +776,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -742,7 +793,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -759,7 +810,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -787,7 +838,7 @@
                         android:layout_gravity="center_horizontal"
                         android:gravity="end"
 
-                        android:paddingBottom="5dp"
+                        android:paddingBottom="@dimen/row_between_rows_margin"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorRedish"
@@ -798,7 +849,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Start time of mean -->
@@ -857,7 +908,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
 
@@ -904,7 +955,7 @@
                             android:layout_weight="35"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -917,7 +968,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Lat Sigma -->
@@ -944,7 +995,7 @@
                             />
                         <!-- Long Sigma -->
                         <TextView
-                            android:text="@string/mean_long_sigma"
+                            android:text="@string/mean_lng_sigma"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -956,14 +1007,14 @@
                             />
                         <TextView
                             android:id="@+id/meanWgs84LongSigmaOutput"
-                            android:hint="@string/mean_long_sigma"
+                            android:hint="@string/mean_lng_sigma"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
                             android:layout_weight="35"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -979,7 +1030,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Latitude Label -->
@@ -990,7 +1041,7 @@
                             android:layout_weight="15"
                             android:gravity="end"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
                             />
@@ -1004,7 +1055,7 @@
                             android:layout_weight="60"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorGrayish"
@@ -1018,7 +1069,7 @@
                             android:layout_weight="15"
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -1033,7 +1084,7 @@
                             android:layout_weight="15"
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -1048,7 +1099,7 @@
                             android:layout_weight="35"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -1064,7 +1115,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Longitude Label -->
@@ -1076,7 +1127,7 @@
 
                             android:gravity="end"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
                             />
@@ -1090,7 +1141,7 @@
                             android:layout_weight="60"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorGrayish"
@@ -1104,7 +1155,7 @@
                             android:layout_weight="15"
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -1119,7 +1170,7 @@
                             android:layout_weight="15"
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorWhite"
@@ -1134,7 +1185,7 @@
                             android:layout_weight="35"
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
 
                             android:textColor="@color/colorTextBlack"
@@ -1155,7 +1206,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginBottom="5dp"
+                            android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                             >
                             <!-- Elevation  -->
@@ -1167,7 +1218,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
                                 />
@@ -1180,7 +1231,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="70"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1194,7 +1245,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="75"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1220,7 +1271,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
                                 />
@@ -1234,7 +1285,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="70"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1248,7 +1299,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="75"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1277,7 +1328,7 @@
                         android:layout_gravity="center_horizontal"
                         android:gravity="center"
 
-                        android:paddingBottom="5dp"
+                        android:paddingBottom="@dimen/row_between_rows_margin"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorGreenish"
@@ -1299,7 +1350,7 @@
                             android:layout_weight="30"
                             android:gravity="end"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
@@ -1312,7 +1363,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="70"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:inputType="number"
 
@@ -1331,7 +1382,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="75"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
 
                             android:inputType="text"
                             android:gravity="center"
@@ -1347,7 +1398,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Easting -->
@@ -1358,7 +1409,7 @@
                             android:layout_weight="30"
                             android:gravity="end"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
                             />
@@ -1372,7 +1423,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1388,7 +1439,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1402,7 +1453,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Northing -->
@@ -1413,7 +1464,7 @@
                             android:layout_weight="30"
                             android:gravity="end"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
@@ -1429,7 +1480,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1446,7 +1497,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1460,7 +1511,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Convergence / Scale Factor -->
@@ -1480,7 +1531,7 @@
                                 android:gravity="end"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
                                 />
@@ -1497,7 +1548,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1515,7 +1566,7 @@
                                 android:enabled="false"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1533,7 +1584,7 @@
                                 android:inputType="numberSigned|number"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1551,7 +1602,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1564,7 +1615,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:paddingTop="5dp"
+                            android:paddingTop="@dimen/row_between_rows_margin"
                             >
 
                             <!-- Scale Factor -->
@@ -1575,7 +1626,7 @@
                                 android:layout_weight="25"
                                 android:gravity="end"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -1588,7 +1639,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="125"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
                                 android:inputType="numberSigned|numberDecimal"
 
                                 android:textColor="@color/colorTextBlack"
@@ -1602,7 +1653,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingTop="5dp"
+                        android:paddingTop="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Elevation  -->
@@ -1610,7 +1661,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginBottom="5dp"
+                            android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                             >
                             <!-- Elevation  -->
@@ -1622,7 +1673,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -1639,7 +1690,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1655,7 +1706,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1679,7 +1730,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -1696,7 +1747,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1713,7 +1764,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -1743,7 +1794,7 @@
                         android:layout_gravity="center_horizontal"
                         android:gravity="center"
 
-                        android:paddingBottom="5dp"
+                        android:paddingBottom="@dimen/row_between_rows_margin"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorBlueish"
@@ -1755,7 +1806,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
 
                         >
                         <!-- label -->
@@ -1777,7 +1828,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="50"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="number"
 
                             android:gravity="center"
@@ -1794,7 +1845,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="45"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="text"
 
                             android:gravity="center"
@@ -1811,7 +1862,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="45"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:inputType="text"
 
                             android:gravity="center"
@@ -1827,7 +1878,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Easting -->
@@ -1838,7 +1889,7 @@
                             android:layout_weight="30"
                             android:gravity="end"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
@@ -1853,7 +1904,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1869,7 +1920,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1894,7 +1945,7 @@
                             android:layout_weight="30"
                             android:gravity="end"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                             android:textColor="@color/colorTextBlack"
                             android:background="@color/colorScreenBackground"
@@ -1910,7 +1961,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginEnd="@dimen/row_between_fields_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1927,7 +1978,7 @@
 
                             android:gravity="center"
 
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/row_cap_margin"
                             android:inputType="numberSigned|numberDecimal"
 
                             android:textColor="@color/colorTextBlack"
@@ -1941,7 +1992,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/row_between_rows_margin"
                         >
 
                         <!-- Convergence / Scale Factor -->
@@ -1961,7 +2012,7 @@
                                 android:gravity="end"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
                                 />
@@ -1978,7 +2029,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -1996,7 +2047,7 @@
                                 android:enabled="false"
 
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -2014,7 +2065,7 @@
                                 android:inputType="numberSigned|number"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -2032,7 +2083,7 @@
                                     android:inputType="numberSigned|numberDecimal"
                                     android:enabled="false"
 
-                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginEnd="@dimen/row_cap_margin"
 
                                     android:textColor="@color/colorTextBlack"
                                     android:background="@color/colorWhite"
@@ -2045,7 +2096,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:paddingTop="5dp"
+                            android:paddingTop="@dimen/row_between_rows_margin"
                             >
 
                             <!-- Scale Factor -->
@@ -2056,7 +2107,7 @@
                                 android:layout_weight="25"
                                 android:gravity="end"
 
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -2069,7 +2120,7 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="125"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
                                 android:inputType="numberSigned|numberDecimal"
 
                                 android:textColor="@color/colorTextBlack"
@@ -2083,7 +2134,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingTop="5dp"
+                        android:paddingTop="@dimen/row_between_rows_margin"
 
                         >
                         <!-- Elevation  -->
@@ -2091,7 +2142,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginBottom="5dp"
+                            android:layout_marginBottom="@dimen/row_between_rows_margin"
                             >
                             <!-- Elevation  -->
                             <TextView
@@ -2102,7 +2153,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -2119,7 +2170,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -2135,7 +2186,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"
@@ -2159,7 +2210,7 @@
 
                                 android:gravity="end"
 
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorScreenBackground"
@@ -2176,7 +2227,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorGrayish"
@@ -2193,7 +2244,7 @@
                                 android:inputType="numberSigned|numberDecimal"
                                 android:enabled="false"
 
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/row_cap_margin"
 
                                 android:textColor="@color/colorTextBlack"
                                 android:background="@color/colorWhite"

@@ -14,7 +14,7 @@
         android:layout_width        = "match_parent"
         android:layout_height       = "wrap_content"
         android:orientation         = "horizontal"
-        android:layout_marginBottom = "10dp"
+        android:layout_marginBottom = "5dp"
 
         >
         <!-- Elevation  -->
@@ -22,9 +22,10 @@
             android:text          = "@string/elevation_label"
             android:layout_height = "wrap_content"
             android:layout_width  = "0dp"
-            android:layout_weight = "25"
+            android:layout_weight = "15"
 
             android:gravity       = "end"
+            android:layout_marginStart="@dimen/row_cap_margin"
 
             android:textColor     = "@color/colorTextBlack"
             android:background    = "@color/colorScreenBackground"
@@ -36,31 +37,33 @@
             android:gravity          = "center"
             android:layout_height    = "wrap_content"
             android:layout_width     = "0dp"
-            android:layout_weight    = "75"
+            android:layout_weight    = "70"
 
-            android:layout_marginEnd = "16dp"
+            android:layout_marginEnd = "@dimen/row_between_fields_margin"
+            android:enabled          = "false"
 
-            android:inputType        = "numberDecimal"
+            android:inputType        = "numberSigned|numberDecimal"
 
             android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorWhite"
+            android:background       = "@color/colorGrayish"
             />
 
         <EditText
-            android:id               = "@+id/elevationFeetInput"
-            android:hint             = "@string/type_elevation_feet_label"
-            android:layout_gravity   = "center_horizontal"
-            android:gravity          = "center"
-            android:layout_height    = "wrap_content"
-            android:layout_width     = "0dp"
-            android:layout_weight    = "75"
+            android:id="@+id/elevationFeetInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="@dimen/row_cap_margin"
+            android:layout_weight="75"
+            android:background="@color/colorGrayish"
 
-            android:layout_marginEnd = "16dp"
+            android:enabled="false"
+            android:gravity="center"
 
-            android:inputType        = "numberDecimal"
+            android:hint="@string/type_elevation_feet_label"
 
-            android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorWhite"
+            android:inputType="numberSigned|numberDecimal"
+            android:textColor="@color/colorTextBlack"
 
             />
 
@@ -79,7 +82,7 @@
             android:text          = "@string/geoid_height_label"
             android:layout_height = "wrap_content"
             android:layout_width  = "0dp"
-            android:layout_weight = "25"
+            android:layout_weight = "17"
 
             android:gravity       = "end"
 
@@ -94,14 +97,15 @@
             android:gravity          = "center"
             android:layout_height    = "wrap_content"
             android:layout_width     = "0dp"
-            android:layout_weight    = "75"
+            android:layout_weight    = "70"
 
-            android:layout_marginEnd = "16dp"
+            android:layout_marginEnd = "@dimen/row_between_fields_margin"
+            android:enabled="false"
 
-            android:inputType        = "numberDecimal"
+            android:inputType        = "numberSigned|numberDecimal"
 
             android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorWhite"
+            android:background       = "@color/colorGrayish"
             />
 
         <EditText
@@ -113,12 +117,13 @@
             android:layout_width     = "0dp"
             android:layout_weight    = "75"
 
-            android:layout_marginEnd = "16dp"
+            android:layout_marginEnd = "@dimen/row_cap_margin"
+            android:enabled="false"
 
-            android:inputType        = "numberDecimal"
+            android:inputType        = "numberSigned|numberDecimal"
 
             android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorWhite"
+            android:background       = "@color/colorGrayish"
             />
 
     </LinearLayout>

@@ -49,6 +49,9 @@ abstract class GBCoordinateEN extends GBCoordinate {
     double getEastingFeet() { return GBUtilities.convertMetersToFeet(mEasting);  }
     double getNorthingFeet(){ return GBUtilities.convertMetersToFeet(mNorthing); }
 
+    double getEastingIFeet() {return GBUtilities.convertMetersToIFeet(mEasting);}
+    double getNorthingIFeet(){return GBUtilities.convertMetersToIFeet(mNorthing);}
+
     int  getZone()        { return mZone;     }
     void setZone(int zone)              { mZone = zone;   }
 

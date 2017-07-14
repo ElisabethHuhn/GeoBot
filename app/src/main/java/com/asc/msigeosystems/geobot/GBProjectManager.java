@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by Elisabeth Huhn on 5/18/2016.
@@ -83,7 +82,7 @@ class GBProjectManager {
             //Not going to pull cascading objects from the DB until they are explicitly
             // requested with a call to project.getPoints
         } else {
-            mProjectList.add(position, newProject);
+            mProjectList.set(position, newProject);
         }
 
         if (addToDBToo){
@@ -144,11 +143,10 @@ class GBProjectManager {
         if (mProjectList == null){
             mProjectList = new ArrayList<>();
         }
-        if (mProjectList.size() == 0){
-            //get the Projects from the DB
-            GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-            databaseManager.getAllProjects();
-        }
+        // TODO: 7/6/2017 check if there is a way to only do this when necessary
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        databaseManager.getAllProjects();
+
         return mProjectList;
     }
 
@@ -360,95 +358,6 @@ class GBProjectManager {
     /* ******* Translation Utility Methods  *****/
     /* ******************************************/
 
-    GBProject deepCopyProject(GBActivity activity, GBProject fromProject, boolean assignNextID){
-
-        //This method of deep copy only works if the most current copy of the
-        //project exists in the DB.
-        //This assumption is often valid, as in ListProjects. The only way a project
-        //  can appear in the UI List is if is the most current copy of the object
-
-        //do a deep copy of the project by reading in the
-        //DB version of the project
-        //This also brings in the ProjectSettings associated with the project
-        GBProject toProject = getProjectFromDB(fromProject.getProjectID());
-
-        long toProjectID;
-        if (assignNextID) {
-            //set the new project ID on the toProject and on its Settings
-            toProjectID = GBProject.getNextProjectID(activity);
-            toProject.setProjectID(toProjectID);
-            toProject.getSettings().setProjectID(toProjectID);
-        } else {
-            toProjectID = fromProject.getProjectID();
-        }
-
-           //update the date created and date last maintained
-        toProject.setProjectDateCreated(new Date().getTime());
-        toProject.setProjectLastModified(new Date().getTime());
-
-        //the coordinate type is OK as read in from the DB, it does not need to be touched
-
-        //do a deep copy of the points on this project is to read them in from the DB
-        //GBPointManager pointManager = GBPointManager.getInstance();
-
-        //This not only reads in the points from the DB, it adds those points to
-        //    the pointsList on the project
-        //The return value is not what is important here, it's the side effect of reading
-        //    all the points in from the DB and adding them to memory
-        toProject.getPoints();
-
-        //change the pointIDs and the projectID's on the points of the project
-        GBPoint toPoint;
-        ArrayList<GBPoint> toPointList   = toProject.getPoints();
-
-        //initialize the first point ID
-        //The ID is assigned and stored the first time the object is added to the DB
-        toProject.setProjectID(GBUtilities.ID_DOES_NOT_EXIST);
-
-        //iterate through the point list, changing the IDs
-        int last = toPointList.size();
-        for (int position = 0; position < last; position++) {
-
-            //set the forProjectID on the point to the new projectID
-            toPoint = toPointList.get(position);
-            toPoint.setForProjectID(toProjectID);
-
-            //and assign a new point id to this point
-            //ID will be assigned when the point is first saved to the DB
-            toPoint.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
-
-            //add the new point to the list on the project AND to the db
-            //pointManager.addPointToProject(toProject, toPoint, true);
-
-            //  give the coordinate on the point a new ID
-            int toCoordinateID = GBCoordinate.getNextCoordinateID();
-            toPoint.getCoordinate().setCoordinateID(toCoordinateID);
-            toPoint.setHasACoordinateID(toCoordinateID);
-
-        }
-        
-        //Picture ID's are the timestamp of when they were taken, so will not change
-        //The project they are in makes the ID unique, so update the picture's project ID
-        //iterate through the picture list, changing the project IDs
-        ArrayList<GBPicture> toPictureList   = toProject.getPictures();
-        GBPicture toPicture;
-        last = toPictureList.size();
-        for (int position = 0; position < last; position++) {
-
-            //set the forProjectID on the picture to the new projectID
-            toPicture = toPictureList.get(position);
-            toPicture.setProjectID(toProjectID);
-            
-            //leave the PictureID alone, it is the timestamp of when the picture was taken
-            
-            //add the new picture to the list on the project AND to the db
-            // TODO: 12/29/2016 make sure the project has already added pictures in the getP'rojectFromDB() 
-            //pictureManager.addPointToProject(toProject, toPicture, true);
-            
-        }
-
-        return toProject;
-    }
 
 
     //returns the ContentValues object needed to add/update the PROJECT to/in the DB
@@ -456,8 +365,8 @@ class GBProjectManager {
         //convert the GBProject object into a ContentValues object containing a project
         ContentValues cvProject = new ContentValues();
         //put(columnName, value);
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ID,project.getProjectID());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NAME,project.getProjectName().toString());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ID,          project.getProjectID());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NAME,    project.getProjectName().toString());
         //CONVERT the dates to strings in the DB.
         // They will be converted back to milliseconds in memory
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_CREATED,
@@ -466,16 +375,23 @@ class GBProjectManager {
                                                 String.valueOf(project.getProjectLastModified()));
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DESCRIPTION,
                                                 project.getProjectDescription().toString());
+        //next point number is stored in shared preferences, not the DB
+        //cvProject.put(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM, project.getNextPointNumber());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_HEIGHT,       project.getHeight());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_COORDINATE_TYPE,
-                                                project.getProjectCoordinateType().toString());
-
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS, project.getDistanceUnits());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN,   project.getNumMean());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_EN_V_NE,    project.getEnVNe());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM, project.getNextPointNumber());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION, project.getLocPrecision());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION, project.getStdDevPrecision());
+                                                                   project.getCoordinateType());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ZONE,         project.getZone());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN,     project.getNumMean());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS,   project.getDistanceUnits());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_AUTOSAVE,     project.getAutosave());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV, project.getRMSvStD());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ORDER,        project.getOrderOnUI());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DD_V_DMS,     project.getDDvDMS());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIR_V_PM,     project.getDIRvPlusMinus());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DATA_SOURCE,  project.getDataSource());
+
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION, project.getLocPrecision());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION,project.getStdDevPrecision());
 
         return cvProject;
     }
@@ -604,32 +520,50 @@ class GBProjectManager {
 
         cursor.moveToPosition(position);
         project.setProjectID(
-                cursor.getInt  (cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_ID)));
+                cursor.getLong  (cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_ID)));
         project.setProjectName(
                 cursor.getString(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NAME)));
-        project.setProjectDateCreated(Long.parseLong(cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_CREATED))));
-        project.setProjectLastModified(Long.parseLong(cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LAST_MAINTAINED))));
-        project.setProjectDescription(cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DESCRIPTION)));
-        project.setProjectCoordinateType(cursor.getString(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_COORDINATE_TYPE)));
+        project.setProjectDateCreated(Long.parseLong(
+                cursor.getString(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_CREATED))));
+        project.setProjectLastModified(Long.parseLong(
+                cursor.getString(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LAST_MAINTAINED))));
+        project.setProjectDescription(
+                cursor.getString(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DESCRIPTION)));
+        /* Next point number is stored in the Shared Preferences, not the DB
+        project.setNextPointNumber(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM)));
+                */
+        project.setHeight(
+                cursor.getDouble(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_HEIGHT)));
 
-        project.setDistanceUnits(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS)));
-        project.setNumMean(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN)));
-        project.setNextPointNumber(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NXT_POINT_NUM)));
-        project.setNumMean(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN)));
-        project.setLocPrecision(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION)));
-        project.setStdDevPrecision(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION)));
-        project.setRMSvStD(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV)));
+        project.setCoordinateType(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_COORDINATE_TYPE)));
+        project.setNumMean(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN)));
+        project.setZone(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_ZONE)));
+
+        project.setDistanceUnits(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS)));
+        project.setAutosave(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_AUTOSAVE)));
+        project.setRMSvStD(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV)));
+
+        project.setOrderOnUI(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_ORDER)));
+        project.setDDvDMS(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DD_V_DMS)));
+        project.setDIRvPlusMinus(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIR_V_PM)));
+        project.setDataSource(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DATA_SOURCE)));
+
+
+        project.setLocPrecision(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION)));
+        project.setStdDevPrecision(
+                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION)));
 
         return project;
     }

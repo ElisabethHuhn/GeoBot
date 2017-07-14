@@ -15,6 +15,8 @@ class GBMeanToken {
     // ******************************************************** //
     // **************    Static Constants    ****************** //
     // ******************************************************** //
+    //Tags for storing a token in arguments
+    private static final String sTokenIDTag = "tokenID";
     //Meaning Variables
     //Flags 0 = false, 1 = true
     private static final String IS_MEANING        = "IsMeaning";
@@ -25,6 +27,36 @@ class GBMeanToken {
     private static final String FIXED_READING     = "FixedReading";
     private static final String RAW_READING       = "RawReading";
 
+
+
+    /* **************************************************************/
+    /*               Static Methods                                 */
+    /* **************************************************************/
+
+    static Bundle putTokenInArguments(Bundle args, long tokenID) {
+
+        if (tokenID == GBUtilities.ID_DOES_NOT_EXIST){
+            //And error, but what to do about it here??
+            args.putLong(GBMeanToken.sTokenIDTag, GBUtilities.ID_DOES_NOT_EXIST);
+        } else {
+            args.putLong(GBMeanToken.sTokenIDTag, tokenID);
+        }
+        //all other attributes are stored in the DB via the TokenManager
+        return args;
+    }
+
+
+    static long getTokenFromArguments(Bundle args) {
+
+        return args.getLong (GBMeanToken.sTokenIDTag);
+
+    }
+
+
+
+
+
+
     // ******************************************************** //
     // **************** Member Variables ********************** //
     // ******************************************************** //
@@ -32,6 +64,7 @@ class GBMeanToken {
     //variables for the meaning process
     private long    mMeanTokenID;
     private long    mProjectID;
+    private long    mPointID;
     private boolean mIsMeanInProgress = false;
     private boolean mIsFirstPointInMean = false;
     private boolean mIsLastPointInMean = false;
@@ -78,7 +111,8 @@ class GBMeanToken {
 
 
     private void initializeDefaultValues(){
-        mMeanTokenID = GBUtilities.ID_DOES_NOT_EXIST;
+        mMeanTokenID        = GBUtilities.ID_DOES_NOT_EXIST;
+        mProjectID          = GBUtilities.ID_DOES_NOT_EXIST;
         mIsMeanInProgress   = false;
         mIsFirstPointInMean = false;
         mIsLastPointInMean  = false;
@@ -103,6 +137,10 @@ class GBMeanToken {
     long getProjectID() { return mProjectID;}
     void setProjectID(long projectID) {
         mProjectID = projectID;}
+
+    long getPointID() { return mPointID;}
+    void setPointID(long pointID) {
+        mPointID = pointID;}
 
     boolean isMeanInProgress() {return mIsMeanInProgress;}
     void setMeanInProgress(boolean meanInProgress) {mIsMeanInProgress = meanInProgress;}
@@ -169,8 +207,14 @@ class GBMeanToken {
     }
 
     int getCoordinateSize() {
-        if (mMeanedCoordinates == null)return 0;
-        return mMeanedCoordinates.size();
+        if (areCoordinatesInMemory()) {
+            ArrayList<GBCoordinateWGS84> coordinates = getCoordinates();
+            if (coordinates == null) return 0;
+            return getCoordinates().size();
+        } else {
+            GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
+            return coordinateManager.getRawCoordinatesCount(getMeanTokenID());
+        }
     }
     GBCoordinateWGS84 getCoordinateAt(int position){
         if (position < 0)return null;
@@ -182,7 +226,13 @@ class GBMeanToken {
         return getCoordinateAt(position);
     }
     boolean addCoordinate(GBCoordinateWGS84 newCoordinate){
-        return getCoordinates().add(newCoordinate);
+        ArrayList<GBCoordinateWGS84> coordinates = getCoordinates();
+        if (coordinates == null){
+            mMeanedCoordinates = new ArrayList<>();
+            coordinates = mMeanedCoordinates;
+        }
+
+        return coordinates.add(newCoordinate);
     }
 
     void    resetCoordinates(){

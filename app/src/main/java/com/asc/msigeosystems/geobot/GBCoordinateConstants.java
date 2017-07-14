@@ -192,6 +192,7 @@ public class GBCoordinateConstants {
     //*+****************************************************************//
 
     GBCoordinateConstants(int zone) {
+        if (zone == 0)return;
         int last = rawConstants.length;
         int position = 0;
 

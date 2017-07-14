@@ -237,6 +237,8 @@ class GBNmeaParser {
             return true;
         }
     }
+
+
     class GLGNS implements SentenceParser {
         char quality;
         public boolean parse(String [] tokens, GBNmea nmeaInfo) {
@@ -382,7 +384,7 @@ class GBNmeaParser {
             try {
                 int msgInCycle = Integer.parseInt(tokens[1]); //The number of messages in the cycle
                 int thisMsg = Integer.parseInt(tokens[2]); //Which message this one is in the cycle
-                int totSat = Integer.parseInt(tokens[3]); //total number of satelites in the cycle
+                int totSat = Integer.parseInt(tokens[3]); //total number of satellites in the cycle
                 int i = totSat - ((thisMsg - 1) * 4);//number of satellites in this NMEA Sentence
                 if (i > 4) {
                     i = 4; //The most satellites in one sentence is 4
@@ -416,8 +418,7 @@ class GBNmeaParser {
                                 Integer.parseInt(tokens[(l * 4) + 5]), //elevation
                                 Integer.parseInt(tokens[(l * 4) + 6]), //azimuth
                                 Integer.parseInt(tokens[(l * 4) + 7])); //SNR
-                        //nmeaInfo.setSatellite(satellite);
-                        //remove any old satellite records before adding this new one
+                        //remove any old records for this satellite before adding this new one
                         satelliteManager.add(satellite);
                     }
                 }
@@ -526,6 +527,10 @@ class GBNmeaParser {
                     nmeaInfo.mVdop = Double.parseDouble(tokens[17]);
                 }
 
+                GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
+                satelliteManager.setHdop(nmeaInfo.getHdop());
+                satelliteManager.setVdop(nmeaInfo.getVdop());
+                satelliteManager.setPdop(nmeaInfo.getPdop());
                 return true;
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
@@ -571,6 +576,10 @@ class GBNmeaParser {
                     nmeaInfo.mVdop = Double.parseDouble(tokens[17]);
                 }
 
+                GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
+                satelliteManager.setHdop(nmeaInfo.getHdop());
+                satelliteManager.setVdop(nmeaInfo.getVdop());
+                satelliteManager.setPdop(nmeaInfo.getPdop());
                 return true;
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
@@ -603,7 +612,7 @@ class GBNmeaParser {
         sentenceParsers.put("GPVTG", new GPVTG());
 ******/
 
-        //then a map of any strings that Prism is interested in
+        //then a map of any strings that GeoBot is interested in
 
         //IN sample data
         //position

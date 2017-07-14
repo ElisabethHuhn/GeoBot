@@ -26,8 +26,6 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     //static final double sSemiMajorAxis      = 6378137.0;    // a meters
     //static final double sFlattening         = 298.257223563; // 1/f unitless
 
-    private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeWGS84;
-    private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassWGS84;
 
     static final String sDatum = "WGS84";
 
@@ -55,22 +53,22 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
      **********/
 
     GBCoordinateWGS84(){
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
     }
 
     GBCoordinateWGS84(GBCoordinateUTM coordinateUTM){
         // TODO: 12/27/2016 finish the conversion from UTM to WGS
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
     }
 
     GBCoordinateWGS84(GBCoordinateNAD83 coordinateNAD83){
         // TODO: 12/27/2016 finish conversion from NAD to WGS
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
     }
 
     GBCoordinateWGS84(GBCoordinateSPCS coordinateSPCS){
 
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
         int zone = coordinateSPCS.getZone();
         GBCoordinateConstants constants = new GBCoordinateConstants(zone);
         int spcsZone = constants.getZone();
@@ -130,7 +128,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
                       int longitudeDegree, int longitudeMinute, double longitudeSecond){
 
         //initialize all variables to their defaults
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
 
         latLongDMS( latitudeDegree,  latitudeMinute,  latitudeSecond,
                     longitudeDegree, longitudeMinute, longitudeSecond);
@@ -139,7 +137,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     GBCoordinateWGS84(CharSequence latitudeString, CharSequence longitudeString) {
 
         //initialize all variables to their defaults
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
 
         super.latLongDDStrings(latitudeString, longitudeString);
     }
@@ -265,17 +263,6 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
      **********/
 
 
-    //This method returns the type of the instance actually instantiated
-    @Override
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-    void         setCoordinateType(){
-        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeWGS84;
-    }
-
-    //This method returns the type of the instance as a string for UI display
-    @Override
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
     /* ******
      *
      * Static methods
@@ -298,12 +285,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         //initialize all variables common to EN coordinates
         super.initializeDefaultVariables();
 
-
-        //initialize all variables from this level
-        mThisCoordinateType  = sCoordinateTypeWGS84;
-        mThisCoordinateClass = sCoordinateTypeClassWGS84;
-
-        mDatum       = sDatum; //eg WGS84
+        mCoordinateDBType = GBCoordinate.sCoordinateDBTypeWGS84;
 
     }
 

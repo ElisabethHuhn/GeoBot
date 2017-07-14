@@ -27,7 +27,7 @@ import android.widget.Toast;
 public class GBGpsFromNmeaFragment extends Fragment implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
 
     private GpsStatus mGpsStatus = null;
-    private static GBNmeaParser mNmeaParser = new GBNmeaParser();
+    private static GBNmeaParser mNmeaParser = GBNmeaParser.getInstance();
     int counter = 0;
     private GBNmea mNmeaData; //latest nmea sentence received
 

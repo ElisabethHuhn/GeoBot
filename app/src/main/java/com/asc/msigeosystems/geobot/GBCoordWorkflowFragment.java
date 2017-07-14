@@ -28,7 +28,7 @@ import java.util.Locale;
  */
 public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
 
-    private static GBNmeaParser mNmeaParser = new GBNmeaParser();
+    private static GBNmeaParser mNmeaParser = GBNmeaParser.getInstance();
     private LocationManager     mLocationManager;
     private GBNmea              mNmeaData; //latest nmea sentence received
     private GpsStatus           mGpsStatus = null;
@@ -426,7 +426,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
         //todo maybe need to do something with the timestamp
         try {
             //create an object with all the fields from the string
-            if (mNmeaParser == null)mNmeaParser = new GBNmeaParser();
+            if (mNmeaParser == null)mNmeaParser = GBNmeaParser.getInstance();
             GBNmea nmeaData = mNmeaParser.parse(nmea);
             if (nmeaData == null) return;
 
@@ -514,6 +514,8 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
     private void initializeMeanToken(){
         if (mMeanToken == null)mMeanToken = new GBMeanToken();
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+        mMeanToken.setProjectID(openProjectID);
         mMeanToken.setMeanInProgress(false);
         mMeanToken.setFirstPointInMean(false);
         mMeanToken.setLastPointInMean(false);

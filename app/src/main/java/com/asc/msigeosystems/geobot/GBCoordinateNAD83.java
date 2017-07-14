@@ -38,9 +38,7 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
     //static final double sPolarRadiusB = -sEquatorialRadiusA * (sFlattening-1.0);
 
 
-    private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeNAD83;
-    private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassNAD83;
-    static final String sDatum = "NAD83";
+     static final String sDatum = "NAD83";
 
     /* ******
      *
@@ -49,7 +47,7 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
      **********/
 
     GBCoordinateNAD83(){
-        super.initializeDefaultVariables();
+        initializeDefaultVariables();
     }
 
     GBCoordinateNAD83(GBCoordinateWGS84 wsg84Coordinate) {
@@ -67,19 +65,6 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
      * Setters and Getters
      *
      **********/
-
-    //This method returns the type of the instance actually instantiated
-    @Override
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-    void         setCoordinateType(){
-        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeNAD83;
-    }
-
-
-    //This method returns the type of the instance as a string for UI display
-    @Override
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
 
 
     /* ******
@@ -105,8 +90,7 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
 
         //initialize all variables from this level
         //initialize all variables from this level
-        mThisCoordinateType  = sCoordinateTypeNAD83;
-        mThisCoordinateClass = sCoordinateTypeClassNAD83;
+        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeNAD83;
 
         mDatum               = sDatum; //eg WGS84
 

@@ -26,7 +26,7 @@
                 android:layout_width= "match_parent"
                 android:layout_height="match_parent"
                 >
-                <!-- title line, must match data_project_list_row.xml -->
+                <!-- title line, must match data_list_row_project.xml -->
                 <LinearLayout
 
                     android:orientation=  "horizontal"

@@ -70,17 +70,16 @@ class GBPoint {
     private CharSequence mPointNotes;
 
 
-    private ArrayList<GBPicture> mPictures;
-
     //Quality fields
     private double      mHdop;
     private double      mVdop;
     private double      mTdop;
     private double      mPdop;
-    private double      mGdop;
     private double      mHrms;
     private double      mVrms;
 
+
+    private ArrayList<GBPicture> mPictures;
 
 
 
@@ -113,16 +112,27 @@ class GBPoint {
             point = GBPointManager.getInstance().getPoint(openProjectID, pointID);
 
         } else {
-            //there is no existing point, it is being created
-
-            //Start with an empty point with default values
-            point = new GBPoint();
-            //set the bogus point ID
-            point.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
-            //save the project ID
-            point.setForProjectID(openProjectID);
+            point = initializePoint(activity);
         }
 
+        return point;
+    }
+
+    private static GBPoint initializePoint(GBActivity activity){
+        //A project must be open for this to work
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        if (openProject == null)return null;
+
+        GBPoint point = new GBPoint();
+        point.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
+
+        point.setForProjectID(openProject.getProjectID());
+        point.setHeight(openProject.getHeight());
+        point.setPointNumber(openProject.getNextPointNumber(activity));
+        //the point number is not incremented until the point is saved for the first time
+        //The SQL Helper is in charge of assigning both
+        // the DB ID and then incrementing the point number
+        //openProject.incrementPointNumber(activity);
         return point;
     }
 
@@ -176,15 +186,17 @@ class GBPoint {
     void setHasACoordinateID(long isACoordinateID) { mHasACoordinateID = isACoordinateID; }
 
     GBCoordinate getCoordinate()                {
+
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-        return databaseManager.getCoordinateFromDB(getHasACoordinateID(), getForProjectID());
+        return databaseManager.getCoordinateFromDB(getHasACoordinateID());
     }
     long setCoordinate(GBCoordinate coordinate) {
         if (coordinate != null){
 
             GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
-            coordinateManager.addCoordinate(coordinate);
-            long coordinateID = coordinate.getCoordinateID();
+            long coordinateID = coordinateManager.addCoordinate(coordinate);
+            // TODO: 7/9/2017 assure the ID coming back from teh DB is the same as recorded on the coordinate instance 
+            coordinateID = coordinate.getCoordinateID();
             setHasACoordinateID(coordinateID);
             return coordinateID;
         }
@@ -259,14 +271,6 @@ class GBPoint {
         mPdop = pdop;
     }
 
-    // TODO: 6/13/2017 This is probably not saved in the DB
-    double getGdop() {
-        return mGdop;
-    }
-    void   setGdop(double gdop) {
-        mGdop = gdop;
-    }
-
     double getHrms() {
         return mHrms;
     }
@@ -321,14 +325,14 @@ class GBPoint {
         this.mPointFeatureCode = "";
         this.mPointNotes       = "";
 
-          this.mPictures         = new ArrayList<>();
         this.mHdop = 0d;
         this.mVdop = 0d;
         this.mTdop = 0d;
         this.mPdop = 0d;
-        this.mGdop = 0d;
         this.mHrms = 0d;
         this.mVrms = 0d;
+
+        this.mPictures         = new ArrayList<>();
 
     }
 

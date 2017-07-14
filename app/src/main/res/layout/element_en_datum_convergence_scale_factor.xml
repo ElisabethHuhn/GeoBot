@@ -1,105 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android               = "http://schemas.android.com/apk/res/android"
-          android:orientation   = "horizontal"
+          android:orientation   = "vertical"
           android:layout_width  = "match_parent"
           android:layout_height = "wrap_content"
-          android:paddingBottom = "20dp"
+
+          android:paddingBottom = "5dp"
     >
 
     <!-- datum / convergenceAngle / scaleFactor Factor input fields -->
-
-    <!-- Dataum -->
-    <TextView
-        android:text="@string/datum_label"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="25"
-        android:gravity="end"
+        android:orientation="horizontal"
+        >
+        <!-- Dataum -->
+        <TextView
+            android:text="@string/datum_label"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:gravity="end"
 
-        android:layout_marginTop="6dp"
 
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorScreenBackground"
-        />
-    <EditText
-        android:id="@+id/datumOutput"
-        android:hint="@string/datum_label"
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <EditText
+            android:id="@+id/datumOutput"
+            android:hint="@string/datum_label"
 
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="75"
+
+            android:gravity="center"
+
+            android:layout_marginEnd="@dimen/row_between_fields_margin"
+            android:enabled="false"
+
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+
+
+        <!-- Scale Factor -->
+        <TextView
+            android:text="@string/scale_factor_label"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:gravity="end"
+
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <EditText
+            android:id="@+id/scaleFactorOutput"
+            android:hint="@string/scale_factor_label"
+
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="75"
+
+            android:inputType="numberSigned|numberDecimal"
+
+             android:layout_marginEnd="@dimen/row_cap_margin"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="50"
-
-        android:gravity="center"
-
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="16dp"
-
-
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorWhite"
-        />
-
-    <!-- Convergence -->
-    <TextView
-        android:text="@string/convergence_label"
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="25"
-        android:gravity="end"
-
-        android:layout_marginTop="6dp"
-
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorScreenBackground"
-        />
-    <EditText
-        android:id="@+id/convergenceOutput"
-        android:hint="@string/convergence_label"
-
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="50"
-
-        android:gravity="center"
-
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        >
+        <!-- Convergence -->
+        <TextView
+            android:text="@string/convergence_label"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:gravity="end"
 
 
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorWhite"
-        />
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorScreenBackground"
+            />
+        <EditText
+            android:id="@+id/convergenceOutput"
+            android:hint="@string/convergence_label"
 
-    <!-- Scale Factor -->
-    <TextView
-        android:text="@string/scale_factor_label"
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="25"
-        android:gravity="end"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="75"
 
-        android:layout_marginTop="6dp"
+            android:gravity="center"
 
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorScreenBackground"
-        />
-    <EditText
-        android:id="@+id/scaleFactorOutput"
-        android:hint="@string/scale_factor_label"
+            android:layout_marginEnd="@dimen/row_between_fields_margin"
+            android:enabled="false"
 
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="50"
 
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="16dp"
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+        <!-- degrees -->
+        <EditText
+            android:id="@+id/convDegreesInput"
+            android:hint="@string/type_degrees_label"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:gravity="center"
 
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorWhite"
-        />
+            android:inputType="numberSigned|number"
+            android:enabled="false"
+
+
+            android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+        <!-- minutes -->
+        <EditText
+            android:id="@+id/convMinutesInput"
+            android:hint="@string/type_minutes_label"
+
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:gravity="center"
+
+            android:inputType="numberSigned|number"
+            android:enabled="false"
+
+            android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+        <!-- seconds -->
+        <EditText
+            android:id="@+id/convSecondsInput"
+            android:hint="@string/type_seconds_label"
+
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="50"
+            android:gravity="center"
+
+            android:inputType="numberSigned|numberDecimal"
+            android:enabled="false"
+
+            android:layout_marginEnd="@dimen/row_cap_margin"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>

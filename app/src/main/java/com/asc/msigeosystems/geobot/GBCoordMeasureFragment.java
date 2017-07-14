@@ -7,6 +7,9 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -22,34 +25,28 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.Locale;
 
 import static com.asc.msigeosystems.geobot.R.color.colorNegNumber;
 import static com.asc.msigeosystems.geobot.R.color.colorPosNumber;
-import static com.asc.msigeosystems.geobot.R.id.spcScaleFactorOutput;
+import static com.asc.msigeosystems.geobot.R.id.spcScaleFactor;
 
 /**
  * The Collect Fragment is the UI
  * when the workflow from WGS84 GPS to NAD83 to UTM/State Plane Coordinates
  * Created by Elisabeth Huhn on 6/15/2016.
  */
-public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
+public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
 
     //These must be in the same order as the items are
     // added to the spinner in wireDataSourceSpinner{}
-    private static final int dataSourceNoneSelected           = 0;
-    private static final int dataSourceWGSManual              = 1;
-    private static final int dataSourceSPCSManual             = 2;
-    private static final int dataSourceUTMManual              = 3;
-    private static final int dataSourcePhoneGps               = 4;
-    private static final int dataSourceExternalGps            = 5;
-    private static final int dataSourceCellTowerTriangulation = 6;
-    
+
     private static final boolean sENABLE = true;
     private static final boolean sDISABLE = false;
 
 
-    private GBNmeaParser mNmeaParser = new GBNmeaParser();
+    private GBNmeaParser mNmeaParser = GBNmeaParser.getInstance();
     private LocationManager locationManager;
     private GBNmea              mNmeaData; //latest nmea sentence received
     private GpsStatus           mGpsStatus = null;
@@ -70,8 +67,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //**********************************************************/
     //*****  DataSource types for Spinner Widgets     **********/
     //**********************************************************/
-    String[] mDataSourceTypes;
-    private Spinner  mSpinner;
+
 
 
     private int    mCurDataSource;
@@ -79,11 +75,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //**********************************************************/
     //*****      Static Methods                       **********/
     //**********************************************************/
-    public static GBCoordConvertFragment newInstance(GBPoint point) {
+    public static GBCoordMeasureFragment newInstance(GBPoint point) {
 
         Bundle args = GBPoint.putPointInArguments(new Bundle(), point);
 
-        GBCoordConvertFragment fragment = new GBCoordConvertFragment();
+        GBCoordMeasureFragment fragment = new GBCoordMeasureFragment();
 
         fragment.setArguments(args);
         return fragment;
@@ -93,7 +89,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     //*****  Constructor                              **********/
     //**********************************************************/
 
-    public GBCoordConvertFragment() {
+    public GBCoordMeasureFragment() {
         //for now, we don't need to initialize anything when the fragment
         //  is first created
     }
@@ -108,22 +104,35 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
         super.onCreate(savedInstanceState);
 
-
+        GBProject openProject;
         mPointBeingMaintained = GBPoint.getPointFromArguments((GBActivity)getActivity(), getArguments());
         if (mPointBeingMaintained == null){
             mPointBeingMaintained = new GBPoint();
             //Theoretically the project id might be null,
             // but you can't really get this far if the project does not exist and is not open
-            mPointBeingMaintained.setForProjectID(GBUtilities.getInstance().
-                    getOpenProjectID((GBActivity)getActivity()));
+            initializePoint();
         }
         long projectID = mPointBeingMaintained.getForProjectID();
         if (projectID == GBUtilities.ID_DOES_NOT_EXIST){
-            projectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
-            mPointBeingMaintained.setForProjectID(projectID);
+            initializePoint();
         }
 
     }
+
+
+    private void initializePoint(){
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (openProject == null)return;
+        mPointBeingMaintained.setForProjectID(openProject.getProjectID());
+        mPointBeingMaintained.setHeight(openProject.getHeight());
+        mPointBeingMaintained.setPointNumber(openProject.getNextPointNumber((GBActivity)getActivity()));
+        //The point number is not incremented until the point is saved to the DB for the first time
+        //Then the SQL Helper recognizes that a DB ID is being assigned, and
+        // also increments the point number
+        //openProject.incrementPointNumber((GBActivity)getActivity());
+        return;
+    }
+
 
 
     @Override
@@ -131,12 +140,15 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                              Bundle savedInstanceState) {
 
         //Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_convert, container, false);
+        View v = inflater.inflate(R.layout.fragment_coord_measure, container, false);
 
         wireWidgets(v);
         wireDataSourceSpinner(v);
 
-        updateMeanProgressUI(v);
+        initializeUI(v);
+        initializeAutosaveUI(v);
+
+        initializeMeanProgressUI(v);
 
         return v;
     }
@@ -147,14 +159,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     public void onResume() {
         super.onResume();
 
-        if ((mCurDataSource == dataSourcePhoneGps) && (isGpsOn == true)) {
+        if ((mCurDataSource == GBProject.sDataSourcePhoneGps) && (isGpsOn == true)) {
             startGps();
         }
         setSubtitle();
     }
 
     private void setSubtitle() {
-        ((GBActivity) getActivity()).setSubtitle(R.string.subtitle_convert);
+        ((GBActivity) getActivity()).setSubtitle(R.string.subtitle_measure);
     }
 
     @Override
@@ -176,8 +188,37 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     //+**********************************************
 
+    private boolean autoSave(){
+        //if we don't succeed in saving, and GPS was on, we need to turn it back on
+        boolean gpsIsRunning = isGpsOn;
+        if (isGpsOn) {
+            stopGps();
+        }
+        boolean saveCode = onSave();
+
+        if (saveCode) {
+            ((GBActivity) getActivity()).switchToPointEditScreen(new GBPath(GBPath.sEditTag),
+                                                                 mPointBeingMaintained);
+        } else {
+            if (gpsIsRunning){
+                startGps();;
+            }
+        }
+        return saveCode;
+    }
 
     private void wireWidgets(View v) {
+
+        //make DD vs DMS on the project work by making various views invisible
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        boolean isDD = false;
+        if (openProject.getDDvDMS() == GBProject.sDD)isDD = true;
+
+
+        int distUnits = openProject.getDistanceUnits();
+        turnOffViews(v, isDD, distUnits);
+
+
 
         //Save Button
         Button saveButton = (Button) v.findViewById(R.id.saveButton);
@@ -187,28 +228,21 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
                 GBUtilities.getInstance().showStatus(getActivity(), R.string.save_label);
 
-                //if we don't succeed in saving, and GPS was on, we need to turn it back on
-                boolean gpsIsRunning = isGpsOn;
-                if (isGpsOn) {
-                    stopGps();
-                }
-                boolean saveCode = onSave();
-
-                if (saveCode) {
-                    ((GBActivity) getActivity()).switchToPointEditScreen(new GBPath(GBPath.sEditTag),
-                            mPointBeingMaintained);
-                } else {
-                    if (gpsIsRunning){
-                        startGps();;
-                    }
-                }
-
+                autoSave();
 
             }//End on Click
         });
 
         //Start/Stop Data  Button
         Button startStopDataButton = (Button) v.findViewById(R.id.startStopDataButton);
+        startStopDataButton.setLongClickable(true);
+        startStopDataButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ((GBActivity)getActivity()).switchToListSatellitesScreen();
+                return false;
+            }
+        });
         startStopDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -216,14 +250,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 // TODO: 6/22/2017 this is only if the data source is phone gps
                 int msg = 0;
                 switch(mCurDataSource){
-                    case dataSourceNoneSelected:
+                    case GBProject.sDataSourceNoneSelected:
                         msg = R.string.select_data_source;
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
                         enableManualUtmInput(sDISABLE);
                         stopGps();
                         break;
-                    case dataSourceWGSManual: //manual
+                    case GBProject.sDataSourceWGSManual: //manual
                         msg = R.string.manual_wgs_data_source;
                         stopGps();
                         enableManualWgsInput(sENABLE);
@@ -231,7 +265,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         enableManualUtmInput(sDISABLE);
 
                         break;
-                    case dataSourceSPCSManual: //manual
+                    case GBProject.sDataSourceSPCSManual: //manual
                         msg = R.string.manual_spcs_data_source;
                         stopGps();
                         enableManualWgsInput(sDISABLE);
@@ -239,7 +273,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         enableManualUtmInput(sDISABLE);
 
                         break;
-                    case dataSourceUTMManual: //manual
+                    case GBProject.sDataSourceUTMManual: //manual
                         msg = R.string.manual_utm_data_source;
                         stopGps();
                         enableManualWgsInput(sDISABLE);
@@ -247,7 +281,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         enableManualUtmInput(sENABLE);
 
                         break;
-                    case dataSourcePhoneGps://pnone GPS
+                    case GBProject.sDataSourcePhoneGps://pnone GPS
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
                         enableManualUtmInput(sDISABLE);
@@ -263,7 +297,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         }
 
                         break;
-                    case dataSourceExternalGps://external gps
+                    case GBProject.sDataSourceExternalGps://external gps
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
                         enableManualUtmInput(sDISABLE);
@@ -271,7 +305,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         msg = R.string.external_gps_not_available;
                         stopGps();
                         break;
-                    case dataSourceCellTowerTriangulation: //cell tower triangulation
+                    case GBProject.sDataSourceCellTowerTriangulation: //cell tower triangulation
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
                         enableManualUtmInput(sDISABLE);
@@ -303,33 +337,21 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 int message;
                 if (isMeanInProgress()){
 
-                    message =  R.string.stop_mean_button_label;
-                    //set flags that mean is done
-                    mMeanToken.setMeanInProgress(false);
-                    mMeanToken.setEndMeanTime(mNmeaData.getTimeStamp());
-                    mMeanToken.setLastPointInMean(true);
-                } else if (mCurDataSource == dataSourceNoneSelected){
+                    message = endMeaning(mMeanToken, mNmeaData);
+
+                } else if (mCurDataSource == GBProject.sDataSourceNoneSelected){
                     message = R.string.select_data_source;
-                } else if ((mCurDataSource == dataSourceWGSManual) ||
-                           (mCurDataSource == dataSourceSPCSManual)||
-                           (mCurDataSource == dataSourceUTMManual))  {
+                } else if ((mCurDataSource == GBProject.sDataSourceWGSManual) ||
+                           (mCurDataSource == GBProject.sDataSourceSPCSManual)||
+                           (mCurDataSource == GBProject.sDataSourceUTMManual))  {
                     // TODO: 6/22/2017 think about how to lift limitation on meaning manual data
                     message = R.string.can_not_mean_manual;
                 } else {
-                    message = R.string.start_mean_button_label;
-
-                    //set flags to start taking mean
-                    initializeMeanToken();
-                    mMeanToken.setFirstPointInMean(true);
-                    mMeanToken.setMeanInProgress(true);
+                    message = startMeaning(mMeanToken);
                 }
                 updateMeanProgressUI();
 
-
-
                 GBUtilities.getInstance().showStatus(getActivity(), message);
-
-
             }//End on Click
         });
 
@@ -345,10 +367,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             public void onClick(View v){
 
                 int message = R.string.select_data_source;
-                if (mCurDataSource == dataSourceNoneSelected){
+                if (mCurDataSource == GBProject.sDataSourceNoneSelected){
                     message = R.string.select_data_source;
                 } else if (!isMeanInProgress() ) {
-                    message = R.string.coordinate_conversion;
+                    message = R.string.coordinate_measure;
                     onConvert();
                 } else {
                     message = R.string.can_not_convert_during_mean;
@@ -371,10 +393,214 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     }
 
 
+    private void turnOffViews(View v, boolean isDD, int distUnits){
+
+        //Raw GPS
+        //Meaned WGS84
+        //SPCS
+        //UTM
+
+        //Raw GPS
+        //GPS Latitude
+        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+
+        //GPS Longitude
+        TextView LongitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        TextView LongDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        TextView LongMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        TextView LongSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+
+        //Elevation
+        TextView ElevationMetersInput   = (TextView) v.findViewById(R.id.gpsWgs84ElevationMetersInput);
+        TextView GeoidHeightMetersInput = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightMetersInput);
+        TextView ElevationFeetInput     = (TextView) v.findViewById(R.id.gpsWgs84ElevationFeetInput);
+        TextView GeoidHeightFeetInput   = (TextView) v.findViewById(R.id.gpsWgs84GeoidHeightFeetInput);
+
+        //convergence & scale factor
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
+        TextView CAdegInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
+        TextView CAminInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
+        TextView CAsecInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+
+
+        if (isDD){
+            LatDegreesInput.setVisibility(View.GONE);
+            LatMinutesInput.setVisibility(View.GONE);
+            LatSecondsInput.setVisibility(View.GONE);
+
+            LongDegreesInput.setVisibility(View.GONE);
+            LongMinutesInput.setVisibility(View.GONE);
+            LongSecondsInput.setVisibility(View.GONE);
+
+            CAdegInput .setVisibility(View.GONE);
+            CAminInput .setVisibility(View.GONE);
+            CAsecInput .setVisibility(View.GONE);
+
+        } else { //is DMS
+            LatitudeInput        .setVisibility(View.GONE);
+            LongitudeInput       .setVisibility(View.GONE);
+            ConvergenceAngleInput.setVisibility(View.GONE);
+        }
+
+        if (distUnits == GBProject.sMeters){
+            ElevationFeetInput   .setVisibility(View.GONE);
+            GeoidHeightFeetInput .setVisibility(View.GONE);
+
+        } else {
+            ElevationMetersInput   .setVisibility(View.GONE);
+            GeoidHeightMetersInput .setVisibility(View.GONE);
+
+        }
+
+        //Mean Latitude
+        TextView meanWgs84LatitudeInput   = (TextView) v.findViewById(R.id.meanWgs84LatitudeInput);
+        TextView meanWgs84LatDegreesInput = (TextView) v.findViewById(R.id.meanWgs84LatDegreesInput);
+        TextView meanWgs84LatMinutesInput = (TextView) v.findViewById(R.id.meanWgs84LatMinutesInput);
+        TextView meanWgs84LatSecondsInput = (TextView) v.findViewById(R.id.meanWgs84LatSecondsInput);
+
+        TextView meanWgs84LongitudeInput   = (TextView) v.findViewById(R.id.meanWgs84LongitudeInput);
+        TextView meanWgs84LongDegreesInput = (TextView) v.findViewById(R.id.meanWgs84LongDegreesInput);
+        TextView meanWgs84LongMinutesInput = (TextView) v.findViewById(R.id.meanWgs84LongMinutesInput);
+        TextView meanWgs84LongSecondsInput = (TextView) v.findViewById(R.id.meanWgs84LongSecondsInput);
+
+        //Elevation
+        TextView meanWgs84ElevationMetersInput   = (TextView) v.findViewById(
+                                                                R.id.meanWgs84ElevationMetersInput);
+        TextView meanWgs84ElevationFeetInput     = (TextView) v.findViewById(
+                                                                R.id.meanWgs84ElevationFeetInput);
+        TextView meanWgs84GeoidHeightMetersInput = (TextView) v.findViewById(
+                                                                R.id.meanWgs84GeoidHeightMetersInput);
+        TextView meanWgs84GeoidHeightFeetInput   = (TextView) v.findViewById(
+                                                                R.id.meanWgs84GeoidHeightFeetInput);
+
+
+
+        if (isDD){
+            meanWgs84LatDegreesInput.setVisibility(View.GONE);
+            meanWgs84LatMinutesInput.setVisibility(View.GONE);
+            meanWgs84LatSecondsInput.setVisibility(View.GONE);
+
+            meanWgs84LongDegreesInput.setVisibility(View.GONE);
+            meanWgs84LongMinutesInput.setVisibility(View.GONE);
+            meanWgs84LongSecondsInput.setVisibility(View.GONE);
+
+
+        } else { //is DMS
+            meanWgs84LatitudeInput        .setVisibility(View.GONE);
+            meanWgs84LongitudeInput       .setVisibility(View.GONE);
+         }
+
+        if (distUnits == GBProject.sMeters){
+            meanWgs84ElevationFeetInput   .setVisibility(View.GONE);
+            meanWgs84GeoidHeightFeetInput .setVisibility(View.GONE);
+
+        } else {
+            meanWgs84ElevationMetersInput   .setVisibility(View.GONE);
+            meanWgs84GeoidHeightMetersInput .setVisibility(View.GONE);
+
+        }
+
+
+
+
+        //SPC
+        TextView spcEastingMetersOutput  = (TextView) v.findViewById(R.id.spcEastingMetersOutput);
+        TextView spcNorthingMetersOutput = (TextView) v.findViewById(R.id.spcNorthingMetersOutput);
+        TextView spcEastingFeetOutput    = (TextView) v.findViewById(R.id.spcEastingFeetOutput);
+        TextView spcNorthingFeetOutput   = (TextView) v.findViewById(R.id.spcNorthingFeetOutput);
+
+        //Elevation
+        TextView spcsElevationMetersInput   = (TextView) v.findViewById(R.id.spcsElevationMetersInput);
+        TextView spcsGeoidHeightMetersInput = (TextView) v.findViewById(R.id.spcsGeoidHeightMetersInput);
+        TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
+        TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
+
+        //convergence & scale factor
+        ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        CAdegInput  = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        CAminInput  = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        CAsecInput  = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+
+
+
+
+        if (isDD){
+            CAdegInput .setVisibility(View.GONE);
+            CAminInput .setVisibility(View.GONE);
+            CAsecInput .setVisibility(View.GONE);
+
+        } else { //is DMS
+
+            ConvergenceAngleInput.setVisibility(View.GONE);
+
+        }
+        if (distUnits == GBProject.sMeters){
+            spcEastingFeetOutput     .setVisibility(View.GONE);
+            spcNorthingFeetOutput    .setVisibility(View.GONE);
+            spcsElevationFeetInput   .setVisibility(View.GONE);
+            spcsGeoidHeightFeetInput .setVisibility(View.GONE);
+
+        } else {
+            spcEastingMetersOutput       .setVisibility(View.GONE);
+            spcNorthingMetersOutput      .setVisibility(View.GONE);
+            spcsElevationMetersInput     .setVisibility(View.GONE);
+            spcsGeoidHeightMetersInput   .setVisibility(View.GONE);
+
+        }
+
+        TextView utmEastingMetersOutput  = (TextView) v.findViewById(R.id.utmEastingMetersOutput);
+        TextView utmNorthingMetersOutput = (TextView) v.findViewById(R.id.utmNorthingMetersOutput);
+        TextView utmEastingFeetOutput    = (TextView) v.findViewById(R.id.utmEastingFeetOutput);
+        TextView utmNorthingFeetOutput   = (TextView) v.findViewById(R.id.utmNorthingFeetOutput);
+
+        TextView utmElevationOutput       = (TextView) v.findViewById(R.id.utmElevationMetersInput) ;
+        TextView utmElevationFeetOutput   = (TextView) v.findViewById(R.id.utmElevationFeetInput) ;
+        TextView utmGeoidOutput           = (TextView) v.findViewById(R.id.utmGeoidHeightMetersInput) ;
+        TextView utmGeoidFeetOutput       = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput) ;
+
+        //convergence & scale factor
+        ConvergenceAngleInput  = (TextView) v.findViewById(R.id.utmConvergenceInput);
+        CAdegInput  = (TextView) v.findViewById(R.id.utmConvDegreesInput);
+        CAminInput  = (TextView) v.findViewById(R.id.utmConvMinutesInput);
+        CAsecInput  = (TextView) v.findViewById(R.id.utmConvSecondsInput);
+
+
+        if (isDD){
+            CAdegInput .setVisibility(View.GONE);
+            CAminInput .setVisibility(View.GONE);
+            CAsecInput .setVisibility(View.GONE);
+
+        } else { //is DMS
+
+            ConvergenceAngleInput.setVisibility(View.GONE);
+
+        }
+        if (distUnits == GBProject.sMeters){
+            utmEastingFeetOutput  .setVisibility(View.GONE);
+            utmNorthingFeetOutput .setVisibility(View.GONE);
+            utmElevationFeetOutput.setVisibility(View.GONE);
+            utmGeoidFeetOutput    .setVisibility(View.GONE);
+
+        } else {
+            utmEastingMetersOutput .setVisibility(View.GONE);
+            utmNorthingMetersOutput.setVisibility(View.GONE);
+            utmElevationOutput     .setVisibility(View.GONE);
+            utmGeoidOutput         .setVisibility(View.GONE);
+
+        }
+
+    }
+
+
+
+
     private void wireDataSourceSpinner(View v){
 
         //Create the array of spinner choices from the Types of Coordinates defined
-        mDataSourceTypes = new String[]{getString(R.string.select_data_source),
+        String[] dataSourceTypes = new String[]{getString(R.string.select_data_source),
                                         getString(R.string.manual_wgs_data_source),
                                         getString(R.string.manual_spcs_data_source),
                                         getString(R.string.manual_utm_data_source),
@@ -383,21 +609,21 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                                         getString(R.string.cell_tower_triangulation)};
 
         //Then initialize the spinner itself
-        mSpinner = (Spinner) v.findViewById(R.id.data_source_spinner);
+        Spinner dataSourceSpinner = (Spinner) v.findViewById(R.id.data_source_spinner);
 
         // Create an ArrayAdapter using the Activities context AND
         // the string array and a default spinner layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item,
-                mDataSourceTypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(  getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            dataSourceTypes);
 
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        mSpinner.setAdapter(adapter);
+        dataSourceSpinner.setAdapter(adapter);
 
         //attach the listener to the spinner
-        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        dataSourceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 clearForm();
@@ -405,14 +631,14 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
                 int msg = 0;
                 switch(mCurDataSource){
-                    case dataSourceNoneSelected:
+                    case GBProject.sDataSourceNoneSelected:
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
                         enableManualUtmInput(sDISABLE);
                         stopGps();
                         msg = R.string.select_data_source;
                         break;
-                    case dataSourceWGSManual:
+                    case GBProject.sDataSourceWGSManual:
                         msg = R.string.manual_wgs_data_source;
                         enableManualWgsInput(sENABLE);
                         enableManualSpcsInput(sDISABLE);
@@ -420,7 +646,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         stopGps();
 
                         break;
-                    case dataSourceSPCSManual:
+                    case GBProject.sDataSourceSPCSManual:
                         msg = R.string.manual_spcs_data_source;
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sENABLE);
@@ -428,7 +654,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         stopGps();
 
                         break;
-                    case dataSourceUTMManual:
+                    case GBProject.sDataSourceUTMManual:
                         msg = R.string.manual_utm_data_source;
                         enableManualWgsInput(sDISABLE);
                         enableManualSpcsInput(sDISABLE);
@@ -436,7 +662,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         stopGps();
 
                         break;
-                    case dataSourcePhoneGps:
+                    case GBProject.sDataSourcePhoneGps:
                         // TODO: 6/22/2017 need to check that GPS is supported on this device
                         initializeGPS();
                         startGps();
@@ -446,7 +672,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         msg = R.string.phone_gps;
 
                         break;
-                    case dataSourceExternalGps:
+                    case GBProject.sDataSourceExternalGps:
                         msg = R.string.external_gps;
                         msg = R.string.external_gps_not_available;
                         enableManualWgsInput(sDISABLE);
@@ -454,7 +680,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         enableManualUtmInput(sDISABLE);
                         stopGps();
                         break;
-                    case dataSourceCellTowerTriangulation:
+                    case GBProject.sDataSourceCellTowerTriangulation:
                         msg = R.string.cell_tower_triangulation;
                         msg = R.string.cell_tower_triangu_not_available;
                         enableManualWgsInput(sDISABLE);
@@ -483,10 +709,24 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             }
         });
 
+
+        //set default setting from the project
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        int dataSource = openProject.getDataSource();
+        dataSourceSpinner.setSelection(dataSource);
+
+
     }
 
+    private void initializeUI(View v){
+        GBProject openProdject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        int zone = openProdject.getZone();
+        updateSpcsZone(v, zone);
 
+        String distUnitString = openProdject.getDistUnitString();
+        updateDistUnits(v, distUnitString);
 
+    }
 
     //******************************************************************//
     //            Button Handlers                                       //
@@ -537,52 +777,52 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             coordinate = convertSpcsInputs();
 
         }
+        if (coordinate == null){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_not_valid);
+            return false;
+        }
         coordinate.setProjectID(openProjectID);
 
         if (coordinate.isValidCoordinate()) {
             //store the mean token
             GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
-            long returnCode = GBUtilities.ID_DOES_NOT_EXIST + 1;
-            if (mMeanToken != null) {
-                returnCode = tokenManager.addMeanToDB(mMeanToken);
+
+            //when here, know the coordinate is valid, and
+            // the mean token has been successfully saved to the DB
+            if (mPointBeingMaintained == null) {
+                //Create the new point and put it on the project
+                mPointBeingMaintained = new GBPoint();
+                initializePoint();//initialize point with values from project
             }
-            if (returnCode != GBUtilities.ID_DOES_NOT_EXIST) {
-                //when here, know the coordinate is valid, and
-                // the mean token has been successfully saved to the DB
-                if (mPointBeingMaintained == null) {
-                    //Create the new point and put it on the project
-                    mPointBeingMaintained = new GBPoint();
-                    mPointBeingMaintained.setForProjectID(openProjectID);
-                }
-                //now add the point to memory and db
-                //Have to make sure the point is in the DB before the coordinate
-                // TODO: 7/2/2017 do we really need to write point to DB twice???
-                GBPointManager pointManager = GBPointManager.getInstance();
-                boolean addToDBToo = true;
-                if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
-                    //This will NOT do a cascade add of coordinate, meanToken
-                    GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
-                    return false;
-                }
-                //The setCoordinate() and setMeanToken() routines updatae the DB as well as the local point object
-                //update the coordinate with the point id
-                coordinate.setPointID(mPointBeingMaintained.getPointID());
-                coordinate.setProjectID(openProjectID);
-                mPointBeingMaintained.setCoordinate(coordinate);
-                if (mMeanToken != null) {
-                    //record it in DB an on the point
-                    //Writing to the DB results in the ID being assigned
-                    mPointBeingMaintained.setMeanToken(mMeanToken);
-                    mPointBeingMaintained.setMeanTokenID(mMeanToken.getMeanTokenID());
-                }
-                //If the coordinate was changed, we need to update it in the DB again.
-                if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
-                    //This will NOT do a cascade add of coordinate, meanToken
-                    GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
-                    return false;
-                }
-
-
+            //now add the point to memory and db
+            //Have to make sure the point is in the DB before the coordinate
+            // TODO: 7/2/2017 do we really need to write point to DB twice???
+            GBPointManager pointManager = GBPointManager.getInstance();
+            boolean addToDBToo = true;
+            if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
+                //This will NOT do a cascade add of coordinate, meanToken
+                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
+                return false;
+            }
+            //The setCoordinate() and setMeanToken() routines updatae the DB as well as the local point object
+            //update the coordinate with the point id
+            coordinate.setPointID(mPointBeingMaintained.getPointID());
+            coordinate.setProjectID(openProjectID);
+            //setCoordinate() also stores the coordinate in the DB
+            mPointBeingMaintained.setCoordinate(coordinate);
+            if (mMeanToken != null) {
+                //record it in DB an on the point
+                //Writing to the DB results in the ID being assigned
+                mMeanToken.setProjectID(openProjectID);
+                mMeanToken.setPointID(mPointBeingMaintained.getPointID());
+                //setting the Mean Token on the point writes the token to the DB as well
+                mPointBeingMaintained.setMeanToken(mMeanToken);
+            }
+            //As the coordinate & token were changed, we need to update the point in the DB again.
+            if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
+                //This will NOT do a cascade add of coordinate, meanToken
+                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
+                return false;
             }
         } else {
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_not_valid);
@@ -602,7 +842,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             if (getActivity() == null)return;
 
             //create an object with all the fields from the string
-            if (mNmeaParser == null)mNmeaParser = new GBNmeaParser();
+            if (mNmeaParser == null)mNmeaParser = GBNmeaParser.getInstance();
+
             GBNmea nmeaData = mNmeaParser.parse(nmea);
             if (nmeaData == null) return;
 
@@ -631,10 +872,17 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                         mMeanToken.setStartMeanTime(mNmeaData.getTimeStamp());
                         mMeanToken.setFirstPointInMean(false);
                     }
-                    // TODO: 6/19/2017 remember debug change. Remove the 0
-                    updateNmeaUI(mMeanToken.getLastCoordinate(), nmeaData);
-                    //updateNmeaUI(mMeanToken.getCoordinateAt(0), nmeaData);
+
+                    updateNmeaUI(mMeanToken.getLastCoordinate(), mNmeaData);
+
                     updateMeanUI(meanCoordinate, mMeanToken);
+
+                    //determine if we have enough fixed points to be done with the mean
+                    GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                    int numMean = openProject.getNumMean();
+                    if (numMean <= mMeanToken.getFixedReadings()){
+                        endMeaning(mMeanToken, mNmeaData);
+                    }
                 }
             } else {
                 if ((mMeanToken != null) && (mMeanToken.isLastPointInMean())){
@@ -660,7 +908,16 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
             //there was an exception processing the NMEA Sentence
             GBUtilities.getInstance().showStatus(getActivity(), e.getMessage());
             //throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        if ((mMeanToken != null) && (mMeanToken.isLastPointInMean())){
+            GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+            if (openProject.getAutosave() == GBProject.sAUTOSAVE){
+                autoSave();
+            }
+        }
+
     }
 
     private GBNmea refineNmeaData(GBNmea nmeaData){
@@ -678,9 +935,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         }
 
 
-
+        // TODO: 7/6/2017 need to include Satellite sentences to be able to reject points from satellites too low on the horizon
         if (!type.contains("GGA")) {
             if (!type.contains("GNS")){
+                //put satellite DOP in footer
                 return null;
             }
         }
@@ -704,12 +962,45 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     private void initializeMeanToken(){
         if (mMeanToken == null)mMeanToken = new GBMeanToken();
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+        long pointID = mPointBeingMaintained.getPointID();
+        mMeanToken.setProjectID(openProjectID);
+        mMeanToken.setPointID(pointID);
         mMeanToken.setMeanInProgress(false);
         mMeanToken.setFirstPointInMean(false);
         mMeanToken.setLastPointInMean(false);
         mMeanToken.resetCoordinates();
         updateMeanProgressUI();
     }
+
+
+    private int startMeaning(GBMeanToken token){
+        //set flags to start taking mean
+        initializeMeanToken();
+        mMeanToken.setFirstPointInMean(true);
+        mMeanToken.setMeanInProgress(true);
+        updateMeanProgressUI();
+
+        return R.string.start_mean_button_label;
+    }
+
+    private int endMeaning(GBMeanToken token, GBNmea nmeaData){
+        //set flags that mean is done
+        token.setMeanInProgress(false);
+        token.setEndMeanTime(nmeaData.getTimeStamp());
+        token.setLastPointInMean(true);
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getActivity().getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateMeanProgressUI();
+        onConvert();
+        return  R.string.stop_mean_button_label;
+    }
+
 
 
     private boolean updateNmeaUI(GBCoordinateWGS84 coordinateWGS84, GBNmea nmeaData){
@@ -917,7 +1208,23 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
     }
 
 
-    private boolean updateMeanProgressUI(View v) {
+    private boolean initializeAutosaveUI(View v) {
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+         //Time
+        TextView autosaveOnOffOutput = (TextView) v.findViewById(R.id.autosave_on_off_output);
+        int message;
+        if (openProject.isAutosave()){
+            message = R.string.autosave_on;
+        } else {
+            message = R.string.autosave_off;
+        }
+        autosaveOnOffOutput.setText(getString(message));
+
+        return true;
+    }
+
+    private boolean initializeMeanProgressUI(View v) {
 
         //Time
         TextView meanOnOffOutput = (TextView) v.findViewById(R.id.gpsMeanInProgressOutput);
@@ -936,7 +1243,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         View v = getView();
         if (v == null) return false;
 
-       return updateMeanProgressUI(v);
+       return initializeMeanProgressUI(v);
     }
 
 
@@ -1111,7 +1418,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         GBCoordinateSPCS coordinateSPCS = new GBCoordinateSPCS(coordinateWgs, zone);
 
         if ((coordinateSPCS.getZone() == (int)GBUtilities.ID_DOES_NOT_EXIST) ||
-            (coordinateSPCS.getZone() != zone))    {
+                (coordinateSPCS.getZone() != zone))    {
             clearSpcUI(v);
             spcZoneInput  .setText(String.valueOf(coordinateSPCS.getZone()));
             spcStateOutput.setText(getString(R.string.spc_zone_error));
@@ -1150,7 +1457,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView CAsecInput  = (TextView) v.findViewById(R.id.spcConvSecondsInput);
 
         //scale factor
-        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.spcScaleFactor);
+        TextView ScaleFactorInput       = (TextView) v.findViewById(spcScaleFactor);
 
 
         spcZoneInput           .setText(String.valueOf(coordinateSPCS.getZone()));
@@ -1183,6 +1490,46 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     }
 
+
+    private boolean updateSpcsZone(View v, int zone){
+
+
+        //need to ask for zone, then convert based on the zone
+        EditText spcZoneInput = (EditText)v.findViewById(R.id.spcZoneOutput);
+        TextView spcStateOutput  = (TextView) v.findViewById(R.id.spcStateOutput);
+        if (zone == 0){
+            spcStateOutput.setText(getString(R.string.spc_zone_error));
+            return false;
+        }
+
+        String zoneString = String.valueOf(zone);
+        if (GBUtilities.isEmpty(zoneString)){
+            spcStateOutput.setText(getString(R.string.spc_zone_error));
+            return false;
+        }
+
+
+
+        GBCoordinateConstants constants = new GBCoordinateConstants(zone);
+        int spcsZone = constants.getZone();
+        if (spcsZone != (int)GBUtilities.ID_DOES_NOT_EXIST) {
+            String state = constants.getState();
+            spcStateOutput.setText(state);
+            spcZoneInput.setText(zoneString);
+        }
+
+        return true;
+    }
+
+    private boolean updateDistUnits(View v, String distUnitString){
+
+
+        //need to ask for zone, then convert based on the zone
+        EditText distUnitsOutput = (EditText)v.findViewById(R.id.measureDistanceUnitsInput);
+        distUnitsOutput.setText(distUnitString);
+
+        return true;
+    }
 
 
     private String doubleToUI(double reading){
@@ -1296,7 +1643,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         GBCoordinateWGS84 coordinateWGS84 = null;
         switch(mCurDataSource){
 
-            case dataSourceWGSManual:
+            case GBProject.sDataSourceWGSManual:
                 coordinateWGS84 = convertWgsInputs();
                 if ((coordinateWGS84 == null) || !coordinateWGS84.isValidCoordinate()){
                     GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_failed);
@@ -1313,7 +1660,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
                 break;
 
-            case dataSourceSPCSManual:
+            case GBProject.sDataSourceSPCSManual:
                 GBCoordinateSPCS coordinateSPCS = convertSpcsInputs();
                 if ((coordinateSPCS == null) || !coordinateSPCS.isValidCoordinate()){
                     GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_failed);
@@ -1333,7 +1680,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 updateUtmUI(coordinateWGS84);
                 break;
 
-            case dataSourceUTMManual:
+            case GBProject.sDataSourceUTMManual:
                 GBCoordinateUTM coordinateUTM = convertUtmInputs();
                 if ((coordinateUTM == null) || !coordinateUTM.isValidCoordinate()){
                     GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_failed);
@@ -1358,8 +1705,8 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 updateUtmUI(coordinateUTM);
                 break;
 
-            case dataSourcePhoneGps:
-            case dataSourceExternalGps:
+            case GBProject.sDataSourcePhoneGps:
+            case GBProject.sDataSourceExternalGps:
                 stopGps();
                 coordinateWGS84 = convertMeanedOrRaw();
                 if ((coordinateWGS84 == null) || (!coordinateWGS84.isValidCoordinate())){
@@ -1381,7 +1728,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                 break;
 
 
-            case dataSourceCellTowerTriangulation:
+            case GBProject.sDataSourceCellTowerTriangulation:
                 //for now, cell tower conversion is not supported
 
                 break;
@@ -1442,8 +1789,13 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
 
-        long timeStamp = GBUtilities.getDateTimeFromString(getActivity(),
-                TimeStampOutput.getText().toString());
+        String timeStampUIString = TimeStampOutput.getText().toString();
+
+        if (timeStampUIString.equals("")){
+            Date now = new Date();
+            timeStampUIString = GBUtilities.getDateTimeString(now.getTime());
+        }
+        long timeStamp = GBUtilities.getDateTimeFromString(getActivity(), timeStampUIString);
         GBCoordinateWGS84 coordinateWGS84 = new GBCoordinateWGS84(
                                                 timeStamp,
                                                 LatitudeInput.getText().toString(),
@@ -1522,11 +1874,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView ConvergenceOutput      = (TextView) v.findViewById(R.id.spcConvergenceOutput);
+        TextView ConvergenceInput      = (TextView) v.findViewById(R.id.spcConvergenceInput);
         TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
         TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(spcScaleFactorOutput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
 
 
 
@@ -1542,7 +1894,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
                                                     spcsElevationFeetInput.getText().toString(),
                                                     spcsGeoidHeightMetersInput.getText().toString(),
                                                     spcsGeoidHeightFeetInput.getText().toString(),
-                                                    ConvergenceOutput.getText().toString(),
+                                                    ConvergenceInput.getText().toString(),
                                                     ScaleFactorOutput.getText().toString());
         if (!coordinateSPCS.isValidCoordinate()){
 
@@ -1567,10 +1919,10 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         spcsGeoidHeightMetersInput  .setText(String.valueOf(coordinateSPCS.getGeoid()));
         spcsGeoidHeightFeetInput.setText(String.valueOf(coordinateSPCS.getGeoidFeet()));
 
-        ConvergenceOutput.setText(String.valueOf(coordinateSPCS.getConvergenceAngle()));
+        ConvergenceInput.setText(String.valueOf(coordinateSPCS.getConvergenceAngle()));
         boolean isCA = true;
         convertDDtoDMS(getActivity(),
-                        ConvergenceOutput,
+                        ConvergenceInput,
                         CAdegInput,
                         CAminInput,
                         CAsecInput,
@@ -1607,7 +1959,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmElevationFeetInput     = (TextView) v.findViewById(R.id.utmElevationFeetInput);
         TextView utmGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput);
 
-        TextView ConvergenceOutput      = (TextView) v.findViewById(R.id.utmConvergence);
+        TextView ConvergenceOutput      = (TextView) v.findViewById(R.id.utmConvergenceInput);
         TextView CAdegInput             = (TextView) v.findViewById(R.id.utmConvDegreesInput);
         TextView CAminInput             = (TextView) v.findViewById(R.id.utmConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.utmConvSecondsInput);
@@ -1758,7 +2110,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
 
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(spcScaleFactor);
 
         spcZoneInput           .setEnabled(true);//always enabled for input, regardless
 
@@ -1806,7 +2158,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
 
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(spcScaleFactor);
 
         utmZoneOutput          .setEnabled(enableFlag);
 
@@ -1840,7 +2192,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
         clearMeanUI(v);
 
-        clearSpcUI(v);
+        clearSpcUIxZone(v);
 
         clearUtmUI(v);
 
@@ -2023,9 +2375,12 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
     private void clearSpcUIxZone(View v) {
         TextView spcZoneOutput = (TextView) v.findViewById(R.id.spcZoneOutput);
+        TextView spcStateOutput = (TextView) v.findViewById(R.id.spcStateOutput);
         String zone = spcZoneOutput.getText().toString().trim();
+        String state = spcStateOutput.getText().toString().trim();
         clearSpcUI(v);
         spcZoneOutput.setText(zone);
+        spcStateOutput.setText(state);
     }
     private void clearSpcUI(View v){
 
@@ -2046,11 +2401,11 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
 
 
         //convergence & scale factor
-        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
-        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
-        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
-        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
 
 
         spcZoneOutput          .setText("");
@@ -2205,7 +2560,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
 
-        TextView ScaleFactorInput       = (TextView) v.findViewById(R.id.spcScaleFactor);
+        TextView ScaleFactorInput       = (TextView) v.findViewById(spcScaleFactor);
 
         int uiColor;
         if (coordinateSPCS.getEasting() >= 0.0) {
@@ -2292,7 +2647,7 @@ public class GBCoordConvertFragment extends Fragment implements GpsStatus.Listen
         TextView utmGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.utmGeoidHeightFeetInput);
 
 
-        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergence);
+        TextView utmConvergenceOutput    = (TextView) v.findViewById(R.id.utmConvergenceInput);
         TextView utmScaleFactorOutput    = (TextView) v.findViewById(R.id.utmScaleFactor);
 
         int uiColor;

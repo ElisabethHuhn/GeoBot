@@ -210,10 +210,10 @@ public class GBPointManager {
             GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
             //first get rid of any coordinate on the point
             long coordinateID = point.getHasACoordinateID();
-            databaseManager.removeCoordinate(coordinateID, projectID);
+            databaseManager.removeCoordinate(coordinateID);
             // then get rid of the point itself
             // TODO: 6/15/2017 Aren't including DB in returnCode, should it?
-            databaseManager.removePoint(point.getPointID(), projectID);
+            int ret = databaseManager.removePoint(point.getPointID(), projectID);
         }
 
         return returnCode;
@@ -348,7 +348,7 @@ public class GBPointManager {
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_HRMS)));
         point.setVrms            (cursor.getDouble(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.POINT_VRMS)));
-
+        //Pictures are saved in their own right, and not on the point.
 
         return point;
     }

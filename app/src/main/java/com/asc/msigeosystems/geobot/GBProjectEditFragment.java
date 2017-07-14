@@ -12,8 +12,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,7 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,7 @@ public class GBProjectEditFragment extends    Fragment {
     private static final String TAG = "EDIT_PROJECT_FRAGMENT";
 
 
+
     //**********************************************************/
     //*****  Coordinate types for Spinner Widgets     **********/
     //**********************************************************/
@@ -46,16 +48,9 @@ public class GBProjectEditFragment extends    Fragment {
 
 
     private String   mSelectedCoordinateType;
-
-
-    //set defaults
     private int      mSelectedCoordinateTypePosition;
-    private int      mSelectedDistUnitPosition      = GBProject.sMeters;
-    private int      mSelectedENvNEPosition         = GBProject.sNE;
-    private int      mSelectedLatLngPosition        = GBProject.sLatLng;
-    private int      mSelectedRMSvStdDevPosition    = GBProject.sStdDev;
-    private int      mSelectedDDvDMSPosition        = GBProject.sDMS;
-    private int      mSelectedDirVPlusMinusPosition = GBProject.sDirections;
+
+
 
 
 
@@ -67,6 +62,7 @@ public class GBProjectEditFragment extends    Fragment {
     private GBProject    mProjectBeingMaintained;
 
     private boolean      mProjectChanged = false;
+    private boolean      mProjectFirstTime;
     private CharSequence mProjectPath;
 
     //Constructor
@@ -101,15 +97,18 @@ public class GBProjectEditFragment extends    Fragment {
 
         super.onCreate(savedInstanceState);
 
-        mProjectBeingMaintained = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        if (mProjectBeingMaintained == null){
-            mProjectBeingMaintained = new GBProject();
-        }
 
         GBPath path             = GBPath.getPathFromArguments(getArguments());
         mProjectPath            = path.getPath();
 
-        //put this info on the screen in initializeUI() after the view has been created
+        if (mProjectPath == GBPath.sCreateTag){
+            mProjectBeingMaintained = new GBProject();
+        } else {
+            mProjectBeingMaintained = GBUtilities.getInstance().getOpenProject((GBActivity) getActivity());
+        }
+        if (mProjectBeingMaintained == null){
+            mProjectBeingMaintained = new GBProject();
+        }
 
     }
 
@@ -124,7 +123,6 @@ public class GBProjectEditFragment extends    Fragment {
         //Wire up the UI widgets so they can handle events later
         wireWidgets(v);
 
-        wireCoordinateSpinner(v);
         wireSpinners(v);
 
         // TODO: 6/30/2017 make this the list of points, not the list of pictures
@@ -134,8 +132,12 @@ public class GBProjectEditFragment extends    Fragment {
         //If we had any arguments passed, update the screen with them
         initializeUI(v);
 
-        //set the title bar subtitle
-        setSubtitle();
+        setProjectSavedFlags();
+        if (savedInstanceState == null){
+            mProjectFirstTime = true;
+        } else {
+            mProjectFirstTime = false;
+        }
 
         return v;
     }
@@ -143,7 +145,13 @@ public class GBProjectEditFragment extends    Fragment {
     @Override
     public void onResume(){
         super.onResume();
+        //set the title bar subtitle
         setSubtitle();
+
+        if (mProjectFirstTime){
+            setProjectSavedFlags();
+            mProjectFirstTime = false;
+        }
     }
 
 
@@ -153,18 +161,37 @@ public class GBProjectEditFragment extends    Fragment {
     private void wireWidgets(View v){
         if (mProjectBeingMaintained == null)return;
 
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                //This tells you that text is about to change.
+                // Starting at character "start", the next "count" characters
+                // will be changed with "after" number of characters
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                //This tells you where the text has changed
+                //Starting at character "start", the "before" number of characters
+                // has been replaced with "count" number of characters
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //This tells you that somewhere within editable, it's text has changed
+                setProjectChangedFlags();
+            }
+        };
+
+
         //For now ignore the text view widgets, as this is just a mockup
         //      for the real screen we'll have to actually fill the fields
 
         //Project Name
         EditText projectNameInput = (EditText) v.findViewById(R.id.projectNameInput);
-        projectNameInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                setProjectChangedFlags();
-                return false;
-            }
-        });
+        projectNameInput.addTextChangedListener(textWatcher);
 
         //Project ID
         //TextView projectIDLabel = (TextView) v.findViewById(R.id.projectIDLabel);
@@ -174,62 +201,48 @@ public class GBProjectEditFragment extends    Fragment {
         EditText projectIDInput = (EditText) v.findViewById(R.id.projectIDInput);
         //Shouldn't be able to change ID
         projectIDInput.setFocusable(false);
-        projectIDInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                setProjectChangedFlags();
-                return false;
-            }
-
-        });
+        projectIDInput.addTextChangedListener(textWatcher);
 
         //Project Creation Date
         EditText projectDateInput = (EditText) v.findViewById(R.id.projectCreationDateInput);
         projectDateInput.setFocusable(false);
-        /*
-        mProjectDateInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                setProjectChangedFlags();
-                return false;
-            }
-        });
-        */
 
         //Project Last Modified Date
         EditText projectMaintInput = (EditText) v.findViewById(R.id.projectModifiedDateInput);
         projectMaintInput.setFocusable(false);
 
-        /*
-       mProjectMaintInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                setProjectChangedFlags();
-                return false;
-            }
-        });
-        */
-
         //Project Number of points
         EditText projectNumPtsOutput = (EditText) v.findViewById(R.id.projectNumPointsOutput);
         projectNumPtsOutput.setFocusable(false);
 
+        //Project Number of points in mean
+        EditText projectNumMeanOutput = (EditText) v.findViewById(R.id.projectNumMeanOutput);
+        projectNumMeanOutput.setFocusable(true);
+        projectNumMeanOutput.setEnabled(true);
+        projectNumMeanOutput.addTextChangedListener(textWatcher);
+
+        //Project Height
+        EditText projectHeightOutput = (EditText) v.findViewById(R.id.projectHeightOutput);
+        projectHeightOutput.setFocusable(true);
+        projectHeightOutput.setEnabled(true);
+        projectHeightOutput.addTextChangedListener(textWatcher);
+
+        //Project Next Point Number
+        EditText projectNxtPtNbOutput = (EditText) v.findViewById(R.id.projectNxtPointNumOutput);
+        projectNxtPtNbOutput.setFocusable(true);
+        projectNxtPtNbOutput.setEnabled(true);
+        projectNxtPtNbOutput.addTextChangedListener(textWatcher);
+
+        //Project Next Point Number
+        EditText projectZoneInput = (EditText) v.findViewById(R.id.projectSpcZoneInput);
+        projectZoneInput.setFocusable(true);
+        projectZoneInput.setEnabled(true);
+        projectZoneInput.addTextChangedListener(textWatcher);
+
+
         //Project Description
         EditText projectDescInput = (EditText) v.findViewById(R.id.projectDescInput);
-        projectDescInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                setProjectChangedFlags();
-                return false;
-            }
-        });
-
-        //Coordinate Type
-       // mProjectCoordTypeOutput = (EditText)v.findViewById(R.id.projectCoordTypeInput);
-        //mProjectCoordTypeOutput.setFocusable(false);
-
-
-
+        projectDescInput.addTextChangedListener(textWatcher);
 
 
 
@@ -352,34 +365,41 @@ public class GBProjectEditFragment extends    Fragment {
     private void wireSpinners(View v){
         if (mProjectBeingMaintained == null)return;
 
-        //
-        //Distance Units
-        //
-        //set the defaults
-        mSelectedDistUnitPosition      = GBProject.sMeters;
-        mSelectedENvNEPosition         = GBProject.sNE;
-        mSelectedLatLngPosition        = GBProject.sLatLng;
-        mSelectedRMSvStdDevPosition    = GBProject.sRMS;
-        mSelectedDDvDMSPosition        = GBProject.sDD;
-        mSelectedDirVPlusMinusPosition = GBProject.sDirections;
 
-        // TODO: 6/29/2017 conditional envne versus latlngvlnglat only one of these on the screen
-        //Create the array of spinner choices from the Types of Coordinates defined
-        String [] distanceUnits = new String[]{GBProject.sMetersString, GBProject.sFeetString};
+         //Create the array of spinner choices from the Types of Coordinates defined
+        String [] distanceUnits = new String[]{ GBProject.sMetersString,
+                                                GBProject.sFeetString,
+                                                GBProject.sIntFeetString};
+        String [] autosave      = new String[]{     getString(R.string.autosave_item),
+                                                    getString(R.string.manual_item)};
+        String [] rmsVstddev    = new String[]{GBProject.sRMSString,    GBProject.sStdDevString};
+        String [] coordinateTypes = new String[]{   GBCoordinate.sCoordinateTypeWGS84,
+                                                    GBCoordinate.sCoordinateTypeSPCS,
+                                                    GBCoordinate.sCoordinateTypeUTM};
         String [] enVne         = new String[]{GBProject.sENString,     GBProject.sNEString};
         String [] latLngVlngLat = new String[]{GBProject.sLatLngString, GBProject.sLngLatString};
-        String [] rmsVstddev    = new String[]{GBProject.sRMSString,    GBProject.sStdDevString};
-        String [] ddVdms        = new String[]{GBProject.sDDString,     GBProject.sFeetString};
+        final String [] ddVdms  = new String[]{GBProject.sDDString,     GBProject.sDMSString};
         String [] dirVplusminus = new String[]{GBProject.sDirectionsString, GBProject.sPlusMinusString};
+        String [] dataSourceTypes = new String[]{getString(R.string.select_data_source),
+                                                 getString(R.string.manual_wgs_data_source),
+                                                 getString(R.string.manual_spcs_data_source),
+                                                 getString(R.string.manual_utm_data_source),
+                                                 getString(R.string.phone_gps),
+                                                 getString(R.string.external_gps),
+                                                 getString(R.string.cell_tower_triangulation)};
 
 
-        //Then initialize the spinners themselves
-        Spinner distUnitsSpinner     = (Spinner) v.findViewById(R.id.distance_units_spinner);
-        Spinner enVneSpinner         = (Spinner) v.findViewById(R.id.en_v_ne_spinner);
-        //Spinner latLngvLngLatSpinner = (Spinner) v.findViewById(R.id.);
-        Spinner rmsVstddevSpinner    = (Spinner) v.findViewById(R.id.rms_v_stddev_spinner);
-        Spinner ddVdmsSpinner        = (Spinner) v.findViewById(R.id.dd_v_dms_spinner);
-        Spinner dirVplusminusSpinner = (Spinner) v.findViewById(R.id.dir_v_plusminus_spinner);
+        // TODO: 6/29/2017 conditional envne versus latlngvlnglat only one of these on the screen
+        //Then initialize the spinner itself
+
+        Spinner distUnitsSpinner           = (Spinner) v.findViewById(R.id.distance_units_spinner);
+        Spinner autosaveSpinner            = (Spinner) v.findViewById(R.id.autosave_spinner);
+        Spinner rmsVstddevSpinner          = (Spinner) v.findViewById(R.id.rms_v_stddev_spinner);
+        Spinner coordSpinner               = (Spinner) v.findViewById(R.id.coordinate_type_spinner);
+        final Spinner orderSpinner         = (Spinner) v.findViewById(R.id.order_spinner);
+        final Spinner ddVdmsSpinner        = (Spinner) v.findViewById(R.id.dd_v_dms_spinner);
+        final Spinner dirVplusminusSpinner = (Spinner) v.findViewById(R.id.dir_v_plusminus_spinner);
+        Spinner dataSourceSpinner          = (Spinner) v.findViewById(R.id.data_source_spinner);
 
         // Create the ArrayAdapters using the Activities context AND
         // the string array and a default spinner layout
@@ -387,43 +407,66 @@ public class GBProjectEditFragment extends    Fragment {
                                                             android.R.layout.simple_spinner_item,
                                                             distanceUnits);
 
+        ArrayAdapter<String> asAdapter = new ArrayAdapter<>(getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            autosave);
+
+        ArrayAdapter<String> rmsAdapter = new ArrayAdapter<>(getActivity(),
+                                                             android.R.layout.simple_spinner_item,
+                                                             rmsVstddev);
+
+        ArrayAdapter<String> ctAdapter = new ArrayAdapter<>(getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            coordinateTypes);
+
         // This is actually conditional about whether EN or LatLng
-        ArrayAdapter<String> enAdapter = new ArrayAdapter<>(getActivity(),
+        final ArrayAdapter<String> enAdapter = new ArrayAdapter<>(getActivity(),
                                                             android.R.layout.simple_spinner_item,
                                                             enVne);
 
-        ArrayAdapter<String> rmsAdapter = new ArrayAdapter<>(getActivity(),
+        final ArrayAdapter<String> llAdapter = new ArrayAdapter<>(getActivity(),
                                                             android.R.layout.simple_spinner_item,
-                                                            rmsVstddev);
+                                                            latLngVlngLat);
 
-        ArrayAdapter<String> ddAdapter = new ArrayAdapter<>(getActivity(),
+         ArrayAdapter<String> ddAdapter = new ArrayAdapter<>(getActivity(),
                                                             android.R.layout.simple_spinner_item,
                                                             ddVdms);
 
         ArrayAdapter<String> dirAdapter = new ArrayAdapter<>(getActivity(),
                                                             android.R.layout.simple_spinner_item,
                                                             dirVplusminus);
+        ArrayAdapter<String> dsAdapter = new ArrayAdapter<>(getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            dataSourceTypes);
 
 
         // Specify the layout to use when the list of choices appears
         duAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        enAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        asAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         rmsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ctAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        enAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        llAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ddAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dirAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dsAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
         distUnitsSpinner    .setAdapter(duAdapter);
-        enVneSpinner        .setAdapter(enAdapter);
+        autosaveSpinner     .setAdapter(asAdapter);
         rmsVstddevSpinner   .setAdapter(rmsAdapter);
+        coordSpinner        .setAdapter(ctAdapter);
+        orderSpinner        .setAdapter(llAdapter);
         ddVdmsSpinner       .setAdapter(ddAdapter);
         dirVplusminusSpinner.setAdapter(dirAdapter);
+        dataSourceSpinner.setAdapter(dsAdapter);
 
-        distUnitsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        //attach the listener to the spinner
+        distUnitsSpinner.setOnItemSelectedListener (new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (canMakeChange()) {
-                    mSelectedDistUnitPosition = position;
+                     setProjectChangedFlags();
                 }
             }
 
@@ -432,11 +475,12 @@ public class GBProjectEditFragment extends    Fragment {
 
             }
         });
-        enVneSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        autosaveSpinner.setOnItemSelectedListener (new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (canMakeChange()) {
-                    mSelectedENvNEPosition = position;
+
+                    setProjectChangedFlags();
                 }
             }
 
@@ -448,7 +492,7 @@ public class GBProjectEditFragment extends    Fragment {
         rmsVstddevSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedRMSvStdDevPosition = position;
+                setProjectChangedFlags();
             }
 
             @Override
@@ -456,11 +500,68 @@ public class GBProjectEditFragment extends    Fragment {
 
             }
         });
-        ddVdmsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        coordSpinner.setOnItemSelectedListener     (new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int oldPosition = mSelectedCoordinateTypePosition;
+
+                mSelectedCoordinateTypePosition = position;
+                mSelectedCoordinateType = (String) parent.getItemAtPosition(position);
+
+                if (oldPosition != position){
+                    //other spinners have to change
+                    if (position == GBCoordinate.sCoordinateDBTypeWGS84){
+                        //switching to Lat/Lng from Easting/Northing
+                        orderSpinner.setAdapter(llAdapter);
+                        llAdapter.notifyDataSetChanged();
+
+                        ddVdmsSpinner.setBackgroundColor(Color.WHITE);
+                        ddVdmsSpinner.setEnabled(true);
+
+                        dirVplusminusSpinner.setBackgroundColor(Color.WHITE);
+                        ddVdmsSpinner.setEnabled(true);
+
+                    } else if (oldPosition == GBCoordinate.sCoordinateDBTypeWGS84){
+                        orderSpinner.setAdapter(enAdapter);
+                        enAdapter.notifyDataSetChanged();
+
+                        ddVdmsSpinner.setBackgroundColor(Color.LTGRAY);
+                        ddVdmsSpinner.setEnabled(false);
+
+                        dirVplusminusSpinner.setBackgroundColor(Color.LTGRAY);
+                        ddVdmsSpinner.setEnabled(false);
+                    }
+                }
+
+                setProjectChangedFlags();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        orderSpinner.setOnItemSelectedListener     (new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (canMakeChange()) {
-                    mSelectedDDvDMSPosition = position;
+
+                    setProjectChangedFlags();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        ddVdmsSpinner.setOnItemSelectedListener    (new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (canMakeChange()) {
+
+                    setProjectChangedFlags();
                 }
             }
 
@@ -473,7 +574,8 @@ public class GBProjectEditFragment extends    Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (canMakeChange()) {
-                    mSelectedDirVPlusMinusPosition = position;
+
+                    setProjectChangedFlags();
                 }
             }
 
@@ -482,18 +584,77 @@ public class GBProjectEditFragment extends    Fragment {
 
             }
         });
+        dataSourceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                int msg;
+
+                switch(position){
+                    case GBProject.sDataSourceNoneSelected:
+
+                        msg = R.string.select_data_source;
+                        break;
+                    case GBProject.sDataSourceWGSManual:
+                        msg = R.string.manual_wgs_data_source;
+
+                        break;
+                    case GBProject.sDataSourceSPCSManual:
+                        msg = R.string.manual_spcs_data_source;
+                        break;
+                    case GBProject.sDataSourceUTMManual:
+                        msg = R.string.manual_utm_data_source;
+                        break;
+                    case GBProject.sDataSourcePhoneGps:
+                        // TODO: 6/22/2017 need to check that GPS is supported on this device
+                         msg = R.string.phone_gps;
+
+                        break;
+                    case GBProject.sDataSourceExternalGps:
+                        msg = R.string.external_gps;
+                        msg = R.string.external_gps_not_available;
+                        break;
+                    case GBProject.sDataSourceCellTowerTriangulation:
+                        msg = R.string.cell_tower_triangulation;
+                        msg = R.string.cell_tower_triangu_not_available;
+                        break;
+                    default:
+                         msg = R.string.select_data_source;
+                }
+
+
+                String selectMsg = getString(R.string.selected_data_source, getString(msg) );
+
+                GBUtilities.getInstance().showStatus(getActivity(), selectMsg);
+                setProjectChangedFlags();
+
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //for now, do nothing
+            }
+        });
 
 
         //The size of a project is it's number of points
         if (mProjectBeingMaintained.getSize() > 0){
             //can't change if any points are on the project
+            //can't change the coordinate type if any points are on the project
             distUnitsSpinner.setEnabled(false);
             distUnitsSpinner.setClickable(false);
             distUnitsSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
 
-            enVneSpinner.setEnabled(false);
-            enVneSpinner.setClickable(false);
-            enVneSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+            coordSpinner.setEnabled(false);
+            coordSpinner.setClickable(false);
+            coordSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
+
+            orderSpinner.setEnabled(false);
+            orderSpinner.setClickable(false);
+            orderSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
 
             ddVdmsSpinner.setEnabled(false);
             ddVdmsSpinner.setClickable(false);
@@ -502,14 +663,28 @@ public class GBProjectEditFragment extends    Fragment {
             dirVplusminusSpinner.setEnabled(false);
             dirVplusminusSpinner.setClickable(false);
             dirVplusminusSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
-
-
         }
-
-
         //mPointCoordinateTypePrompt = (TextView) v.findViewById(R.id.coordinate_prompt);
 
     }
+
+
+    private void wireDataSourceSpinner(View v){
+
+        //Create the array of spinner choices from the Types of Coordinates defined
+
+        //Then initialize the spinner itself
+
+        // Create an ArrayAdapter using the Activities context AND
+        // the string array and a default spinner layout
+
+        // Specify the layout to use when the list of choices appears
+        // Apply the adapter to the spinner
+
+        //attach the listener to the spinner
+
+    }
+
 
     private boolean canMakeChange(){
         long projectID = mProjectBeingMaintained.getProjectID();
@@ -524,62 +699,7 @@ public class GBProjectEditFragment extends    Fragment {
 
     }
 
-    private void wireCoordinateSpinner(View v){
-        if (mProjectBeingMaintained == null)return;
 
-        //set the default
-        mSelectedCoordinateType = GBCoordinate.sCoordinateTypeClassUTM;
-
-        //Create the array of spinner choices from the Types of Coordinates defined
-        String [] coordinateTypes = new String[]{getString(R.string.enter_coordinate_type),
-                                                 GBCoordinate.sCoordinateTypeWGS84,
-                                                 GBCoordinate.sCoordinateTypeNAD83,
-                                                 GBCoordinate.sCoordinateTypeUTM,
-                                                 GBCoordinate.sCoordinateTypeSPCS };
-
-        //Then initialize the spinner itself
-        Spinner coordSpinner = (Spinner) v.findViewById(R.id.coordinate_type_spinner);
-
-        // Create an ArrayAdapter using the Activities context AND
-        // the string array and a default spinner layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                                                          android.R.layout.simple_spinner_item,
-                                                          coordinateTypes);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        coordSpinner.setAdapter(adapter);
-
-        //attach the listener to the spinner
-        coordSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedCoordinateTypePosition = position;
-                mSelectedCoordinateType = (String) parent.getItemAtPosition(position);
-
-                setProjectChangedFlags();
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        //The size of a project is it's number of points
-        if (mProjectBeingMaintained.getSize() > 0){
-            //can't change the coordinate type if any points are on the project
-            coordSpinner.setEnabled(false);
-            coordSpinner.setClickable(false);
-            coordSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
-        }
-
-
-        //mPointCoordinateTypePrompt = (TextView) v.findViewById(R.id.coordinate_prompt);
-
-    }
 
     private void initializeRecyclerView(View v){
 
@@ -652,12 +772,27 @@ public class GBProjectEditFragment extends    Fragment {
         if (mProjectBeingMaintained == null)return;
 
         //show the data that came out of the input arguments bundle
-        EditText projectNameInput  = (EditText) v.findViewById(R.id.projectNameInput);
-        EditText projectIDInput    = (EditText) v.findViewById(R.id.projectIDInput);
-        EditText projectDateInput  = (EditText) v.findViewById(R.id.projectCreationDateInput);
-        EditText projectMaintInput = (EditText) v.findViewById(R.id.projectModifiedDateInput);
-        EditText projectNumPtsOutput = (EditText) v.findViewById(R.id.projectNumPointsOutput);
-        EditText projectDescInput  = (EditText) v.findViewById(R.id.projectDescInput);
+        EditText projectNameInput     = (EditText) v.findViewById(R.id.projectNameInput);
+        EditText projectIDInput       = (EditText) v.findViewById(R.id.projectIDInput);
+        EditText projectDateInput     = (EditText) v.findViewById(R.id.projectCreationDateInput);
+        EditText projectMaintInput    = (EditText) v.findViewById(R.id.projectModifiedDateInput);
+        EditText projectNumPtsOutput  = (EditText) v.findViewById(R.id.projectNumPointsOutput);
+        EditText projectNumMeanOutput = (EditText) v.findViewById(R.id.projectNumMeanOutput);
+        EditText projectDescInput     = (EditText) v.findViewById(R.id.projectDescInput);
+        EditText projectNxtPointNumOutput = (EditText) v.findViewById(R.id.projectNxtPointNumOutput);
+        EditText projectHeightInput   = (EditText) v.findViewById(R.id.projectHeightOutput);
+        EditText projectZoneInput     = (EditText) v.findViewById(R.id.projectSpcZoneInput);
+        TextView projectStateInput    = (TextView) v.findViewById(R.id.projectSpcStateOutput);
+
+
+        Spinner distUnitsSpinner           = (Spinner) v.findViewById(R.id.distance_units_spinner);
+        Spinner autosaveSpinner            = (Spinner) v.findViewById(R.id.autosave_spinner);
+        Spinner rmsVstddevSpinner          = (Spinner) v.findViewById(R.id.rms_v_stddev_spinner);
+        final Spinner orderSpinner         = (Spinner) v.findViewById(R.id.order_spinner);
+        //Spinner latLngvLngLatSpinner     = (Spinner) v.findViewById(R.id.);
+        final Spinner ddVdmsSpinner        = (Spinner) v.findViewById(R.id.dd_v_dms_spinner);
+        final Spinner dirVplusminusSpinner = (Spinner) v.findViewById(R.id.dir_v_plusminus_spinner);
+        Spinner dataSourceSpinner          = (Spinner) v.findViewById(R.id.data_source_spinner);
 
         EditText projectLocPrecisionInput = (EditText) v.findViewById(R.id.projectLocPrecisionInput);
         EditText projectStdDevPrecisionInput = (EditText) v.findViewById(R.id.projectStdDevPrecisionInput);
@@ -665,10 +800,14 @@ public class GBProjectEditFragment extends    Fragment {
 
         //a new id is not assigned until the first save
         if (mProjectPath.equals(GBPath.sCreateTag)){
-            long nextID = GBProject.getPotentialNextID((GBActivity)getActivity());
-            projectIDInput.setText(String.valueOf(nextID));
+            projectIDInput.setText(String.valueOf(GBUtilities.ID_DOES_NOT_EXIST));
+            // TODO: 7/4/2017 determine good color to use
+            projectIDInput.setBackgroundColor(ContextCompat.
+                                                getColor(getActivity(), R.color.colorLightPink));
         } else {
             projectIDInput.setText(String.valueOf(mProjectBeingMaintained.getProjectID()));
+            projectIDInput.setBackgroundColor(ContextCompat.
+                                                getColor(getActivity(), R.color.colorGray));
         }
         projectNameInput .setText(mProjectBeingMaintained.getProjectName());
         projectDateInput .setText(mProjectBeingMaintained.getDateString(
@@ -679,33 +818,78 @@ public class GBProjectEditFragment extends    Fragment {
         int numberOfPoints = mProjectBeingMaintained.getSize();
         projectNumPtsOutput.setText(String.valueOf(numberOfPoints));
 
+        int numMean = mProjectBeingMaintained.getNumMean();
+        projectNumMeanOutput.setText(String.valueOf(numMean));
+
         projectDescInput .setText(mProjectBeingMaintained.getProjectDescription());
+
+        int nxtPointNumber = mProjectBeingMaintained.getNextPointNumber((GBActivity)getActivity());
+        projectNxtPointNumOutput.setText(String.valueOf(nxtPointNumber));
+
+        double height = mProjectBeingMaintained.getHeight();
+        projectHeightInput.setText(String.valueOf(height));
+
+        int zone = mProjectBeingMaintained.getZone();
+        projectZoneInput.setText(String.valueOf(zone));
+
+        GBCoordinateConstants constants = new GBCoordinateConstants(zone);
+        int spcsZone = constants.getZone();
+        if (spcsZone != (int)GBUtilities.ID_DOES_NOT_EXIST) {
+            String state = constants.getState();
+            projectStateInput.setText(state);
+        }
+
+
+
+
         //mProjectCoordTypeOutput.setText(mProjectBeingMaintained.getProjectCoordinateType());
+        String [] enVne         = new String[]{GBProject.sENString,     GBProject.sNEString};
+        String [] latLngVlngLat = new String[]{GBProject.sLatLngString, GBProject.sLngLatString};
+
+        ArrayAdapter<String> orderAdapter;
+
+        ArrayAdapter<String> enAdapter = new ArrayAdapter<>(getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            enVne);
+
+        ArrayAdapter<String> llAdapter = new ArrayAdapter<>(getActivity(),
+                                                            android.R.layout.simple_spinner_item,
+                                                            latLngVlngLat);
+
+        enAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        llAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+
 
         Spinner coordSpinner = (Spinner) v.findViewById(R.id.coordinate_type_spinner);
         CharSequence spinnerSelection = mProjectBeingMaintained.getProjectCoordinateType();
-        //NOTE: THIS NEXT SECTION MUST BE IN THE SAME ORDER AS THAT WHEN THE SPINNER
-        //IS CREATED. THE ORDERING IS ENFORCED BY THE PROGRAMMER AT CODING TIME
-        //THERE IS NOTHING AUTOMATIC ABOUT THIS HARD CODING
-        //I'm not proud of it, but it works, so.......... be it
+        //The following code assumes that the values of the sCoordinateDBTypeXXX are in the same
+        //  order as the spinner selections for coordinate type as defined in wireSpinners
         String selectedCoordinateType;
         int    selectedCoordinateTypePosition;
         if (spinnerSelection.equals(GBCoordinate.sCoordinateTypeNAD83)) {
-            selectedCoordinateType = GBCoordinate.sCoordinateTypeClassNAD83;
-            selectedCoordinateTypePosition = 2;
-            coordSpinner.setSelection(2);
-        } else if (spinnerSelection == GBCoordinate.sCoordinateTypeUTM) {
-            selectedCoordinateType = GBCoordinate.sCoordinateTypeUTM;
-            selectedCoordinateTypePosition = 3;
-            coordSpinner.setSelection(3);
-        } else if (spinnerSelection == GBCoordinate.sCoordinateTypeSPCS){
-            selectedCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
-            selectedCoordinateTypePosition = 4;
-            coordSpinner.setSelection(4);
+            selectedCoordinateType         = GBCoordinate.sCoordinateTypeClassNAD83;
+            selectedCoordinateTypePosition = GBCoordinate.sCoordinateDBTypeNAD83;
+            coordSpinner.setSelection(GBCoordinate.sCoordinateDBTypeNAD83);
+            orderAdapter = llAdapter;
+
+        } else if (spinnerSelection.equals(GBCoordinate.sCoordinateTypeUTM)) {
+            selectedCoordinateType         = GBCoordinate.sCoordinateTypeUTM;
+            selectedCoordinateTypePosition = GBCoordinate.sCoordinateDBTypeUTM;
+            coordSpinner.setSelection(GBCoordinate.sCoordinateDBTypeUTM);
+            orderAdapter = enAdapter;
+
+        } else if (spinnerSelection.equals(GBCoordinate.sCoordinateTypeSPCS)){
+            selectedCoordinateType         = GBCoordinate.sCoordinateTypeSPCS;
+            selectedCoordinateTypePosition = GBCoordinate.sCoordinateDBTypeSPCS;
+            coordSpinner.setSelection(GBCoordinate.sCoordinateDBTypeSPCS);
+            orderAdapter = enAdapter;
+
         } else  { //Use WGS84 as the default
-            selectedCoordinateType = GBCoordinate.sCoordinateTypeWGS84;
-            selectedCoordinateTypePosition = 1;
-            coordSpinner.setSelection(1);
+            selectedCoordinateType         = GBCoordinate.sCoordinateTypeWGS84;
+            selectedCoordinateTypePosition = GBCoordinate.sCoordinateDBTypeWGS84;
+            coordSpinner.setSelection(GBCoordinate.sCoordinateDBTypeWGS84);
+            orderAdapter = llAdapter;
 
             //update the project with this new default
             mProjectBeingMaintained.setProjectCoordinateType(selectedCoordinateType);
@@ -715,11 +899,20 @@ public class GBProjectEditFragment extends    Fragment {
         mSelectedCoordinateType         = selectedCoordinateType;
         mSelectedCoordinateTypePosition = selectedCoordinateTypePosition;
 
+        orderSpinner        .setAdapter(orderAdapter);
+
 
         //mPointCoordinateTypePrompt.setText();
         projectLocPrecisionInput.setText(String.valueOf(mProjectBeingMaintained.getLocPrecision()));
         projectStdDevPrecisionInput.setText(String.valueOf(mProjectBeingMaintained.getStdDevPrecision()));
 
+        distUnitsSpinner    .setSelection(mProjectBeingMaintained.getDistanceUnits());
+        autosaveSpinner     .setSelection(mProjectBeingMaintained.getAutosave());
+        rmsVstddevSpinner   .setSelection(mProjectBeingMaintained.getRMSvStD());
+        orderSpinner        .setSelection(mProjectBeingMaintained.getOrderOnUI());
+        ddVdmsSpinner       .setSelection(mProjectBeingMaintained.getDDvDMS());
+        dirVplusminusSpinner.setSelection(mProjectBeingMaintained.getDIRvPlusMinus());
+        dataSourceSpinner   .setSelection(mProjectBeingMaintained.getDataSource());
     }
 
     private void setSubtitle(){
@@ -745,12 +938,13 @@ public class GBProjectEditFragment extends    Fragment {
 
 
 
+
     //**********************************************************/
     //****     Respond to UI events                      *******/
     //**********************************************************/
 
     private void onSelectPicture(int position){
-        //Toast.makeText(getActivity(), "Picture Selected", Toast.LENGTH_SHORT).show();
+        //GBUtilities.getInstance().showStatus(getActivity(), "Picture Selected", Toast.LENGTH_SHORT).show();
         View v = getView();
         if (v == null)return;
 
@@ -772,7 +966,7 @@ public class GBProjectEditFragment extends    Fragment {
             recyclerView.invalidate();
         } else {
             String msg = getString(R.string.missing_picture_file)+ " " + pathToPicture;
-            Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(), msg);
         }
 
     }
@@ -825,15 +1019,18 @@ public class GBProjectEditFragment extends    Fragment {
 
         //****************** CREATE **************************************/
         if (mProjectPath.equals(GBPath.sCreateTag)){
-            GBUtilities.getInstance().showStatus(getActivity(), R.string.save_new_project);
 
 
             //returns false if there is something wrong with information on the screen and
             //the project can not be updated
             if (updateProjectFromUIFields(mProjectBeingMaintained)) {
-                //need to assign a project ID
-                long projectID = GBProject.getNextProjectID((GBActivity)getActivity());
-                mProjectBeingMaintained.setProjectID(projectID);
+                //project ID assigned when project first saved to the DB
+                //This saves the project. does a cascade add/update
+                boolean addToDBToo = true;
+                boolean cascadeFlag = true;
+                projectManager.addProject(mProjectBeingMaintained, addToDBToo, cascadeFlag);
+
+                long projectID = mProjectBeingMaintained.getProjectID();
                 //Make the Project Settings ID match the project ID
                 GBProjectSettings projectSettings = mProjectBeingMaintained.getSettings();
                 if (projectSettings == null){
@@ -844,16 +1041,10 @@ public class GBProjectEditFragment extends    Fragment {
                     projectSettings.setProjectID(projectID);
                 }
 
-                //This saves the project. does a cascade add/update
-                boolean addToDBToo = true;
-                boolean cascadeFlag = true;
+                //save it again to pick up the changes just made
                 projectManager.addProject(mProjectBeingMaintained, addToDBToo, cascadeFlag);
                 //change the path to edit
                 mProjectPath = GBPath.sEditTag;
-
-                //change the ID field label
-                //TextView projectIDLabel = (TextView) v.findViewById(R.id.projectIDLabel);
-                //projectIDLabel.setText(R.string.project_id_label);
 
                 //enable the list points button if there are any points
                 Button projectListPointsButton =
@@ -864,20 +1055,19 @@ public class GBProjectEditFragment extends    Fragment {
                 }
 
                 GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(), mProjectBeingMaintained);
+                GBUtilities.getInstance().showStatus(getActivity(), R.string.save_new_project);
 
             }
 
         //************************************* Edit *****************************/
         } else if (mProjectPath.equals(GBPath.sEditTag)){
             if (mProjectBeingMaintained == null){
-               Toast.makeText(getActivity(),
-                              R.string.project_missing_exception,
-                              Toast.LENGTH_SHORT).show();
-                throw new RuntimeException(getString(R.string.project_missing_exception));
+               GBUtilities.getInstance().showStatus(getActivity(),
+                              R.string.project_missing_exception);
+                return null;
             }
-            Toast.makeText(getActivity(),
-                    R.string.save_existing_project,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),
+                    R.string.save_existing_project);
 
 
             if (updateProjectFromUIFields(mProjectBeingMaintained)){
@@ -901,9 +1091,8 @@ public class GBProjectEditFragment extends    Fragment {
                                                             projectNameInput.getText(),
                                                             Long.valueOf(projectIDString));
             }
-            Toast.makeText(getActivity(),
-                    R.string.save_copied_project,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),
+                                                    R.string.save_copied_project);
 
             if (updateProjectFromUIFields(mProjectBeingMaintained)){
                 boolean addToDBToo = true;
@@ -933,42 +1122,73 @@ public class GBProjectEditFragment extends    Fragment {
         if (v == null) return false;
 
         boolean returnCode = true;
-        EditText projectIDInput   = (EditText) v.findViewById(R.id.projectIDInput) ;
-        EditText projectNameInput = (EditText) v.findViewById(R.id.projectNameInput) ;
-        EditText projectDescInput = (EditText) v.findViewById(R.id.projectDescInput) ;
-        EditText projectLocPrecision = (EditText)v.findViewById(R.id.projectLocPrecisionInput);
+        EditText projectIDInput         = (EditText) v.findViewById(R.id.projectIDInput) ;
+        EditText projectNameInput       = (EditText) v.findViewById(R.id.projectNameInput) ;
+        EditText projectDescInput       = (EditText) v.findViewById(R.id.projectDescInput) ;
+        EditText projectLocPrecision    = (EditText)v.findViewById(R.id.projectLocPrecisionInput);
         EditText projectStdDevPrecision = (EditText)v.findViewById(R.id.projectStdDevPrecisionInput);
-
+        EditText projectNumMean         = (EditText) v.findViewById(R.id.projectNumMeanOutput);
+        EditText projectHeight          = (EditText) v.findViewById(R.id.projectHeightOutput);
+        EditText projectNxtPtNum        = (EditText) v.findViewById(R.id.projectNxtPointNumOutput);
+        EditText projectZone            = (EditText) v.findViewById(R.id.projectSpcZoneInput);
 
         //show the data that came out of the input arguments bundle
         project.setProjectID(Integer.valueOf(projectIDInput  .getText().toString().trim()));
         project.setProjectName              (projectNameInput.getText().toString().trim());
         project.setProjectDescription       (projectDescInput .getText().toString().trim());
         //The date fields are not modifiable from this screen
+
+        project.setHeight(Double.valueOf(projectHeight.getText().toString()));
+        String nxtPtNumString = projectNxtPtNum.getText().toString();
+        int nxtPtNum = Integer.valueOf(nxtPtNumString);
+        project.setNextPointNumber((GBActivity)getActivity(),nxtPtNum);
+
+        String zoneString = projectZone.getText().toString();
+        int zone = Integer.valueOf(zoneString);
+        project.setZone(zone);
+
+
+        //Project Settings
+        String numMeanString = projectNumMean.getText().toString();
+        int numMean;
+        if (GBUtilities.isEmpty(numMeanString)){
+            numMean = 0;
+        } else {
+            numMean = Integer.valueOf(numMeanString);
+        }
+
+        project.setNumMean(numMean);
+
+        Spinner distUnitsSpinner     = (Spinner) v.findViewById(R.id.distance_units_spinner);
+        Spinner autosaveSpinner      = (Spinner) v.findViewById(R.id.autosave_spinner);
+        Spinner rmsVstddevSpinner    = (Spinner) v.findViewById(R.id.rms_v_stddev_spinner);
+        Spinner coordSpinner         = (Spinner) v.findViewById(R.id.coordinate_type_spinner);
+        Spinner orderSpinner         = (Spinner) v.findViewById(R.id.order_spinner);
+        Spinner ddVdmsSpinner        = (Spinner) v.findViewById(R.id.dd_v_dms_spinner);
+        Spinner dirVplusminusSpinner = (Spinner) v.findViewById(R.id.dir_v_plusminus_spinner);
+        Spinner dataSourceSpinner    = (Spinner) v.findViewById(R.id.data_source_spinner);
+
+        project.setDistanceUnits(distUnitsSpinner    .getSelectedItemPosition());
+        project.setAutosave     (autosaveSpinner     .getSelectedItemPosition());
+        project.setRMSvStD      (rmsVstddevSpinner   .getSelectedItemPosition());
+        project.setOrderOnUI    (orderSpinner        .getSelectedItemPosition());
+        project.setDDvDMS       (ddVdmsSpinner       .getSelectedItemPosition());
+        project.setDIRvPlusMinus(dirVplusminusSpinner.getSelectedItemPosition());
+        project.setDataSource   (dataSourceSpinner   .getSelectedItemPosition());
+
+        //Precision digits
+        project.setLocPrecision(Integer.valueOf(projectLocPrecision.getText().toString().trim()));
+        project.setStdDevPrecision(Integer.valueOf(projectStdDevPrecision.getText().toString().trim()));
+
+        String coordType = (String) coordSpinner.getSelectedItem();
         //Set the coordinate type
-        if (mSelectedCoordinateType == null){
+        if (GBUtilities.isEmpty(coordType)){
             //must declare the type of coordinates in order to create the project
             project.setProjectCoordinateType("");
             returnCode = false;
         }else{
-            project.setProjectCoordinateType(mSelectedCoordinateType);
+            project.setProjectCoordinateType(coordType);
         }
-
-        //Project Settings
-        project.setDistanceUnits(mSelectedDistUnitPosition);
-        //// TODO: 6/30/2017 This may be LatLng. Determine if changes need to be made here
-        project.setEnVNe        (mSelectedENvNEPosition);
-        project.setRMSvStD      (mSelectedRMSvStdDevPosition);
-        project.setDDvDMS       (mSelectedDDvDMSPosition);
-        project.setDIRvPlusMinus(mSelectedDirVPlusMinusPosition);
-
-        project.setLocPrecision(Integer.valueOf(projectLocPrecision.getText().toString().trim()));
-        project.setStdDevPrecision(Integer.valueOf(projectStdDevPrecision.getText().toString().trim()));
-
-
-        //Precision digits
-
-
 
         return returnCode;
 
@@ -982,9 +1202,8 @@ public class GBProjectEditFragment extends    Fragment {
         //what this button does depends upon the path  {create, open, copy}
         //*********************** CREATE **************************************/
         if (mProjectPath.equals(GBPath.sCreateTag)){
-            Toast.makeText(getActivity(),
-                    R.string.cant_view_projects,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(),
+                                                            R.string.cant_view_projects);
 
             //switchToProjectList();
 
@@ -997,9 +1216,8 @@ public class GBProjectEditFragment extends    Fragment {
                 areYouSureViewProjects();
 
             } else {
-                Toast.makeText(getActivity(),
-                        R.string.project_unchanged,
-                        Toast.LENGTH_SHORT).show();
+                GBUtilities.getInstance().showStatus(getActivity(),
+                                                        R.string.project_unchanged);
 
                 switchToProjectList();
 
@@ -1007,9 +1225,7 @@ public class GBProjectEditFragment extends    Fragment {
 
             //*********************** UNKNOWN **************************************/
         } else {
-            Toast.makeText(getActivity(),
-                    R.string.unrecognized_path_encountered,
-                    Toast.LENGTH_SHORT).show();
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.unrecognized_path_encountered);
 
             //Notice that we don't leave the screen on this condition
         }
@@ -1026,9 +1242,7 @@ public class GBProjectEditFragment extends    Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though project has chaged
-                                Toast.makeText(getActivity(),
-                                        R.string.continue_abandon_changes,
-                                        Toast.LENGTH_SHORT).show();
+                                GBUtilities.getInstance().showStatus(getActivity(), R.string.continue_abandon_changes);
 
                                switchToProjectList();
                             }
@@ -1036,9 +1250,7 @@ public class GBProjectEditFragment extends    Fragment {
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(), R.string.cancel_pressed);
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)
@@ -1065,9 +1277,7 @@ public class GBProjectEditFragment extends    Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though project has chaged
-                                Toast.makeText(getActivity(),
-                                        R.string.continue_abandon_changes,
-                                        Toast.LENGTH_SHORT).show();
+                                GBUtilities.getInstance().showStatus(getActivity(), R.string.continue_abandon_changes);
 
 
                                 switchToProjectSettings();
@@ -1077,9 +1287,7 @@ public class GBProjectEditFragment extends    Fragment {
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(),R.string.cancel_pressed);
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)
@@ -1108,17 +1316,14 @@ public class GBProjectEditFragment extends    Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though project has chaged
-                                GBUtilities.getInstance().showStatus(getActivity(),
-                                                                R.string.continue_abandon_changes);
+                                GBUtilities.getInstance().showStatus(getActivity(), R.string.continue_abandon_changes);
                                 switchToListPoints();
                             }
                         })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(),R.string.cancel_pressed);
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)
@@ -1152,9 +1357,7 @@ public class GBProjectEditFragment extends    Fragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Leave even though project has chaged
-                                Toast.makeText(getActivity(),
-                                        R.string.continue_abandon_changes,
-                                        Toast.LENGTH_SHORT).show();
+                                GBUtilities.getInstance().showStatus(getActivity(), R.string.continue_abandon_changes);
                                 switchToExit();
 
                             }
@@ -1162,9 +1365,7 @@ public class GBProjectEditFragment extends    Fragment {
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        Toast.makeText(getActivity(),
-                                "Pressed Cancel",
-                                Toast.LENGTH_SHORT).show();
+                        GBUtilities.getInstance().showStatus(getActivity(),R.string.cancel_pressed);
                     }
                 })
                 .setIcon(R.drawable.ground_station_icon)

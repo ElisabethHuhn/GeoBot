@@ -117,7 +117,7 @@ public class GBSplashFragment extends Fragment  {
         });
 
         //List Points Button
-        Button listPointsButton = (Button) v.findViewById(R.id.splashProceedButton);
+        Button listPointsButton = (Button) v.findViewById(R.id.splashListPointsButton);
         listPointsButton.setText(R.string.list_points_button_label);
         listPointsButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_117_pointsfile, 0, 0);
         listPointsButton.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +131,27 @@ public class GBSplashFragment extends Fragment  {
                 }
 
                 GBUtilities.getInstance().showStatus(getActivity(),
-                                                        R.string.project_not_open_to_list_points);
+                        R.string.project_not_open_to_list_points);
+            }
+        });
+
+        //Measure Points Button
+        Button measurePointsButton = (Button) v.findViewById(R.id.splashMeasureButton);
+        measurePointsButton.setText(R.string.project_measure_button_label);
+        measurePointsButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_002_collect, 0, 0);
+        measurePointsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+                GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                if (project == null){
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+                    return;
+                }
+                ((GBActivity)getActivity()).switchToPointCreateScreen(project);
             }
         });
 

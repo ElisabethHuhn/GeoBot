@@ -66,6 +66,7 @@ public class GBActivity extends AppCompatActivity {
     private static final String sPointDeleteTag        = "POINT_DELETE";
     private static final String sPointShowTag          = "POINT_SHOW";
     //private static final String sPointSettingsTag      = "POINT_SETTINGS";
+    private static final String sMeanTokenTag          = "MEAM_TOKEN";
 
     private static final String sCollectTopTag         = "COLLECT_TOP";
      static final String sCollectPointsTag      = "COLLECT_POINTS";
@@ -161,8 +162,8 @@ public class GBActivity extends AppCompatActivity {
             if (fragment instanceof GBPointEditFragment) {
                 ((GBPointEditFragment) fragment).onExit();
 
-            } else if (fragment instanceof GBCoordConvertFragment) {
-                ((GBCoordConvertFragment) fragment).onExit();
+            } else if (fragment instanceof GBCoordMeasureFragment) {
+                ((GBCoordMeasureFragment) fragment).onExit();
 
             } else if (fragment instanceof GBProjectEditFragment) {
                 ((GBProjectEditFragment) fragment).onExit();
@@ -627,7 +628,7 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToMeasureScreen(GBPoint point){
 
-        Fragment fragment    = GBCoordConvertFragment.newInstance(point);
+        Fragment fragment    = GBCoordMeasureFragment.newInstance(point);
         String   tag         = sMeasureTag;
 
         switchScreen(fragment, tag);
@@ -682,6 +683,9 @@ public class GBActivity extends AppCompatActivity {
 
 
     void switchToProjectCreateScreen(){
+
+        //Close any currently open project
+        GBUtilities.getInstance().closeOpenProject(this);
 
         //Gets the project which contains the defaults for all other projects
         //GBProject project = getProjectForCreate();
@@ -842,6 +846,17 @@ public class GBActivity extends AppCompatActivity {
         switchScreen(fragment, tag);
      }
 
+
+    void switchToRawListScreen(long tokenID){
+
+        //lists the raw coordinates
+        Fragment fragment = GBMeanTokenFragment.newInstance(tokenID);
+        String tag        = sMeanTokenTag;
+
+        switchScreen(fragment, tag);
+    }
+
+
     // ******************************************
      // * COLLECT
      // *******************************************/
@@ -909,9 +924,9 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToCoordConvert(){
 
-        Fragment fragment = new GBCoordConvertFragment();
+        Fragment fragment = new GBCoordMeasureFragment();
         String tag        = sConversionTag;
-        int subTitle      = R.string.subtitle_coordinate_conversion;
+        int subTitle      = R.string.subtitle_measure;
 
         switchScreen(fragment, tag, subTitle);
 
@@ -933,7 +948,7 @@ public class GBActivity extends AppCompatActivity {
 
         Fragment fragment = new GBCoordConversionOldFragment();
         String tag        = sConversionTag;
-        int subTitle      = R.string.subtitle_coordinate_conversion;
+        int subTitle      = R.string.subtitle_measure;
 
         switchScreen(fragment, tag, subTitle);
 
@@ -962,8 +977,8 @@ public class GBActivity extends AppCompatActivity {
 
 
     // ******************************************
-     // * SKYPLOT
-     // *******************************************/
+    // * SKYPLOT
+    // *******************************************/
 
     void switchToTopSkyplotScreen(){
 
@@ -996,7 +1011,7 @@ public class GBActivity extends AppCompatActivity {
         String tag        = sSkyplotListSatelliteTag;
         int subTitle      = R.string.subtitle_list_satellites;
 
-        switchScreen(fragment, tag, subTitle);
+        switchScreenWithStack(fragment, tag);
 
 
     }
@@ -1016,9 +1031,9 @@ public class GBActivity extends AppCompatActivity {
 
 
 
-     // ******************************************
-     // * CONFIG
-     // *******************************************/
+    // ******************************************
+    // * CONFIG
+    // *******************************************/
 
 
     void switchToTopConfigScreen(){

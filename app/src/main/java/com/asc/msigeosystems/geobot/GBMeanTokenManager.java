@@ -89,9 +89,21 @@ class GBMeanTokenManager {
             GBCoordinateWGS84 coordinateWGS84;
             GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
 
+            // TODO: 7/5/2017 Need to think this through. Especially with no purge rules
+            //returns a cursor with all the raw coordinates
+            //each row in the cursor is a relationship between a raw reading and this token
+            //Cursor readingsCursor = GBDatabaseManager.getInstance().getTokenReadings(token.getMeanTokenID());
+            //if the cursor is not null, create a list of the raw coordinates
+
+
+
             while (position < last){
                 coordinateWGS84 = rawCoordinates.get(position);
+
                 coordinateManager.addCoordinate(coordinateWGS84);
+
+                //Determine whether this coordinate already exists in the DB
+                //If the coordinate is represented in the readingsCursor, we don't have to create another
 
                 long coordinateID = coordinateWGS84.getCoordinateID();
 
@@ -137,6 +149,7 @@ class GBMeanTokenManager {
         //put(columnName, value);
         cvToken.put(GBDatabaseSqliteHelper.MEAN_TOKEN_ID,       token.getMeanTokenID());
         cvToken.put(GBDatabaseSqliteHelper.MEAN_TOKEN_PROJECT_ID, token.getProjectID());
+        cvToken.put(GBDatabaseSqliteHelper.MEAN_TOKEN_POINT_ID, token.getPointID());
 
         int progress = 0; //false
         boolean isProgress = token.isMeanInProgress();
@@ -175,6 +188,7 @@ class GBMeanTokenManager {
 
 
         //put(columnName, value);
+        cvTokenReading.put(GBDatabaseSqliteHelper.MEAN_TOKEN_READING_ID,  GBUtilities.ID_DOES_NOT_EXIST);
         cvTokenReading.put(GBDatabaseSqliteHelper.MEAN_TOKEN_READING_MEAN_ID,  token.getMeanTokenID());
         cvTokenReading.put(GBDatabaseSqliteHelper.MEAN_TOKEN_READING_COORDINATE_ID, coordinateID);
 
@@ -204,7 +218,10 @@ class GBMeanTokenManager {
         meanToken.setMeanTokenID(tokenID);
         long projectID = cursor.getLong(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.MEAN_TOKEN_PROJECT_ID));
-        meanToken.setMeanTokenID(projectID);
+        meanToken.setProjectID(projectID);
+        long pointID = cursor.getLong(
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.MEAN_TOKEN_POINT_ID));
+        meanToken.setPointID(pointID);
 
         int inProgress = cursor.getInt(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.MEAN_TOKEN_IN_PROGRESS));
@@ -247,7 +264,8 @@ class GBMeanTokenManager {
 
         long meanID = cursor.getLong(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.MEAN_TOKEN_MEAN_COORD_ID));
-        GBCoordinateMean coordinateMean = GBCoordinateManager.getInstance().getCoordinateMeanFromDB(meanID);
+        GBCoordinateMean coordinateMean =
+                                GBCoordinateManager.getInstance().getCoordinateMeanFromDB(meanID);
         meanToken.setMeanCoordinate(coordinateMean);
 
         return meanToken;

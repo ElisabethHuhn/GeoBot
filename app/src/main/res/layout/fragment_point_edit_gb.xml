@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="10dp"
+            android:paddingBottom="@dimen/row_between_rows_margin"
             >
 
             <!-- Container for primary Point Attributes -->
@@ -30,16 +30,34 @@
                 <!-- Row: Point Screen Label -->
 
 
-                <!-- Row 7: Meaasure, View Existing Points, Save Changes Buttons -->
+                <!-- Row : BUTTONS Meaasure, View Existing Points, Save Changes  -->
                 <TableRow
 
                     android:layout_height  = "wrap_content"
                     android:layout_width   = "match_parent"
                     android:layout_gravity = "center_horizontal"
-                    android:paddingTop     = "10dp"
-                    android:paddingBottom  = "20dp"
+                    android:paddingTop     = "@dimen/row_between_rows_margin"
+
                     >
 
+                    <!-- Save Changes Points -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/pointSaveChangesButton"
+                        android:text="@string/save_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center|center_vertical"
+                        android:layout_gravity="start"
+                        android:layout_weight="1"
+
+                        android:layout_marginStart="@dimen/row_cap_margin"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
                     <!-- Measure Points -->
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
@@ -52,8 +70,7 @@
                         android:layout_gravity="start"
                         android:layout_weight="1"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -70,17 +87,16 @@
                         android:layout_gravity="start"
                         android:layout_weight="1"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
                         />
-                    <!-- Save Changes Points -->
+                    <!-- View Raw Points -->
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
-                        android:id="@+id/pointSaveChangesButton"
-                        android:text="@string/save_changes_button_label"
+                        android:id="@+id/pointViewRawButton"
+                        android:text="@string/point_view_raw_label"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
@@ -88,8 +104,7 @@
                         android:layout_gravity="start"
                         android:layout_weight="1"
 
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:background="@color/colorGrayer"
                         android:textColor="@color/colorTextBlack"
@@ -103,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointProjectNameInput"
@@ -126,7 +141,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:enabled="false"
 
@@ -143,7 +158,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -159,7 +174,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointIDInput"
@@ -182,7 +197,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:enabled="false"
 
@@ -199,7 +214,7 @@
 
                         android:inputType="number"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -216,7 +231,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointFeatureCodeInput"
@@ -234,7 +249,7 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="100"
 
 
                         android:inputType="text"
@@ -242,7 +257,7 @@
                         android:scrollbars="horizontal"
 
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:textColor="@color/colorTextBlack"
                         android:background="@color/colorWhite"
@@ -250,17 +265,18 @@
 
                 </TableRow>
 
-                <!-- Row: Point Notes -->
+                <!-- Row :  SPCS Zone and State -->
                 <TableRow
 
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="5dp"
                     >
+
                     <TextView
-                        android:labelFor="@+id/pointNotesInput"
-                        android:text="@string/point_notes_label"
+                        android:labelFor="@+id/pointSpcZoneInput"
+                        android:text="@string/spc_zone_label"
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
                         android:layout_weight="25"
@@ -270,36 +286,61 @@
                         android:background="@color/colorScreenBackground"
                         />
                     <EditText
-                        android:id="@id/pointNotesInput"
+                        android:id="@id/pointSpcZoneInput"
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="40"
+                        android:gravity="center"
 
-                        android:inputType="textMultiLine"
-                        android:minLines="6"
-                        android:lines="8"
-                        android:maxLines="10"
-                        android:gravity="top|start"
-                        android:scrollbars="horizontal"
+                        android:inputType="number"
 
-                        android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:textColor="@color/colorTextBlack"
-                        android:background="@color/colorWhite"
+                        android:enabled="false"
+                        android:background="@color/colorGray"
+                        />
+
+                    <TextView
+                        android:labelFor="@+id/pointSpcStateOutput"
+                        android:text="@string/spc_state_label"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="end"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorScreenBackground"
+                        />
+                    <TextView
+                        android:id="@id/pointSpcStateOutput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="35"
+                        android:gravity="center"
+
+
+
+                        android:layout_marginEnd="@dimen/row_cap_margin"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:enabled="false"
+                        android:background="@color/colorGray"
                         />
 
                 </TableRow>
 
-                <!-- Row: Height affecting Elevation -->
-                <TableRow
+                <!-- Row: Height and distance units -->
+                <LinearLayout
 
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
+
                     <TextView
                         android:labelFor="@+id/pointHeightInput"
                         android:text="@string/point_height_label"
@@ -316,12 +357,41 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="40"
                         android:gravity="center"
 
                         android:inputType="numberDecimal"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                        android:enabled="false"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorWhite"
+                        />
+
+                    <TextView
+                        android:labelFor="@+id/pointDistanceUnitsInput"
+                        android:text="@string/distance_units_label"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="end"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorScreenBackground"
+                        />
+                    <EditText
+                        android:id="@id/pointDistanceUnitsInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="35"
+                        android:gravity="center"
+
+                        android:inputType="text"
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -329,8 +399,48 @@
                         android:background="@color/colorGray"
                         />
 
+                </LinearLayout>
+
+
+                <!-- Row: # Raw data points -->
+                <TableRow
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="@dimen/row_between_rows_margin"
+                    >
+                    <TextView
+                        android:labelFor="@+id/pointNbRawInput"
+                        android:text="@string/point_num_raw"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="end"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorScreenBackground"
+                        />
+                    <EditText
+                        android:id="@id/pointNbRawInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="100"
+                        android:gravity="center"
+
+                        android:inputType="numberDecimal"
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
+
+                        android:enabled="false"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorGray"
+                        />
 
                 </TableRow>
+
 
             </TableLayout>
 
@@ -338,23 +448,24 @@
             <!-- Container for Coordinates -->
             <LinearLayout
                 android:id="@+id/point_coordinate_container"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 >
 
-                <!--  Prompt (Null prompt is the default, asking user to select -->
+                <!-- Coordinate type for this point (from the Project)  -->
                 <TextView
                     android:id            = "@+id/coordinate_label"
-                    android:text          = "@string/null_prompt"
+
                     android:layout_height = "wrap_content"
                     android:layout_width  = "match_parent"
                     android:layout_gravity= "center_horizontal"
                     android:gravity       = "center"
 
-                    android:paddingTop    = "20dp"
-                    android:paddingBottom = "15dp"
+                    android:paddingTop    = "@dimen/row_between_rows_margin"
+                    android:paddingBottom = "@dimen/row_between_rows_margin"
 
+                    android:text="@string/coordinate_type"
                     android:textColor     = "@color/colorTextBlack"
                     android:background    = "@color/colorScreenBackground"
                     />
@@ -375,13 +486,14 @@
                 android:stretchColumns="*"
 
                 >
+
                 <!-- Row: Quality: HDOP / VDOP -->
                 <TableRow
 
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointHdopInput"
@@ -399,12 +511,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
+                        android:layout_weight="40"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:enabled="false"
 
@@ -433,7 +545,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -449,7 +561,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointTdopInput"
@@ -467,12 +579,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
+                        android:layout_weight="40"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:enabled="false"
 
@@ -501,7 +613,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -518,7 +630,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointHrmsInput"
@@ -536,12 +648,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
+                        android:layout_weight="40"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                         android:enabled="false"
 
@@ -570,7 +682,7 @@
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -579,15 +691,13 @@
                         />
                 </TableRow>
 
-
-
                 <!-- Row: Offset Distance -->
                 <TableRow
 
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointOffDistInput"
@@ -605,12 +715,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="100"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -627,7 +737,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointOffHeadInput"
@@ -645,12 +755,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="100"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -667,7 +777,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/row_between_rows_margin"
                     >
                     <TextView
                         android:labelFor="@+id/pointOffEleInput"
@@ -685,12 +795,12 @@
 
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
-                        android:layout_weight="75"
+                        android:layout_weight="100"
                         android:gravity="center"
 
                         android:inputType="text"
                         android:imeOptions="flagNoExtractUi"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
 
                         android:enabled="false"
 
@@ -700,6 +810,50 @@
 
 
                 </TableRow>
+
+
+                <!-- Row: Point Notes -->
+                <TableRow
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="@dimen/row_between_rows_margin"
+                    >
+                    <TextView
+                        android:labelFor="@+id/pointNotesInput"
+                        android:text="@string/point_notes_label"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:gravity="end"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorScreenBackground"
+                        />
+                    <EditText
+                        android:id="@id/pointNotesInput"
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="100"
+
+                        android:inputType="textMultiLine"
+                        android:minLines="3"
+                        android:lines="8"
+                        android:maxLines="10"
+                        android:gravity="top|start"
+                        android:scrollbars="horizontal"
+
+                        android:imeOptions="flagNoExtractUi"
+                        android:layout_marginEnd="@dimen/row_cap_margin"
+
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorWhite"
+                        />
+
+                </TableRow>
+
 
             </TableLayout>
 

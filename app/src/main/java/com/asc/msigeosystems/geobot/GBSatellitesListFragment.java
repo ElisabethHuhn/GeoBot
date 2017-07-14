@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 
@@ -50,7 +51,7 @@ public class GBSatellitesListFragment extends Fragment implements  GpsStatus.Lis
 
 
     private GBNmea             mNmeaData;
-    private GBNmeaParser       mNmeaParser = new GBNmeaParser();
+    private GBNmeaParser       mNmeaParser = GBNmeaParser.getInstance();
 
 
     /* ********************************************************/
@@ -221,22 +222,37 @@ public class GBSatellitesListFragment extends Fragment implements  GpsStatus.Lis
         mNmeaData = mNmeaParser.parse(nmea);
         if (mNmeaData != null) {
 
-
-            /*
+                  /*
             mNmeaList.add(mNmeaData);
                         */
             View v = getView();
             if (v != null) {
+                updateUI(v);
                 RecyclerView mRecyclerView = (RecyclerView) v.findViewById(R.id.satellitesList);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
                 //notify item inserted rather than data set changed
                 //why this makes a difference, I don't know. But the other doesn't scroll
-                mRecyclerView.getAdapter().notifyItemInserted(mRecyclerView.getAdapter().getItemCount());
-                mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
+                //mRecyclerView.getAdapter().notifyItemInserted(mRecyclerView.getAdapter().getItemCount());
+                //mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
             }
 
 
         }
+    }
+
+    void updateUI(View v){
+
+        EditText vDopOutput = (EditText)v.findViewById(R.id.satelliteVdopInput);
+        EditText hDopOutput = (EditText)v.findViewById(R.id.satelliteHdopInput);
+        EditText pDopOutput = (EditText)v.findViewById(R.id.satellitePdopInput);
+
+        GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
+
+
+        vDopOutput.setText(String.valueOf(satelliteManager.getVdop()));
+        hDopOutput.setText(String.valueOf(satelliteManager.getHdop()));
+        pDopOutput.setText(String.valueOf(satelliteManager.getPdop()));
+
     }
 
     /* ********************************************************************/

@@ -1,0 +1,281 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="24dp">
+
+            <Button
+                android:id="@+id/button_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Button 1"
+                android:padding="16dp"
+                android:layout_margin="8dp"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_green_dark"/>
+
+            <Button
+                android:id="@+id/button_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_margin="8dp"
+                android:text="Button 2"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_blue_light"/>
+
+            <Button
+                android:id="@+id/button_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_margin="8dp"
+                android:text="Button 3"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_red_dark"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:clipToPadding="true"
+        android:background="@android:color/holo_orange_light"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        >
+
+
+        <LinearLayout
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/row_between_rows_margin"
+            >
+
+            <!-- Row: Quality: HDOP / VDOP -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:labelFor="@+id/pointHdopInput"
+                    android:text="@string/hdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/pointHdopInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="40"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+
+                <TextView
+                    android:labelFor="@+id/pointVdopInput"
+                    android:text="@string/vdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/pointVdopInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="35"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+
+            </LinearLayout>
+
+            <!-- Row: Quality: TDOP / PDOP-->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:labelFor="@+id/pointTdopInput"
+                    android:text="@string/tdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/pointTdopInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="40"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+
+                <TextView
+                    android:labelFor="@+id/pointPdopInput"
+                    android:text="@string/pdop_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/pointPdopInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="35"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+
+            </LinearLayout>
+
+
+            <!-- Row: Quality: HRMS / VRMS -->
+            <LinearLayout
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="@dimen/row_between_rows_margin"
+            >
+            <TextView
+                android:labelFor="@+id/pointHrmsInput"
+                android:text="@string/hrms_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/pointHrmsInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="40"
+                android:gravity="center"
+
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:enabled="false"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorGray"
+                />
+
+            <TextView
+                android:labelFor="@+id/pointVrmsInput"
+                android:text="@string/vrms_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/pointVrmsInput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="35"
+                android:gravity="center"
+
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:enabled="false"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorGray"
+                />
+        </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

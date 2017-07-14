@@ -5,12 +5,11 @@
           android:layout_width  = "match_parent"
           android:layout_height = "wrap_content"
 
-          android:paddingBottom = "20dp"
+          android:paddingBottom = "@dimen/row_between_rows_margin"
     >
 
     <!-- Easting/Northing Coordinate -->
 
-    <!-- easting and falseNorthing2 -->
     <include android:id="@+id/eastingContainer"     layout="@layout/element_en_label_meters_feet"/>
     <include android:id="@+id/northingContainer"    layout="@layout/element_en_label_meters_feet"/>
     <!-- elevation -->

@@ -137,9 +137,20 @@ public class GBUtilities {
 
     //********************************************************************************
 
+    // The U.S. Metric Law of 1866 provided the relationship that
+    // one meter is equal to 39.37 inches, exactly
+
+    //one yard equal to 0.9144 meters, exactly.
+    // From that,  one foot is equal to one-third of that constant, or 0.3048 meters.
+    // This is also equivalent to 2.54 centimeters equal to 1 inch,
+
+    //3.28083989501 International Feet are equal to one meter
+
     static final double feetPerMeter   = 3.280833333;
     static final double inchesPerMeter = feetPerMeter*12.;   //39.37
     static final double cmPerInch      = 100. / (feetPerMeter * 12.); //2.54
+
+    static final double ifeetPerMeter  = 3.28083989501;
 
 
 
@@ -172,6 +183,17 @@ public class GBUtilities {
         //function converts Feet to Meters.
         //truncate to a reasonable number of decimal digits
         double feet = meters * GBUtilities.feetPerMeter;
+        BigDecimal bd = new BigDecimal(feet).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
+        feet = bd.doubleValue();
+
+        return (feet);  // official conversion rate of Meters to Feet
+
+    }
+
+    static double convertMetersToIFeet(double meters) {
+        //function converts Feet to Meters.
+        //truncate to a reasonable number of decimal digits
+        double feet = meters * GBUtilities.ifeetPerMeter;
         BigDecimal bd = new BigDecimal(feet).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
         feet = bd.doubleValue();
 
@@ -352,13 +374,17 @@ public class GBUtilities {
     public static long getDateTimeFromString(Context activity, String timeString){
         Date date;
         try {
-            SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy hh:mm:ss", Locale.getDefault());
+            SimpleDateFormat format = getDateTimeFormat();
             date = format.parse(timeString);
         } catch ( ParseException e){
             GBUtilities.getInstance().errorHandler(activity, e.getMessage());
             return 0;
         }
         return date.getTime();
+    }
+
+    static SimpleDateFormat getDateTimeFormat(){
+        return new SimpleDateFormat("MMM d, yyyy hh:mm:ss", Locale.getDefault());
     }
 
 
@@ -375,26 +401,34 @@ public class GBUtilities {
     //***********************************/
 
 
-    GBProject getOpenProject(GBActivity activity) {
+    GBProject getOpenProject  (GBActivity activity) {
         long openProjectID = getOpenProjectID(activity);
         if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST)return null;
 
         return GBProjectManager.getInstance().getProject(openProjectID);
     }
-
-    void  setOpenProject(GBActivity activity, GBProject openProject) {
+    void      setOpenProject  (GBActivity activity, GBProject openProject) {
         if (activity == null){
             return;
+        }
+        long openProjectID;
+        if (openProject == null){
+            openProjectID = GBUtilities.ID_DOES_NOT_EXIST;
+        } else {
+            openProjectID = openProject.getProjectID();
         }
         //Store the PersonID for the next time
         SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putLong(GBActivity.sOpenProjectIDTag, openProject.getProjectID());
+        editor.putLong(GBActivity.sOpenProjectIDTag, openProjectID);
         editor.apply();
 
     }
+    void      closeOpenProject(GBActivity activity) {
+        setOpenProject(activity, null);
+    }
 
-    long  getOpenProjectID(GBActivity activity) {
+    long      getOpenProjectID       (GBActivity activity) {
         if (activity == null){
             return GBUtilities.ID_DOES_NOT_EXIST;
         }
@@ -402,51 +436,22 @@ public class GBUtilities {
         long defaultValue = GBUtilities.ID_DOES_NOT_EXIST;
         return sharedPref.getLong(GBActivity.sOpenProjectIDTag, defaultValue);
     }
-
-    String getOpenProjectIDMessage(GBActivity activity){
+    String    getOpenProjectIDMessage(GBActivity activity){
         if (activity == null){
             return "Programming Error, Activity is null";
         }
         GBProject openProject = getOpenProject(activity);
         if (openProject != null){
             //A project is open
-            return activity.getString(R.string.project_opened_1) + " " +
+            return activity.getString(R.string.project_opened) + " " +
                     String.valueOf(openProject.getProjectID())  + " " +
-                    openProject.getProjectName()                + " " +
-                    activity.getString(R.string.project_opened_2);
+                    openProject.getProjectName()                ;
         } else {
             return activity.getString(R.string.no_project_open);
         }
 
     }
 
-    GBPoint getOpenPoint(GBActivity activity) {
-        long openPointID = getOpenPointID(activity);
-        if (openPointID == GBUtilities.ID_DOES_NOT_EXIST)return null;
-
-        return GBPointManager.getInstance().getPoint(getOpenProjectID(activity), openPointID);
-    }
-
-    void  setOpenPoint(GBActivity activity, GBPoint openPoint) {
-        if (activity == null){
-            return;
-        }
-        //Store the PersonID for the next time
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putLong(GBActivity.sOpenPointIDTag, openPoint.getPointID());
-        editor.apply();
-
-    }
-
-    long  getOpenPointID(GBActivity activity) {
-        if (activity == null){
-            return GBUtilities.ID_DOES_NOT_EXIST;
-        }
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        long defaultValue = GBUtilities.ID_DOES_NOT_EXIST;
-        return sharedPref.getLong(GBActivity.sOpenPointIDTag, defaultValue);
-    }
 
 
 

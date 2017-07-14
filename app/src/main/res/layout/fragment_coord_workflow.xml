@@ -704,7 +704,7 @@
                             />
                         <!-- Long Sigma -->
                         <TextView
-                            android:text="@string/mean_long_sigma"
+                            android:text="@string/mean_lng_sigma"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -716,7 +716,7 @@
                             />
                         <TextView
                             android:id="@+id/meanWgs84LongSigmaOutput"
-                            android:hint="@string/mean_long_sigma"
+                            android:hint="@string/mean_lng_sigma"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"

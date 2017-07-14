@@ -11,28 +11,31 @@ package com.asc.msigeosystems.geobot;
 
 abstract class GBCoordinate {
 
+    static final String sCoordinateTypeUnknown = "Unknown";
     static final String sCoordinateTypeWGS84 = "WGS84 G1762";
-    static final String sCoordinateTypeNAD83 = "NAD83 2011";
-    static final String sCoordinateTypeUTM   = "UTM";
     static final String sCoordinateTypeSPCS  = "US State Plane Coordinates";
+    static final String sCoordinateTypeUTM   = "UTM";
+    static final String sCoordinateTypeNAD83 = "NAD83 2011";
 
+    //This is the order of the items in the Project UI spinner
+    //Unfortunately, this is a hard coded order.
+    // The ProjectEditFragment spinner must be coordinated with any changes
     static final int sCoordinateDBTypeUnknown = -1;
     static final int sCoordinateDBTypeWGS84 = 0;
-    static final int sCoordinateDBTypeNAD83 = 1;
+    static final int sCoordinateDBTypeSPCS  = 1;
     static final int sCoordinateDBTypeUTM   = 2;
-    static final int sCoordinateDBTypeSPCS  = 3;
+    static final int sCoordinateDBTypeNAD83 = 3;
 
+    static final String sCoordinateTypeClassUnknown = "GBCoordinate";
     static final String sCoordinateTypeClassWGS84 = "GBCoordinateWGS84";
-    static final String sCoordinateTypeClassNAD83 = "GBCoordinateNAD83";
-    static final String sCoordinateTypeClassUTM   = "GBCoordinateUTM";
     static final String sCoordinateTypeClassSPCS  = "GBCoordinateSPCS";
+    static final String sCoordinateTypeClassUTM   = "GBCoordinateUTM";
+    static final String sCoordinateTypeClassNAD83 = "GBCoordinateNAD83";
 
     static final int sUNKWidgets = 0;
     static final int sLLWidgets = 1;
     static final int sENWidgets = 2;
 
-    private CharSequence mThisCoordinateType = "Undefined";
-    private CharSequence mThisCoordinateClass = "GBCoordinate";
 
 
     /* *********************************************************/
@@ -41,6 +44,7 @@ abstract class GBCoordinate {
     protected long    mCoordinateID; //All coordinates have a DB ID
     protected long    mProjectID; //May or may not describe a point
     protected long    mPointID;   //These will be null if not describing a point
+    protected int     mCoordinateDBType;
 
     protected long    mTime; //time coordinate taken in milliseconds
 
@@ -53,7 +57,7 @@ abstract class GBCoordinate {
     protected boolean mValidCoordinate = true;
     protected boolean mIsFixed         = true;
 
-    protected CharSequence mDatum = "SPCS"; //eg WGS84
+    protected CharSequence mDatum = ""; //eg WGS84
 
 
     /* *********************************************************/
@@ -107,12 +111,6 @@ abstract class GBCoordinate {
     /* *********************************************************/
 
 
-    //This method returns the type of the instance actually instantiated
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-
-    //This method returns the type of the instance as a string for UI display
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
 
      long getCoordinateID(){return mCoordinateID;}
      void setCoordinateID(long coordinateID){this.mCoordinateID = coordinateID;}
@@ -125,6 +123,31 @@ abstract class GBCoordinate {
     void setPointID(long pointID) { mPointID = pointID; }
 
 
+    int  getCoordinateDBType()            { return mCoordinateDBType; }
+    void setCoordinateDBType(int coordinateDBType) { mCoordinateDBType = coordinateDBType; }
+
+    CharSequence getCoordinateType(){
+
+        CharSequence returnCode = GBCoordinate.sCoordinateTypeUnknown;
+
+        switch (getCoordinateDBType()) {
+            case GBCoordinate.sCoordinateDBTypeWGS84:
+                returnCode = GBCoordinate.sCoordinateTypeWGS84;
+                break;
+            case GBCoordinate.sCoordinateDBTypeSPCS:
+                returnCode = GBCoordinate.sCoordinateTypeSPCS;
+                break;
+            case GBCoordinate.sCoordinateDBTypeUTM:
+                returnCode = GBCoordinate.sCoordinateTypeUTM;
+                break;
+            case GBCoordinate.sCoordinateDBTypeNAD83:
+                returnCode = GBCoordinate.sCoordinateTypeNAD83;
+                break;
+        }
+        return returnCode;
+    }
+
+
     long getTime()              {  return mTime;    }
     void setTime(long time)     {  mTime = time;  }
 
@@ -132,9 +155,11 @@ abstract class GBCoordinate {
     double getElevation()       {  return mElevation;   }
     void setElevation(double elevation) { mElevation = elevation;   }
     double getElevationFeet() {return GBUtilities.convertMetersToFeet(mElevation); }
+    double getElevationIFeet() {return GBUtilities.convertMetersToIFeet(mElevation);}
 
     double getGeoid()           {  return mGeoid; }
     double getGeoidFeet() { return GBUtilities.convertMetersToFeet(mGeoid);}
+    double getGeoidIFeet() {return GBUtilities.convertMetersToIFeet(mGeoid);}
     void setGeoid(double geoid) { mGeoid = geoid;  }
 
     double getScaleFactor()       { return mScaleFactor;       }
@@ -165,13 +190,16 @@ abstract class GBCoordinate {
         //I know that one does not have to initialize int's etc, but
         //to be explicit about the initialization, do it anyway
 
-        mCoordinateID = GBUtilities.ID_DOES_NOT_EXIST;
+        mCoordinateID     = GBUtilities.ID_DOES_NOT_EXIST;
 
-        mProjectID = 0; //assume does not describe a point
-        mPointID = 0;
+        mProjectID        = GBUtilities.ID_DOES_NOT_EXIST; //assume does not describe a point
+        mPointID          = GBUtilities.ID_DOES_NOT_EXIST;
+        mCoordinateDBType = sCoordinateDBTypeUnknown;
 
-        mTime           = 0; //time coordinate taken
-        mValidCoordinate = false;
+
+
+        mTime             = 0; //time coordinate taken
+        mValidCoordinate  = false;
 
         mElevation        = 0d;
         mGeoid            = 0d;

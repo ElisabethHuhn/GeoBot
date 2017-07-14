@@ -45,7 +45,7 @@ class GBProjectAdapter extends RecyclerView.Adapter<GBProjectAdapter.MyViewHolde
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
 
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.data_project_list_row, parent,  false);
+                .inflate(R.layout.data_list_row_project, parent,  false);
         return new MyViewHolder(itemView);
 
     }

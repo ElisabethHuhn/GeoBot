@@ -43,6 +43,9 @@
     <color name="colorNegNumber">#FF0000</color>
     <color name="colorPosNumber">#000000</color>
 
+    <color name="colorLightPink"       >#ffb6c1</color>
+
+
     <color name="title">#222222</color>
     <color name="year">#999999</color>
 

@@ -24,14 +24,15 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
     //implement the ViewHolder as an inner class
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView projectID,    pointID,
+        TextView projectID,    pointID, pointNb,
                         pointEasting, pointNorthing, pointElevation, pointFeatureCode;
 
         MyViewHolder(View v) {
             super(v);
 
-            projectID        = (TextView) v.findViewById(R.id.pointRowProjectID);
-            pointID          = (TextView) v.findViewById(R.id.pointRowPointID);
+            //projectID        = (TextView) v.findViewById(R.id.pointRowProjectID);
+            //pointID          = (TextView) v.findViewById(R.id.pointRowPointID);
+            pointNb          = (TextView) v.findViewById(R.id.pointRowPointNb);
             pointEasting     = (TextView) v.findViewById(R.id.pointRowEasting);
             pointNorthing    = (TextView) v.findViewById(R.id.pointRowNorthing) ;
             pointElevation   = (TextView) v.findViewById(R.id.pointRowElevation);
@@ -48,7 +49,7 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.data_point_list_row, parent,  false);
+                .inflate(R.layout.data_list_row_point, parent,  false);
         return new MyViewHolder(itemView);
 
     }
@@ -80,8 +81,9 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
         if (mPointList != null ) {
             GBPoint point = mPointList.get(position);
 
-            holder.projectID       .setText(String.valueOf(point.getForProjectID()));
-            holder.pointID         .setText(String.valueOf(point.getPointID()));
+            //holder.projectID       .setText(String.valueOf(point.getForProjectID()));
+            //holder.pointID         .setText(String.valueOf(point.getPointID()));
+            holder.pointNb         .setText(String.valueOf(point.getPointNumber()));
             holder.pointFeatureCode.setText(point.getPointFeatureCode().toString());
 
             GBCoordinate coordinate = point.getCoordinate();
@@ -106,8 +108,9 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
         } else {
 
-            holder.projectID       .setText(R.string.no_points);
-            holder.pointID         .setText("");
+            //holder.projectID       .setText(R.string.no_points);
+            //holder.pointID         .setText("");
+            holder.pointNb         .setText("");
             holder.pointFeatureCode.setText("");
             holder.pointEasting.setText(no_coordinate);
             holder.pointNorthing.setText(no_coordinate);

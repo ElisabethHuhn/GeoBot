@@ -15,11 +15,8 @@ import java.math.RoundingMode;
 
 class GBCoordinateUTM extends GBCoordinateEN {
 
-    //variables and setters/getters at super level
-    private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeUTM;
-    private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassUTM;
 
-    static final String sDatum = "SPCS";
+    static final String sDatum = "UTM";
 
     private   char         mHemisphere;  //N or S
     private   char         mLatBand;
@@ -116,12 +113,14 @@ class GBCoordinateUTM extends GBCoordinateEN {
         setLatBand(latbandString.charAt(0));
         setZone(zone);
         char hemi = hemisphereString.charAt(0);
-        if (hemi == 'h')hemi = 'H';
+        if (hemi == 'n')hemi = 'N';
         if (hemi == 's')hemi = 'S';
-        if (!((hemi == 'H') || (hemi == 'S'))){
+        if (!((hemi == 'N') || (hemi == 'S'))){
             setValidCoordinate(false);
             return;
         }
+        setHemisphere(hemi);
+
         setEasting  (getMeters(eastingString,   eastingFString));
         setNorthing (getMeters(northingString,  northingFString));
         setElevation(getMeters(elevationString, elevationFString));
@@ -130,7 +129,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
         setConvergenceAngle(Double.valueOf(convergenceString));
         setScaleFactor(Double.valueOf(scaleString));
 
-
+        setValidCoordinate(true);
     }
 
     GBCoordinateUTM(GBCoordinateWGS84 coordinate) {
@@ -157,22 +156,11 @@ class GBCoordinateUTM extends GBCoordinateEN {
      *
      **********/
 
-    //This method returns the type of the instance actually instantiated
-    @Override
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-    void         setCoordinateType(){
-        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeUTM;
-    }
-
-
-    //This method returns the type of the instance as a string for UI display
-    @Override
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
     char   getLatBand()     { return mLatBand;  }
+    void   setLatBand(char latBand)       { mLatBand = latBand; }
+
     char   getHemisphere()  { return mHemisphere; }
     void   setHemisphere(char hemisphere) { mHemisphere = hemisphere;}
-    void   setLatBand(char latBand)       { mLatBand = latBand; }
 
 
     /* ******
@@ -197,9 +185,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //initialize all variables common to EN coordinates
         super.initializeDefaultVariables();
 
-        //initialize all variables from this level
-        mThisCoordinateType  = sCoordinateTypeUTM;
-        mThisCoordinateClass = sCoordinateTypeClassUTM;
+        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeUTM;
         mDatum               = sDatum; //eg WGS84
 
     }

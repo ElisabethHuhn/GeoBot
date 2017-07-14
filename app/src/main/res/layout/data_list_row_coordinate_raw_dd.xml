@@ -14,80 +14,104 @@
     android:background="?android:attr/selectableItemBackground"
     >
 
-    <!-- Project ID -->
+
+
+
+
+    <!-- Time  10 -->
     <TextView
-        android:id="@+id/pointRowProjectID"
-
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="5"
-
-        android:gravity="center"
-        android:layout_marginEnd="8dp"
-
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorWhite"
-
-        />
-
-    <!-- Point ID -->
-    <TextView
-        android:id="@+id/pointRowPointID"
-
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="6"
-
-        android:gravity="center"
-        android:layout_marginEnd="8dp"
-
-        android:textColor="@color/colorTextBlack"
-        android:background="@color/colorWhite"
-
-        />
-
-    <!-- Easting 10-->
-    <TextView
-        android:id="@+id/pointRowEasting"
+        android:id="@+id/coordinateRowTime"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="10"
 
         android:gravity="center"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/row_cap_margin"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
         android:textColor="@color/colorTextBlack"
         android:background="@color/colorWhite"
 
         />
 
-    <!-- Northing 10-->
+
+    <!-- Fixed  2 -->
     <TextView
-        android:id="@+id/pointRowNorthing"
+        android:id="@+id/coordinateRowFixed"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+
+        android:gravity="center"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Valid  2 -->
+    <TextView
+        android:id="@+id/coordinateRowValid"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+
+        android:gravity="center"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Latitude  10 -->
+    <TextView
+        android:id="@+id/coordinateRowLatitude"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="10"
 
         android:gravity="center"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
         android:textColor="@color/colorTextBlack"
         android:background="@color/colorWhite"
 
         />
 
-    <!-- Elevation 10-->
+    <!-- Longitude  10 -->
     <TextView
-        android:id="@+id/pointRowElevation"
+        android:id="@+id/coordinateRowLongitude"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="10"
 
         android:gravity="center"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Elevation 10 -->
+    <TextView
+        android:id="@+id/coordinateRowElevation"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
 
         android:textColor="@color/colorTextBlack"
         android:background="@color/colorWhite"
@@ -95,16 +119,16 @@
         />
 
 
-    <!-- Feature Code -->
+    <!-- Geoid Height 10 -->
     <TextView
-        android:id="@+id/pointRowFeatureCode"
+        android:id="@+id/coordinateRowGeoid"
 
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="5"
+        android:layout_weight="10"
 
         android:gravity="center"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="@dimen/row_cap_margin"
 
         android:textColor="@color/colorTextBlack"
         android:background="@color/colorWhite"

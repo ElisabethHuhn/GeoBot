@@ -13,6 +13,12 @@ import java.util.List;
  */
 class GBSatelliteManager {
 
+    //Quality of fix Information
+    double mHdop;
+    double mVdop;
+    double mPdop;
+
+
     private static List<GBSatellite> sSatelliteList;
 
     private static GBSatelliteManager ourInstance ;
@@ -32,6 +38,28 @@ class GBSatelliteManager {
 
        //Get the satellite data from GPS
         //prepareSatelliteDataset();
+    }
+
+
+    double getHdop() {
+        return mHdop;
+    }
+    void   setHdop(double hdop) {
+        mHdop = hdop;
+    }
+
+    double getVdop() {
+        return mVdop;
+    }
+    void   setVdop(double vdop) {
+        mVdop = vdop;
+    }
+
+    double getPdop() {
+        return mPdop;
+    }
+    void   setPdop(double pdop) {
+        mPdop = pdop;
     }
 
 

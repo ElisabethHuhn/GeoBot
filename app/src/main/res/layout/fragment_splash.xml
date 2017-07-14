@@ -34,6 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_gravity="center_horizontal"
 
+                    android:textSize="20dp"
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorScreenBackground"
                     />
@@ -58,6 +59,7 @@
 
                         android:layout_marginBottom="20dp"
 
+                        android:textSize="20dp"
                         android:textColor=    "@color/colorTextBlack"
                         android:background=   "@color/colorScreenBackground"
                         />
@@ -114,7 +116,7 @@
                         style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/splashOpenButton"
                         android:text="@string/action_project_open"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
                         android:gravity="center"
@@ -133,7 +135,7 @@
                         style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/splashCreateButton"
                         android:text="@string/project_create_button_label"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
                         android:gravity="center"
@@ -151,7 +153,7 @@
                         style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/splashEditButton"
                         android:text="@string/action_project_edit"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
                         android:gravity="center"
@@ -167,22 +169,47 @@
 
                 </LinearLayout>
 
-                <!-- List -->
-                <Button
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:id="@+id/splashProceedButton"
-                    android:text="@string/splash_opened_proj"
+                <!-- open, create, edit -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp"
+                    >
+                    <!-- List -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashListPointsButton"
+                        android:text="@string/list_points_button_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
 
-                    android:gravity="center"
+                        android:layout_weight="25"
+                        android:gravity="center"
 
-                    android:layout_margin="8dp"
+                        android:layout_margin="8dp"
 
-                    android:background="@color/colorGrayer"
-                    android:textColor="@color/colorTextBlack"
-                    />
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
+                    <!-- Measure -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashMeasureButton"
+                        android:text="@string/project_measure_button_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
 
+                        android:layout_weight="25"
+
+                        android:gravity="center"
+
+                        android:layout_margin="8dp"
+
+                        android:background="@color/colorGrayer"
+                        android:textColor="@color/colorTextBlack"
+                        />
+                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>

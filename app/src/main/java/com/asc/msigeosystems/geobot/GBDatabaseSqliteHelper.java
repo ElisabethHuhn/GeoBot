@@ -44,16 +44,15 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //Table Names
-    static final String TABLE_PROJECT =          "Project";
-    static final String TABLE_PROJECT_SETTINGS = "ProjectSettings";
-    static final String TABLE_POINT =            "Point";
-    static final String TABLE_COORDINATE_EN =    "CoordinateEN";
-    static final String TABLE_COORDINATE_LL =    "CoordinateLL";
-    static final String TABLE_COORDINATE_MEAN  = "CoordinateMean";
-    static final String TABLE_MEAN_TOKEN       = "MeanToken";
-    static final String TABLE_MEAN_TOKEN_READINGS = "MeanTokenReadings";
+    static final String TABLE_PROJECT               = "Project";
+    static final String TABLE_PROJECT_SETTINGS      = "ProjectSettings";
+    static final String TABLE_POINT                 = "Point";
+    static final String TABLE_COORDINATE            = "CoordinateEN";
+    static final String TABLE_COORDINATE_MEAN       = "CoordinateMean";
+    static final String TABLE_MEAN_TOKEN            = "MeanToken";
+    static final String TABLE_MEAN_TOKEN_READINGS   = "MeanTokenReadings";
 
-    static final String TABLE_PICTURE =          "Picture";
+    static final String TABLE_PICTURE =             "Picture";
 
 
 
@@ -62,19 +61,26 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //Project Column Names
-    static final String PROJECT_ID =              "proj_id";
-    static final String PROJECT_NAME =            "proj_name";
-    static final String PROJECT_CREATED =         "proj_created";
+    static final String PROJECT_ID              = "proj_id";
+    static final String PROJECT_NAME            = "proj_name";
+    static final String PROJECT_CREATED         = "proj_created";
     static final String PROJECT_LAST_MAINTAINED = "proj_last_maintained";
-    static final String PROJECT_DESCRIPTION =     "proj_description";
+    static final String PROJECT_DESCRIPTION     = "proj_description";
+    //Next point number is stored in Shared Preferences (see the setter and getter on Project)
+    //static final String PROJECT_NXT_POINT_NUM   = "proj_nxt_pt_num";
+    static final String PROJECT_HEIGHT          = "proj_height";
     static final String PROJECT_COORDINATE_TYPE = "proj_coordinate_type";
-    static final String PROJECT_DIST_UNITS      = "proj_dist_units";
+    static final String PROJECT_ZONE            = "proj_zone";
     static final String PROJECT_NUM_MEAN        = "proj_num_mean";
-    static final String PROJECT_EN_V_NE         = "proj_en_v_ne";
-    static final String PROJECT_NXT_POINT_NUM   = "proj_nxt_pt_num";
+    static final String PROJECT_DIST_UNITS      = "proj_dist_units";
+    static final String PROJECT_AUTOSAVE        = "proj_autosave";
+    static final String PROJECT_RMS_V_STDDEV    = "projset_rms_v_stddev";
+    static final String PROJECT_ORDER           = "proj_en_v_ne";
+    static final String PROJECT_DD_V_DMS        = "proj_dd_v_dms";
+    static final String PROJECT_DIR_V_PM        = "proj_dir_v_pm";
+    static final String PROJECT_DATA_SOURCE     = "proj_data_source";
     static final String PROJECT_LOCATION_PRECISION = "projset_location_precision";
-    static final String PROJECT_STDDEV_PRECISION  = "projset_stddev_precision";
-    static final String PROJECT_RMS_V_STDDEV      = "projset_rms_v_stddev";
+    static final String PROJECT_STDDEV_PRECISION   = "projset_stddev_precision";
 
 
     //create project table
@@ -88,14 +94,19 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             PROJECT_CREATED             + " TEXT, "      +
             PROJECT_LAST_MAINTAINED     + " TEXT, "      +
             PROJECT_DESCRIPTION         + " TEXT, "      +
-            PROJECT_COORDINATE_TYPE     + " TEXT, "      +
-            PROJECT_DIST_UNITS          + " INTEGER, "   +
+            PROJECT_HEIGHT              + " REAL, "      +
+            PROJECT_COORDINATE_TYPE     + " INTEGER, "   +
+            PROJECT_ZONE                + " INTEGER, "   +
             PROJECT_NUM_MEAN            + " INTEGER, "   +
-            PROJECT_EN_V_NE             + " INTEGER, "   +
-            PROJECT_NXT_POINT_NUM       + " INTEGER, "   +
-            PROJECT_LOCATION_PRECISION  + " INTEGER, "  +
-            PROJECT_STDDEV_PRECISION    + " INTEGER, "  +
-            PROJECT_RMS_V_STDDEV        + " INTEGER, "  +
+            PROJECT_DIST_UNITS          + " INTEGER, "   +
+            PROJECT_AUTOSAVE            + " INTEGER, "   +
+            PROJECT_RMS_V_STDDEV        + " INTEGER, "   +
+            PROJECT_ORDER               + " INTEGER, "   +
+            PROJECT_DD_V_DMS            + " INTEGER, "   +
+            PROJECT_DIR_V_PM            + " INTEGER, "   +
+            PROJECT_DATA_SOURCE         + " INTEGER, "   +
+            PROJECT_LOCATION_PRECISION  + " INTEGER, "   +
+            PROJECT_STDDEV_PRECISION    + " INTEGER, "   +
             KEY_CREATED_AT              + " DATETIME"    + ")";
 
     /* ***************************************************/
@@ -172,23 +183,23 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //Point Column Names
-    static final String POINT_ID             = "point_id";
-    static final String POINT_FOR_PROJECT_ID = "point_project_id";
-    static final String POINT_ISA_COORDINATE_ID =  "point_coordinate_ID";
-    static final String POINT_NUMBER          = "point_number";
-    static final String POINT_MEAN_TOKENID    = "point_mean_tokenID";
-    static final String POINT_OFFSET_DISTANCE = "point_offset_distance";
-    static final String POINT_OFFSET_HEADING =  "point_offset_heading";
-    static final String POINT_OFFSET_ELEVATION = "point_offset_elevation";
-    static final String POINT_HEIGHT         =  "point_height";
-    static final String POINT_FEATURE_CODE   = "point_feature_code";
-    static final String POINT_NOTES          = "point_notes";
-    static final String POINT_HDOP           = "point_hdop";
-    static final String POINT_VDOP           = "point_vdop";
-    static final String POINT_TDOP           = "point_tdop";
-    static final String POINT_PDOP           = "point_pdop";
-    static final String POINT_HRMS           = "point_hrms";
-    static final String POINT_VRMS           = "point_vrms";
+    static final String POINT_ID                = "point_id";
+    static final String POINT_FOR_PROJECT_ID    = "point_project_id";
+    static final String POINT_ISA_COORDINATE_ID = "point_coordinate_ID";
+    static final String POINT_NUMBER            = "point_number";
+    static final String POINT_MEAN_TOKENID      = "point_mean_tokenID";
+    static final String POINT_OFFSET_DISTANCE   = "point_offset_distance";
+    static final String POINT_OFFSET_HEADING    = "point_offset_heading";
+    static final String POINT_OFFSET_ELEVATION  = "point_offset_elevation";
+    static final String POINT_HEIGHT            = "point_height";
+    static final String POINT_FEATURE_CODE      = "point_feature_code";
+    static final String POINT_NOTES             = "point_notes";
+    static final String POINT_HDOP              = "point_hdop";
+    static final String POINT_VDOP              = "point_vdop";
+    static final String POINT_TDOP              = "point_tdop";
+    static final String POINT_PDOP              = "point_pdop";
+    static final String POINT_HRMS              = "point_hrms";
+    static final String POINT_VRMS              = "point_vrms";
 
 
 
@@ -218,10 +229,10 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
 
     /* ***************************************************/
-    /* ******   EN Coordinates        ********************/
+    /* ******   Location Coordinates      ****************/
     /* ***************************************************/
 
-    //Coordinate EN column names
+    //Coordinate column names
     static final String COORDINATE_ID            = "coord_id";
     static final String COORDINATE_PROJECT_ID    = "coord_project_id";
     static final String COORDINATE_POINT_ID      = "coord_point_id";
@@ -238,8 +249,13 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String COORDINATE_IS_FIXED      = "coord_is_fixed";   //0 = false, 1 = true
     static final String COORDINATE_DATUM         = "coord_datum";       //eg WGS84
 
+    //Note that Lat/Lng and Northing/Easting map to the same columns
+    static final String COORDINATE_LL_LATITUDE   = "coord_en_northing";
+    static final String COORDINATE_LL_LONGITUDE  = "coord_en_easting";
+
     static final String COORDINATE_EN_EASTING    = "coord_en_easting";
     static final String COORDINATE_EN_NORTHING   = "coord_en_northing";
+
     static final String COORDINATE_EN_ZONE       = "coord_en_zone";        //1-60
 
     static final String COORDINATE_UTM_HEMISPHERE = "coord_utm_hemisphere";  //N or S
@@ -249,8 +265,8 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
 
     //create  table
-    private static final String CREATE_TABLE_COORDINATE_EN = "CREATE TABLE " +
-            TABLE_COORDINATE_EN             + "("            +
+    private static final String CREATE_TABLE_COORDINATE = "CREATE TABLE " +
+            TABLE_COORDINATE             + "("            +
             KEY_ID                          + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COORDINATE_ID                   + " INTEGER, "   +
             COORDINATE_PROJECT_ID           + " INTEGER, "   +
@@ -268,8 +284,10 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_IS_FIXED             + " INTEGER, "   + //0 = FALSE, 1 = TRUE
             COORDINATE_DATUM                + " TEXT, "      +
 
+            //Note that Latitude and Longitude map to the same columns as Northing and Easting
             COORDINATE_EN_EASTING           + " REAL, "      +
             COORDINATE_EN_NORTHING          + " REAL, "      +
+
             COORDINATE_EN_ZONE              + " INTEGER, "   +
             COORDINATE_UTM_HEMISPHERE       + " TEXT, "      +
             COORDINATE_UTM_LATBAND          + " TEXT, "      +
@@ -297,16 +315,16 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     //static final String COORDINATE_IS_FIXED           = "coord_is_fixed";   //0=false, 1=true
     //static final String COORDINATE_DATUM              = "coord_datum";       //eg WGS84
 
-    static final String COORDINATE_LL_LATITUDE          = "coord_ll_latitude";
+    //static final String COORDINATE_LL_LATITUDE          = "coord_ll_latitude";
     //static final String COORDINATE_LL_LATITUDE_DEGREE   = "coord_ll_latitude_degree";
     //static final String COORDINATE_LL_LATITUDE_MINUTE   = "coord_ll_latitude_minute";
     //static final String COORDINATE_LL_LATITUDE_SECOND   = "coord_ll_latitude_second";
-    static final String COORDINATE_LL_LONGITUDE         = "coord_ll_longitude";
+    //static final String COORDINATE_LL_LONGITUDE         = "coord_ll_longitude";
     //static final String COORDINATE_LL_LONGITUDE_DEGREE  = "coord_ll_longitude_degree";
     //static final String COORDINATE_LL_LONGITUDE_MINUTE  = "coord_ll_longitude_minute";
     //static final String COORDINATE_LL_LONGITUDE_SECOND  = "coord_ll_longitude_second";
 
-
+/*
     //create  table
     private static final String CREATE_TABLE_COORDINATE_LL = "CREATE TABLE " +
             TABLE_COORDINATE_LL             + "("          +
@@ -327,20 +345,20 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             COORDINATE_IS_FIXED             + " INTEGER, " +//0 = FALSE, 1 = TRUE
             COORDINATE_DATUM                + " TEXT, "    +
 
-             COORDINATE_LL_LATITUDE          + " REAL, "    +
-     /*
-            COORDINATE_LL_LATITUDE_DEGREE   + " INTEGER, " +
-            COORDINATE_LL_LATITUDE_MINUTE   + " INTEGER, " +
-            COORDINATE_LL_LATITUDE_SECOND   + " REAL, "    +
-    */
-            COORDINATE_LL_LONGITUDE         + " REAL, "    +
-    /*
-            COORDINATE_LL_LONGITUDE_DEGREE  + " INTEGER, " +
-            COORDINATE_LL_LONGITUDE_MINUTE  + " INTEGER, " +
-            COORDINATE_LL_LONGITUDE_SECOND  + " REAL, "    +
-    */
-            KEY_CREATED_AT                  + " DATETIME " + ")";
+            COORDINATE_LL_LATITUDE          + " REAL, "    +
 
+            //COORDINATE_LL_LATITUDE_DEGREE   + " INTEGER, " +
+            //COORDINATE_LL_LATITUDE_MINUTE   + " INTEGER, " +
+            //COORDINATE_LL_LATITUDE_SECOND   + " REAL, "    +
+
+            COORDINATE_LL_LONGITUDE         + " REAL, "    +
+
+            //COORDINATE_LL_LONGITUDE_DEGREE  + " INTEGER, " +
+            //COORDINATE_LL_LONGITUDE_MINUTE  + " INTEGER, " +
+            /COORDINATE_LL_LONGITUDE_SECOND  + " REAL, "    +
+
+            KEY_CREATED_AT                  + " DATETIME " + ")";
+*/
 
     /* ***************************************************/
     /* ******   Mean Coordinates       *******************/
@@ -405,6 +423,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     //column names
     static final String MEAN_TOKEN_ID           = "mean_token_id";
     static final String MEAN_TOKEN_PROJECT_ID   = "mean_token_project_id";
+    static final String MEAN_TOKEN_POINT_ID     = "mean_token_point_id";
     static final String MEAN_TOKEN_IN_PROGRESS  = "mean_token_progress";
     static final String MEAN_TOKEN_FIRST        = "mean_token_first";//0 = FALSE, 1 = TRUE
     static final String MEAN_TOKEN_LAST         = "mean_token_last"; //0 = FALSE, 1 = TRUE
@@ -425,6 +444,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             KEY_ID                   + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MEAN_TOKEN_ID            + " INTEGER, "   +
             MEAN_TOKEN_PROJECT_ID    + " INTEGER, "   +
+            MEAN_TOKEN_POINT_ID      + " INTEGER, "   +
             MEAN_TOKEN_IN_PROGRESS   + " INTEGER, "   +
             MEAN_TOKEN_FIRST         + " INTEGER, "   + //0 = FALSE, 1 = TRUE
             MEAN_TOKEN_LAST          + " INTEGER, "   + //0 = FALSE, 1 = TRUE
@@ -546,8 +566,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_PROJECT_SETTINGS);
         db.execSQL(CREATE_TABLE_POINT);
 
-        db.execSQL(CREATE_TABLE_COORDINATE_LL);
-        db.execSQL(CREATE_TABLE_COORDINATE_EN);
+        db.execSQL(CREATE_TABLE_COORDINATE);
         db.execSQL(CREATE_TABLE_COORDINATE_MEAN);
         db.execSQL(CREATE_TABLE_MEAN_TOKEN);
         db.execSQL(CREATE_TABLE_MEAN_TOKEN_READINGS);
@@ -579,8 +598,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT_SETTINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINT);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_EN);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_LL);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_MEAN);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAN_TOKEN);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAN_TOKEN_READINGS);
@@ -603,6 +621,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /*         Generic CRUD routines                */
     /* The same routine will do for all data types  */
     /* **********************************************/
+
 
     //* ************************** CREATE *************************************
 
@@ -629,6 +648,12 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             values.put(id_key, returnKey);
 
             returnCode = db.update(table, values, where_clause, null);
+
+            // TODO: 7/12/2017 If we have just added a new Point, need to increment the point number on the project
+            if (table.equals(GBDatabaseSqliteHelper.TABLE_POINT)){
+                GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)mContext);
+                openProject.incrementPointNumber((GBActivity)mContext);
+            }
 
         } else {
             //Update the existing DB row

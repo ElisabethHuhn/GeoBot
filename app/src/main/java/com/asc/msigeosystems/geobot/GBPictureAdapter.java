@@ -41,7 +41,7 @@ class GBPictureAdapter extends RecyclerView.Adapter<GBPictureAdapter.MyViewHolde
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
 
         View itemView = LayoutInflater.from(parent.getContext())
-                                           .inflate(R.layout.data_picture_list_row, parent,  false);
+                                           .inflate(R.layout.data_list_row_picture, parent,  false);
         return new MyViewHolder(itemView);
 
     }

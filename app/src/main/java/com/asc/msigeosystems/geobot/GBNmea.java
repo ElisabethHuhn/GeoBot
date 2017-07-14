@@ -43,17 +43,17 @@ class GBNmea {
     private List<GBSatellite> mSatelliteList = new ArrayList<>();
 
     //Quality of fix Information
-    double mHdop;
-    double mVdop;
+            double mHdop;
+            double mVdop;
     private double mTdop;
-    double mPdop;
+            double mPdop;
     private double mGdop;
     private double mHrms;
     private double mVrms;
 
 
-    int    mQuality;
-    boolean mFixed;
+            int    mQuality;
+            boolean mFixed;
 
 
     //****************************** Static Methods *********************/
@@ -83,7 +83,7 @@ class GBNmea {
         mTime = time;
     }
 
-    long getTimeStamp() {
+    long   getTimeStamp() {
         return mTimeStamp;
     }
     void   setTimeStamp(long time) {

@@ -49,7 +49,7 @@ public class GBNmeaListFragment extends Fragment implements //GpsStatus.Listener
 
     private LocationManager mLocationManager;
     private GBNmea          mNmeaData;
-    private GBNmeaParser    mNmeaParser = new GBNmeaParser();
+    private GBNmeaParser    mNmeaParser = GBNmeaParser.getInstance();
 
     private GBNmea          mSelectedNmea;
     private int             mSelectedPosition;

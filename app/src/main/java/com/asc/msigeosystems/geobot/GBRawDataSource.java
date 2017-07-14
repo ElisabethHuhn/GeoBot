@@ -18,7 +18,7 @@ import android.support.v4.content.ContextCompat;
 
 public class GBRawDataSource implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
 
-    private static GBNmeaParser mNmeaParser = new GBNmeaParser();
+    private static GBNmeaParser mNmeaParser = GBNmeaParser.getInstance();
     private LocationManager mLocationManager;
     private GBNmea              mNmeaData; //latest nmea sentence received
 

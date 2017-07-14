@@ -63,7 +63,7 @@ public class GBCoordConversionOldFragment extends Fragment {
 
     private void setSubtitle(){
         ((GBActivity)getActivity())
-                .setSubtitle(R.string.subtitle_coordinate_conversion);
+                .setSubtitle(R.string.subtitle_measure);
     }
 
 

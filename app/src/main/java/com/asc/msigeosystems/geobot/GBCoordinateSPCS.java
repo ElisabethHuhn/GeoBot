@@ -20,8 +20,6 @@ class GBCoordinateSPCS extends GBCoordinateEN {
 
     static final String sDatum = "SPCS";
 
-    private CharSequence mThisCoordinateType  = GBCoordinate.sCoordinateTypeSPCS;
-    private CharSequence mThisCoordinateClass = GBCoordinate.sCoordinateTypeClassSPCS;
 
 
     static final double E0     = 2000000.0000; //meters Easting of projection and grid origion
@@ -46,25 +44,13 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         mState = state;
     }
 
-    //This method returns the type of the instance actually instantiated
-    @Override
-    CharSequence getCoordinateType() { return mThisCoordinateType; }
-    void         setCoordinateType(){
-        this.mThisCoordinateType = GBCoordinate.sCoordinateTypeSPCS;
-    }
-
-
-    //This method returns the type of the instance as a string for UI display
-    @Override
-    CharSequence getCoordinateClass(){ return mThisCoordinateClass; }
-
 
 
     //+*******************************************************************/
     //+**********     Constructors                              **********/
     //+*******************************************************************/
 
-    GBCoordinateSPCS() {super.initializeDefaultVariables(); }
+    GBCoordinateSPCS() {initializeDefaultVariables(); }
 
     GBCoordinateSPCS(String zoneString,
                      String stateString,
@@ -80,12 +66,15 @@ class GBCoordinateSPCS extends GBCoordinateEN {
                      String scaleString){
         initializeDefaultVariables();
 
+        setZone     (Integer.valueOf(zoneString));
+        setState    (stateString);
         setEasting  (getMeters(eastingString,   eastingFString));
         setNorthing (getMeters(northingString,  northingFString));
         setElevation(getMeters(elevationString, elevationFString));
         setGeoid    (getMeters(geoidString    , geoidFFString));
         setConvergenceAngle(Double.valueOf(convergenceString));
         setScaleFactor(Double.valueOf(scaleString));
+        setValidCoordinate(true);
     }
 
 
@@ -123,8 +112,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         super.initializeDefaultVariables();
 
         //initialize all variables from this level
-        mThisCoordinateType  = sCoordinateTypeSPCS;
-        mThisCoordinateClass = sCoordinateTypeClassSPCS;
+        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeSPCS;
         mDatum               = sDatum; //eg WGS84
 
 
@@ -245,8 +233,8 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         //But better still is to use the constant from the table.
         // TODO: 6/30/2017 determine which column r is in
         double oneMinusn       = 1. - n;
-        double oneMinusn2      = 1. - n2;
-        double onePlus9n2Over4 = (1. + ((9.*n2)/4.));
+        double oneMinusn2      = 1. - (n*n);
+        double onePlus9n2Over4 = (1. + ((9.* (n*n))/4.));
         double two25n4Over64   = ((225.*n4)/64.) ;
         double r = ( major * oneMinusn * oneMinusn2 * (onePlus9n2Over4 + two25n4Over64));
                 //(1. - n) *(1. - n2) *(1. + ((9.*n2)/4.) + ((225.*n4)/64.) ));

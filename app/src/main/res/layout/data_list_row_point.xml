@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:focusable="true"
+    android:clickable="true"
+
+    android:paddingTop="@dimen/interum_vertical"
+
+    android:background="?android:attr/selectableItemBackground"
+    >
+
+
+    <!-- Point Numb 6 -->
+    <TextView
+        android:id="@+id/pointRowPointNb"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="6"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Easting 10-->
+    <TextView
+        android:id="@+id/pointRowEasting"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Northing 10-->
+    <TextView
+        android:id="@+id/pointRowNorthing"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Elevation 10-->
+    <TextView
+        android:id="@+id/pointRowElevation"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+
+    <!-- Feature Code -->
+    <TextView
+        android:id="@+id/pointRowFeatureCode"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_cap_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+</LinearLayout>
+

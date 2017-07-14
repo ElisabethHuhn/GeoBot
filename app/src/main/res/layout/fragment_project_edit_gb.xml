@@ -30,25 +30,136 @@
         android:stretchColumns="*"
 
         >
-        <!-- Row : Project Screen Label -->
+
+        <!-- Row : Buttons Save, List Points, View Existing Projects  -->
         <TableRow
+
             android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:paddingTop="5dp"
-            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
             >
-            <TextView
-                android:text="@string/project_screen_label"
+
+            <!-- Save -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectSaveChangesButton"
+                android:text="@string/save_label"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_width ="wrap_content"
+                android:layout_weight="1"
 
-                android:gravity="center_horizontal"
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
 
+                android:layout_marginStart="@dimen/row_cap_margin"
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:background="@color/colorGrayer"
                 android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
+                />
+            <!-- List Points -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectListPointsButton"
+                android:text="@string/list_points_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="center_horizontal"
+
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- View Existing Projects -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectViewExistingButton"
+                android:text="@string/project_view_existing_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
                 />
 
         </TableRow>
+
+        <!-- Row : Buttons Map, Export, Measure  -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="@dimen/row_between_rows_margin"
+            android:paddingBottom="@dimen/row_between_rows_margin"
+            >
+
+            <!-- Map -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectMapButton"
+                android:text="@string/project_map_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginStart="@dimen/row_cap_margin"
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- Export -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectExportButton"
+                android:text="@string/project_export_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="center_horizontal"
+
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- Measure -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectMeasureButton"
+                android:text="@string/project_measure_button_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="end"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+
+        </TableRow>
+
 
         <!-- Row : Project Name -->
         <TableRow
@@ -79,7 +190,7 @@
 
                 android:inputType="text"
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                 android:enabled="false"
 
@@ -96,7 +207,7 @@
 
                 android:inputType="text"
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
@@ -133,13 +244,12 @@
                 android:gravity="center"
 
                 android:inputType="date"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
                 android:background="@color/colorGray"
                 />
-
 
         </TableRow>
 
@@ -172,17 +282,16 @@
 
                 android:inputType="date"
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
                 android:background="@color/colorGray"
                 />
 
-
         </TableRow>
 
-        <!-- Row : Number of points -->
+        <!-- Row : Number of points  -->
         <TableRow
 
             android:layout_height="wrap_content"
@@ -209,13 +318,12 @@
                 android:layout_weight="75"
                 android:gravity="center"
 
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
                 android:background="@color/colorGray"
                 />
-
 
         </TableRow>
 
@@ -253,12 +361,37 @@
                 android:scrollbars="horizontal"
 
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
                 />
 
+
+        </TableRow>
+
+
+        <!-- Row : ********************** Settings Title ********************* -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            >
+            <TextView
+                android:labelFor="@+id/distance_units_spinner"
+                android:text="@string/project_settings_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="center"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
 
         </TableRow>
 
@@ -289,33 +422,193 @@
                 android:layout_width  = "0dp"
                 android:layout_height = "wrap_content"
                 android:layout_weight="75"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
                 />
 
         </TableRow>
 
-        <!-- Row : Settings Title -->
+
+        <!-- Row : Height  -->
         <TableRow
 
             android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
+            android:layout_width="match_parent"
             android:layout_gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="5dp"
             >
             <TextView
-                android:labelFor="@+id/distance_units_spinner"
-                android:text="@string/project_settings_label"
+                android:labelFor="@+id/projectHeightOutput"
+                android:text="@string/project_height_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectHeightOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="numberDecimal|numberSigned"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorWhite"
+                />
+
+        </TableRow>
+
+
+        <!-- Row :  SPCS Zone and State -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+
+            <TextView
+                android:labelFor="@+id/projectSpcZoneInput"
+                android:text="@string/spc_zone_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectSpcZoneInput"
+
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="25"
                 android:gravity="center"
 
-                android:paddingEnd="8dp"
+                android:inputType="number"
+
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorWhite"
+                />
+
+            <TextView
+                android:labelFor="@+id/projectSpcStateOutput"
+                android:text="@string/spc_state_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="15"
+                android:gravity="end"
 
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorScreenBackground"
+                />
+            <TextView
+                android:id="@id/projectSpcStateOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="35"
+                android:gravity="center"
+
+
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorGray"
+                />
+
+        </TableRow>
+
+
+        <!-- Row : Next Point Number  -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectNxtPointNumOutput"
+                android:text="@string/project_nxt_point_num"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectNxtPointNumOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="number"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorWhite"
+                />
+
+        </TableRow>
+
+        <!-- Row :  max mean -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+
+            <TextView
+                android:labelFor="@+id/projectNumMeanOutput"
+                android:text="@string/project_num_mean"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectNumMeanOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="number"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorWhite"
                 />
 
         </TableRow>
@@ -345,15 +638,16 @@
                 android:id            = "@id/distance_units_spinner"
                 android:layout_width  = "0dp"
                 android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="8dp"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
+                android:layout_weight ="75"
+                android:gravity       ="center"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+                android:textColor    ="@color/colorTextBlack"
+                android:background   ="@color/colorWhite"
                 />
 
         </TableRow>
 
-        <!-- Row : EN v NE // LatLng v LngLat -->
+        <!-- Row : Data Source -->
         <TableRow
 
             android:layout_height="wrap_content"
@@ -362,7 +656,75 @@
             android:paddingTop="5dp"
             >
             <TextView
-                android:labelFor="@+id/en_v_ne_spinner"
+                android:labelFor="@+id/autosave_spinner"
+                android:text="@string/data_source"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!--  Spinner to indicate whether save is automatic on measure screen -->
+            <Spinner
+                android:id            = "@id/data_source_spinner"
+                android:layout_width  = "0dp"
+                android:layout_height = "wrap_content"
+                android:layout_weight ="75"
+                android:gravity       ="center"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+                android:textColor    ="@color/colorTextBlack"
+                android:background   ="@color/colorWhite"
+                />
+
+        </TableRow>
+
+        <!-- Row : Measure Auto save -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/autosave_spinner"
+                android:text="@string/measure_autosave"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!--  Spinner to indicate whether save is automatic on measure screen -->
+            <Spinner
+                android:id            = "@id/autosave_spinner"
+                android:layout_width  = "0dp"
+                android:layout_height = "wrap_content"
+                android:layout_weight ="75"
+                android:gravity       ="center"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+                android:textColor    ="@color/colorTextBlack"
+                android:background   ="@color/colorWhite"
+                />
+
+        </TableRow>
+
+        <!-- Row : ORDER:  EN v NE // LatLng v LngLat -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/order_spinner"
                 android:text="@string/en_order"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
@@ -375,44 +737,11 @@
 
             <!--  Spinner to indicate the order of EN or NE to appear on the UI -->
             <Spinner
-                android:id            = "@id/en_v_ne_spinner"
+                android:id            = "@id/order_spinner"
                 android:layout_width  = "0dp"
                 android:layout_height = "wrap_content"
                 android:layout_weight="75"
-                android:layout_marginEnd="8dp"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
-        <!-- Row : RMS v StdDev -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/rms_v_stddev_spinner"
-                android:text="@string/rms_stddev_terminology"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate the type of coordinate for the points in this project -->
-            <Spinner
-                android:id            = "@id/rms_v_stddev_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
                 />
@@ -445,7 +774,7 @@
                 android:layout_width  = "0dp"
                 android:layout_height = "wrap_content"
                 android:layout_weight="75"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
                 />
@@ -478,7 +807,41 @@
                 android:layout_width  = "0dp"
                 android:layout_height = "wrap_content"
                 android:layout_weight="75"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorWhite"
+                />
+
+        </TableRow>
+
+
+        <!-- Row : RMS v StdDev -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width ="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/rms_v_stddev_spinner"
+                android:text="@string/rms_stddev_terminology"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+
+            <!--  Spinner to indicate the type of coordinate for the points in this project -->
+            <Spinner
+                android:id            = "@id/rms_v_stddev_spinner"
+                android:layout_width  = "0dp"
+                android:layout_height = "wrap_content"
+                android:layout_weight="75"
+                android:layout_marginEnd="@dimen/row_cap_margin"
                 android:textColor="@color/colorTextBlack"
                 android:background="@color/colorWhite"
                 />
@@ -514,7 +877,7 @@
 
                 android:inputType="number"
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
@@ -553,7 +916,7 @@
 
                 android:inputType="number"
                 android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/row_cap_margin"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
@@ -565,144 +928,6 @@
 
         <!-- Row : Project Pictures List and image -->
 
-
-
-        <!-- Row : Save, List Points, View Existing Projects Buttons -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="10dp"
-            >
-
-            <!-- Save -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectSaveChangesButton"
-                android:text="@string/save_changes_button_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="end"
-
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="8dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-            <!-- List Points -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectListPointsButton"
-                android:text="@string/list_points_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="center_horizontal"
-
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-            <!-- View Existing Projects -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectViewExistingButton"
-                android:text="@string/project_view_existing_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="end"
-
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="8dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-        </TableRow>
-
-
-        <!-- Row : Map, Export, Measure Buttons -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="10dp"
-            >
-
-            <!-- Map -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectMapButton"
-                android:text="@string/project_map_button_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="end"
-
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="8dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-            <!-- Export -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectExportButton"
-                android:text="@string/project_export_button_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="center_horizontal"
-
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-            <!-- Measure -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectMeasureButton"
-                android:text="@string/project_measure_button_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="end"
-
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="8dp"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
-
-        </TableRow>
 
 
     </TableLayout>

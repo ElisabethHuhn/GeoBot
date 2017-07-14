@@ -37,7 +37,7 @@ class GBSatelliteAdapter extends RecyclerView.Adapter<GBSatelliteAdapter.MyViewH
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
 
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.data_satellite_list_row, parent,  false);
+                .inflate(R.layout.data_list_row_satellite, parent,  false);
         return new MyViewHolder(itemView);
 
     }

@@ -6,8 +6,8 @@ import android.os.Bundle;
  * Created by Elisabeth Huhn on 6/17/2016.
  *
  * This class is NOT part of the Coordinate's hierarchy
- * But it is only meant as a temporary
- * holder of statistical data such as standard deviation
+ * But it is only meant as a summary of the meaning process
+ *  The raw data and meaning process flags are kept on an instance of GBMeanToken
  *
  * NOTE all fields are double, even Degrees and Minutes
  *
@@ -262,12 +262,14 @@ class GBCoordinateMean {
     double getElevation()                           {  return mElevation;   }
     void   setElevation(double elevation)           { mElevation = elevation;   }
     double getElevationFeet() {return GBUtilities.convertMetersToFeet(mElevation); }
+    double getElevationIFeet() {return GBUtilities.convertMetersToIFeet(mElevation);}
 
     double getElevationStdDev()                      {return mElevationStdDev;}
     void   setElevationStdDev(double elevationStdDev){mElevationStdDev = elevationStdDev;}
 
     double getGeoid()                               {  return mGeoid; }
     double getGeoidFeet() { return GBUtilities.convertMetersToFeet(mGeoid);}
+    double getGeoidIFeet(){ return GBUtilities.convertMetersToIFeet(mGeoid);}
     void   setGeoid(double geoid)                   { mGeoid = geoid;  }
 
     //RMS is just another term for Std Deviation
@@ -446,9 +448,10 @@ class GBCoordinateMean {
         setLongitudeStdDev (Math.sqrt(residualLong / sizeD));
         setElevationStdDev (Math.sqrt(residualEle  / sizeD));
 
-        //convert DecimalDegrees to Degrees, Minutes, Seconds
-        //Actually, this is done when output to screen
+        //convert DecimalDegrees to Degrees, Minutes, Seconds is done when output to screen
 
+        //if we've gotten this far, it's valid
+        setValidCoordinate(true);
     }
 
 

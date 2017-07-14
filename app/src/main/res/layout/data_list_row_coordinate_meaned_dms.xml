@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:focusable="true"
+    android:clickable="true"
+
+    android:paddingTop="@dimen/interum_vertical"
+
+    android:background="?android:attr/selectableItemBackground"
+    >
+
+
+
+
+
+    <!-- # raw 2 -->
+    <TextView
+        android:id="@+id/coordinateRowRaw"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+
+        android:gravity="center"
+        android:layout_marginStart="@dimen/row_cap_margin"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+
+    <!-- # Fixed  2 -->
+    <TextView
+        android:id="@+id/coordinateRowFixed"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+
+        android:gravity="center"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Valid  2 -->
+    <TextView
+        android:id="@+id/coordinateRowValid"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+
+        android:gravity="center"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Latitude Degrees 5 -->
+    <TextView
+        android:id="@+id/coordinateRowLatitudeDeg"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Latitude Minutes 5 -->
+    <TextView
+        android:id="@+id/coordinateRowLatitudeMin"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Latitude Seconds 10 -->
+    <TextView
+        android:id="@+id/coordinateRowLatitudeSec"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Longitude Degrees  5 -->
+    <TextView
+        android:id="@+id/coordinateRowLongitudeDeg"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Longitude Minutes  5 -->
+    <TextView
+        android:id="@+id/coordinateRowLongitudeMin"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Longitude Seconds 10 -->
+    <TextView
+        android:id="@+id/coordinateRowLongitudeSec"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+    <!-- Elevation 10 -->
+    <TextView
+        android:id="@+id/coordinateRowElevation"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+
+    <!-- Geoid Height 10 -->
+    <TextView
+        android:id="@+id/coordinateRowGeoid"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_cap_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+</LinearLayout>
+

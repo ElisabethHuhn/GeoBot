@@ -239,23 +239,8 @@ public class GBProjectsListFragment extends Fragment {
 
                 /* *************************  COPY   ***************************/
                 }else if (mProjectPath.equals(GBPath.sCopyTag)){
-                    //do a deep copy, assign the next projectID,
-                    // and add the copied project to memory and the DB
-                    GBProjectManager projectManager = GBProjectManager.getInstance();
-                    boolean assignNextID = true;
-                    GBProject toProject = projectManager.deepCopyProject((GBActivity) getActivity(),
-                                                                          mSelectedProject,
-                                                                          assignNextID);
-                    //save the new project
-                    boolean addToDBToo = true;
-                    boolean cascadeFlag = true;
-                    projectManager.addProject(toProject, addToDBToo, cascadeFlag);
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.project_no_copy);
 
-                    //Save the opened project id up in the Activity
-                    GBUtilities.getInstance().setOpenProject((GBActivity)getActivity(),toProject);
-
-                    //then switch to EDIT project with the new project
-                    myActivity.switchToProjectEditScreen();
 
                 /* *************************  DELETE   ***************************/
                 }else if (mProjectPath.equals(GBPath.sDeleteTag)){

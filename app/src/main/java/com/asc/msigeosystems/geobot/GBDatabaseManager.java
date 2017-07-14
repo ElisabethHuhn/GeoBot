@@ -9,6 +9,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import static com.asc.msigeosystems.geobot.GBDatabaseSqliteHelper.TABLE_COORDINATE;
+
 /**
  * Created by Elisabeth Huhn on 6/10/17. Adapted from MedMinder and Prism4D
  * This manager hides the CRUD routines of the DB.
@@ -178,6 +180,7 @@ class GBDatabaseManager {
     // ***********************************************/
     /*         Project CRUD methods                 */
     // ***********************************************/
+
 
 
     /// ********************************** CREATE ********************************
@@ -374,6 +377,26 @@ class GBDatabaseManager {
     /*        Point CRUD methods               */
     // ***********************************************/
 
+    //* *********************  COUNT **********************************
+    //counts the number of points and returns that as the size of the project
+    long getProjectSize(long projectID) {
+
+        if (projectID == GBUtilities.ID_DOES_NOT_EXIST) return 0;
+
+        //read in all the points that belong to the project from the DB
+        Cursor cursor = mDatabaseHelper.getObject(mDatabase,
+                                                    GBDatabaseSqliteHelper.TABLE_POINT,
+                                                    null,    //get the whole point
+                                                    //Only get the points for this project
+                                                    getPointWhereClause(projectID),
+                                                    null, null, null, null);
+
+       long size = cursor.getCount();
+
+        cursor.close();
+
+        return size;
+    }
 
     /// *****************************    Create    ***********************
     //At the helper level, the helper examins the project ID.
@@ -385,7 +408,7 @@ class GBDatabaseManager {
         long returnCode = sDB_ERROR_CODE;
 
         //first add/update the point
-        String whereClause = getPointWhereClause(point.getForProjectID(), point.getPointID());
+        String whereClause = getPointWhereClause(point.getPointID(),point.getForProjectID());
         GBPointManager pointManager = GBPointManager.getInstance();
         returnCode = mDatabaseHelper.add(mDatabase,
                                          GBDatabaseSqliteHelper.TABLE_POINT,
@@ -408,8 +431,6 @@ class GBDatabaseManager {
     //* *********************  Read **********************************
     //Reads the Points in from the DB,
     //     and adds them to the project instance passed as an argument
-
-
     ArrayList<GBPoint> getPointsForProjectFromDB(long projectID) {
 
         //This list will be added to the project after the points are read in
@@ -506,8 +527,6 @@ class GBDatabaseManager {
         GBProject project = projectManager.getProject(projectID);
         if (project == null) return sDB_ERROR_CODE;
 
-        String table = getCoordinateTypeTable(project);
-
         GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
         ContentValues cv = coordinateManager.getCVFromCoordinate(coordinate);
 
@@ -517,7 +536,7 @@ class GBDatabaseManager {
         String whereClause =
                 getCoordinateWhereClause(coordinate.getCoordinateID(), coordinate.getProjectID());
         returnCode = mDatabaseHelper.add(mDatabase,
-                                         table,
+                                         GBDatabaseSqliteHelper.TABLE_COORDINATE,
                                          cv,
                                          whereClause,
                                          GBDatabaseSqliteHelper.COORDINATE_ID);
@@ -531,47 +550,23 @@ class GBDatabaseManager {
             coordinate.setCoordinateID(returnCode);
         }
         return returnCode;
-
     }
 
 
     //* *********************  Read **********************************
 
-    //NOTE this routine does NOT add the coordinate to the Project where
-    GBCoordinate getCoordinateFromDB(long coordinateID, long projectID) {
-        if (coordinateID == GBUtilities.ID_DOES_NOT_EXIST) return null;
-        if (projectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
-
-        String table = getCoordinateTypeTable(projectID);
-
-        //get the coordinate row from the DB
-        Cursor cursor = mDatabaseHelper.getObject(
-                mDatabase,     //the db to access
-                table,  //table name
-                null,          //get the whole coordinate
-                getCoordinateWhereClause(coordinateID, projectID), //where clause
-                null, null, null, null);//args, group, row grouping, order
-
-        //create a coordinate object from the Cursor object
-        GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
-
-        //get the first row in the cursor
-        GBCoordinate coordinate = coordinateManager.getCoordinateFromCursor(cursor, 0);
-        cursor.close();
-        return coordinate;
-    }
 
     //NOTE this routine does NOT add the coordinate to the Project where
-    GBCoordinate getCoordinateFromDB(long coordinateID, String table) {
+    GBCoordinate getCoordinateFromDB(long coordinateID) {
         if (coordinateID == GBUtilities.ID_DOES_NOT_EXIST) return null;
 
         //get the coordinate row from the DB
         Cursor cursor = mDatabaseHelper.getObject(
-                mDatabase,     //the db to access
-                table,  //table name
-                null,          //get the whole coordinate
-                getCoordinateIDWhereClause(coordinateID), //where clause
-                null, null, null, null);//args, group, row grouping, order
+                                        mDatabase,     //the db to access
+                                        TABLE_COORDINATE,  //table name
+                                        null,          //get the whole coordinate
+                                        getCoordinateIDWhereClause(coordinateID), //where clause
+                                        null, null, null, null);//args, group, row grouping, order
 
         //create a coordinate object from the Cursor object
         GBCoordinateManager coordinateManager = GBCoordinateManager.getInstance();
@@ -587,29 +582,23 @@ class GBDatabaseManager {
 
     //* *******************************     Delete    ***************************
     //The return code indicates how many rows affected
-    int removeCoordinate(long coordinateID, long projectID) {
+    int removeCoordinate(long coordinateID) {
         if (coordinateID == GBUtilities.ID_DOES_NOT_EXIST) return 0;
-        if (projectID == GBUtilities.ID_DOES_NOT_EXIST) return 0;
-
-
-        String table = getCoordinateTypeTable(projectID);
 
         return mDatabaseHelper.remove(mDatabase,
-                table,
-                getCoordinateWhereClause(coordinateID, projectID),
-                null);  //values that replace ? in where clause
+                                        GBDatabaseSqliteHelper.TABLE_COORDINATE,
+                                        getCoordinateIDWhereClause(coordinateID),
+                                        null);  //values that replace ? in where clause
     }
 
     //The return code indicates how many rows affected
     int removeProjectCoordinates(long projectID) {
         if (projectID == GBUtilities.ID_DOES_NOT_EXIST) return 0;
 
-        String table = getCoordinateTypeTable(projectID);
-
         return mDatabaseHelper.remove(mDatabase,
-                table,
-                getCoordinateWhereClause(projectID),
-                null);  //values that replace ? in where clause
+                                        GBDatabaseSqliteHelper.TABLE_COORDINATE,
+                                        getCoordinateWhereClause(projectID),
+                                        null);  //values that replace ? in where clause
     }
 
 
@@ -631,28 +620,8 @@ class GBDatabaseManager {
 
     //This gets all the coordinates related to this project
     private String getCoordinateWhereClause(long projectID) {
-        return GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID +
-                " = '" + String.valueOf(projectID) + "'";
+        return GBDatabaseSqliteHelper.COORDINATE_PROJECT_ID + " = '" + String.valueOf(projectID) + "'";
     }
-
-
-    private String getCoordinateTypeTable(GBProject project) {
-        //Get the table to read from from the Project
-        CharSequence coordinateType = project.getProjectCoordinateType();
-        String table = GBDatabaseSqliteHelper.TABLE_COORDINATE_LL; //assume a default
-        if ((coordinateType == GBCoordinate.sCoordinateTypeUTM) ||
-            (coordinateType == GBCoordinate.sCoordinateTypeSPCS)) {
-            table = GBDatabaseSqliteHelper.TABLE_COORDINATE_EN;
-        }
-        return table;
-    }
-
-    private String getCoordinateTypeTable(long projectID) {
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        GBProject project = projectManager.getProject(projectID);
-        return getCoordinateTypeTable(project);
-    }
-
 
     // ***********************************************/
     /*         CoordinateMean CRUD methods              */
@@ -867,7 +836,7 @@ class GBDatabaseManager {
     }
 
 
-    //This gets all the pictures related to this project
+    //This gets the indicataed token from the DB
     String getTokenWhereClause(long tokenID) {
         return GBDatabaseSqliteHelper.MEAN_TOKEN_ID + " = '" + String.valueOf(tokenID) + "'";
     }
@@ -908,10 +877,10 @@ class GBDatabaseManager {
     long  addCoordinateToReading(ContentValues cv, long coordinateID){
 
         long returncode = mDatabaseHelper.add(mDatabase,
-                GBDatabaseSqliteHelper.TABLE_MEAN_TOKEN_READINGS,
-                cv,
-                getReadingWhereClause(coordinateID),
-                GBDatabaseSqliteHelper.COORDINATE_ID);
+                                              GBDatabaseSqliteHelper.TABLE_MEAN_TOKEN_READINGS,
+                                              cv,
+                                              getReadingWhereClause(coordinateID),
+                                              GBDatabaseSqliteHelper.MEAN_TOKEN_READING_ID);
 
         if (returncode == sDB_ERROR_CODE) return sDB_ERROR_CODE;
         //Readings do not exist in GeoBot, only in the DB, so no need to worry about the ID

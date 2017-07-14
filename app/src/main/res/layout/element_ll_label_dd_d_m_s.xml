@@ -5,13 +5,14 @@
     android:orientation         = "vertical"
     android:layout_width        = "match_parent"
     android:layout_height       = "wrap_content"
-    android:layout_marginBottom = "10dp"
+    android:layout_marginBottom = "@dimen/row_between_rows_margin"
     >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 
 
         <!-- | decimal degrees | degrees | minutes | seconds | -->
@@ -22,8 +23,9 @@
             android:text          = "@string/latitude_label"
             android:layout_height = "wrap_content"
             android:layout_width  = "0dp"
-            android:layout_weight = "25"
+            android:layout_weight = "15"
             android:gravity       = "end"
+            android:layout_marginStart="@dimen/row_cap_margin"
 
             android:textColor     = "@color/colorTextBlack"
             android:background    = "@color/colorScreenBackground"
@@ -36,36 +38,16 @@
 
             android:layout_height    = "wrap_content"
             android:layout_width     = "0dp"
-            android:layout_weight    = "75"
+            android:layout_weight    = "60"
             android:gravity          = "center"
 
-            android:layout_marginEnd = "16dp"
+            android:layout_marginEnd = "@dimen/row_between_fields_margin"
 
-            android:inputType        = "numberDecimal"
+            android:inputType        = "numberSigned|numberDecimal"
+            android:enabled          = "false"
 
             android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorWhite"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        >
-
-        <!-- offset -->
-        <TextView
-            android:text          = ""
-            android:layout_height = "wrap_content"
-            android:layout_width  = "0dp"
-            android:layout_weight = "25"
-            android:gravity       = "end"
-
-            android:textColor     = "@color/colorTextBlack"
-            android:background    = "@color/colorScreenBackground"
+            android:background       = "@color/colorGrayish"
             />
 
         <!-- degrees ll_d_input -->
@@ -74,17 +56,16 @@
             android:hint          = "@string/type_degrees_label"
             android:layout_height = "wrap_content"
             android:layout_width  = "0dp"
-            android:layout_weight = "25"
+            android:layout_weight = "15"
             android:gravity       = "center"
 
+            android:layout_marginEnd   = "@dimen/row_between_fields_margin"
+            android:enabled       = "false"
 
-            android:layout_marginStart = "6dp"
-            android:layout_marginEnd   = "6dp"
+            android:inputType     = "numberSigned|number"
 
-            android:inputType        = "numberSigned"
-
-            android:textColor          = "@color/colorTextBlack"
-            android:background         = "@color/colorWhite"
+            android:textColor     = "@color/colorTextBlack"
+            android:background    = "@color/colorGrayish"
             />
 
         <!-- minutes ll_m_input -->
@@ -93,35 +74,34 @@
             android:hint          = "@string/type_minutes_label"
             android:layout_height = "wrap_content"
             android:layout_width  = "0dp"
-            android:layout_weight = "25"
+            android:layout_weight = "15"
             android:gravity       = "center"
 
+            android:layout_marginEnd   = "@dimen/row_between_fields_margin"
+            android:enabled       = "false"
 
-            android:layout_marginStart = "6dp"
-            android:layout_marginEnd   = "6dp"
+            android:inputType     = "numberSigned|number"
 
-            android:inputType        = "numberSigned"
-
-            android:textColor          = "@color/colorTextBlack"
-            android:background         = "@color/colorWhite"
+            android:textColor     = "@color/colorTextBlack"
+            android:background    = "@color/colorGrayish"
             />
 
         <!-- seconds ll_s_input -->
         <EditText
-        android:id            = "@+id/ll_s_Input"
-        android:hint          = "@string/type_seconds_label"
-        android:layout_height = "wrap_content"
-        android:layout_width  = "0dp"
-        android:layout_weight = "25"
-        android:gravity       = "center"
+            android:id            = "@+id/ll_s_Input"
+            android:hint          = "@string/type_seconds_label"
+            android:layout_height = "wrap_content"
+            android:layout_width  = "0dp"
+            android:layout_weight = "35"
+            android:gravity       = "center"
 
-        android:layout_marginStart = "6dp"
-        android:layout_marginEnd   = "16dp"
+            android:layout_marginEnd   = "@dimen/row_cap_margin"
+            android:enabled       = "false"
 
-        android:inputType        = "numberDecimal"
+            android:inputType     = "numberSigned|numberDecimal"
 
-        android:textColor        = "@color/colorTextBlack"
-        android:background       = "@color/colorWhite"
+            android:textColor     = "@color/colorTextBlack"
+            android:background    = "@color/colorGrayish"
         />
 
 

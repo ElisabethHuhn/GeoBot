@@ -8,6 +8,9 @@
     <dimen name="interum_vertical_margin"   >10dp</dimen>
     <dimen name="interum_vertical"          >5dp</dimen>
     <dimen name="interum_vertical_short"    >2dp</dimen>
+    <dimen name="row_cap_margin"            >8dp</dimen>
+    <dimen name="row_between_fields_margin" >4dp</dimen>
+    <dimen name="row_between_rows_margin"   >5dp</dimen>
     <dimen name="fab_margin"                >16dp</dimen>
     <dimen name="button_start_margin"       >16dp</dimen>
     <dimen name="button_end_margin"         >16dp</dimen>

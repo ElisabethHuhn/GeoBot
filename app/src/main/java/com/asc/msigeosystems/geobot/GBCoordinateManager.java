@@ -26,7 +26,7 @@ class GBCoordinateManager {
     /* **********************************/
     /* ******* Static Constants *********/
     /* **********************************/
-    //public static final int COORDINATE_NOT_FOUND = -1;
+    //static final int COORDINATE_NOT_FOUND = -1;
 
 
     /* **********************************/
@@ -42,7 +42,7 @@ class GBCoordinateManager {
     /* **********************************/
     /* ******* Static Methods   *********/
     /* **********************************/
-    public static GBCoordinateManager getInstance() {
+    static GBCoordinateManager getInstance() {
         if (ourInstance == null){
             ourInstance = new GBCoordinateManager();
 
@@ -72,53 +72,49 @@ class GBCoordinateManager {
 
     //* ****************  CREATE *******************************************
 
-    public long addCoordinateMean(GBCoordinateMean coordinateMean){
+    long addCoordinateMean(GBCoordinateMean coordinateMean){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.addCoordinateMean(coordinateMean);
     }
 
-    public long addCoordinate(GBCoordinate coordinate){
+    long addCoordinate(GBCoordinate coordinate){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.addCoordinate(coordinate);
     }
 
-    public long addCoordinateToReading(ContentValues cv, long coordinateID){
+    long addCoordinateToReading(ContentValues cv, long coordinateID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.addCoordinateToReading(cv, coordinateID);
     }
 
     //* ****************  READ *******************************************
 
-    public GBCoordinateWGS84 getCoordinateWgs84(long coordinateID, long projectID){
-        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-        String table = GBDatabaseSqliteHelper.TABLE_COORDINATE_LL; //assume a default
 
-        return (GBCoordinateWGS84) databaseManager.getCoordinateFromDB(coordinateID, projectID);
+    GBCoordinateWGS84 getCoordinateWgs84(long coordinateID){
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+
+        return (GBCoordinateWGS84) databaseManager.getCoordinateFromDB(coordinateID);
     }
 
-    public GBCoordinateWGS84 getCoordinateWgs84(long coordinateID){
-        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-        String table = GBDatabaseSqliteHelper.TABLE_COORDINATE_LL; //assume a default
-
-        return (GBCoordinateWGS84) databaseManager.getCoordinateFromDB(coordinateID, table);
-    }
-
-    public ArrayList<GBCoordinateMean> getAllCoordinateMeanFromDB (int projectID){
+    ArrayList<GBCoordinateMean> getAllCoordinateMeanFromDB (int projectID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.getAllCoordinateMeanFromDB(projectID);
     }
 
-    public GBCoordinateMean getCoordinateMeanFromDB(long coordinateMeanID){
+    GBCoordinateMean getCoordinateMeanFromDB(long coordinateMeanID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.getCoordinateMeanFromDB(coordinateMeanID);
     }
 
-    public ArrayList<GBCoordinateWGS84> getCoordinatesForToken(long tokenID){
-        ArrayList<GBCoordinateWGS84> rawCoordinates = null;
+    ArrayList<GBCoordinateWGS84> getCoordinatesForToken(long tokenID){
+        ArrayList<GBCoordinateWGS84> rawCoordinates = new ArrayList<>();
 
         //Get the cursor of token readings for this tokenID
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         Cursor cursor = databaseManager.getTokenReadings(tokenID);
+
+        //if the cursor is null, there weren't any raw data readings in the DB yet
+        if (cursor == null)return null;
 
         //Step through the cursor, adding to our list of raw coordinates with each row
         int last = cursor.getCount();
@@ -133,6 +129,23 @@ class GBCoordinateManager {
         }
         cursor.close();
         return rawCoordinates;
+    }
+
+    int getRawCoordinatesCount(long tokenID){
+        ArrayList<GBCoordinateWGS84> rawCoordinates = null;
+
+        //Get the cursor of token readings for this tokenID
+        GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
+        Cursor cursor = databaseManager.getTokenReadings(tokenID);
+
+        //if the cursor is null, there weren't any raw data readings in the DB yet
+        if (cursor == null)return 0;
+
+        //Step through the cursor, adding to our list of raw coordinates with each row
+        int last = cursor.getCount();
+
+        cursor.close();
+        return last;
     }
 
     GBCoordinateWGS84 getCoordinateWgsFromTokenReadingsCursor(Cursor cursor, int position){
@@ -162,13 +175,13 @@ class GBCoordinateManager {
 
 
     //The return code indicates how many rows affected
-    public int removeCoordinateMean(int coordinateMeanID, int projectID){
+    int removeCoordinateMean(int coordinateMeanID, int projectID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.removeCoordinateMean(coordinateMeanID, projectID);
     }
 
     //The return code indicates how many rows affected
-    public int removeProjectCoordinatesMean(int projectID){
+    int removeProjectCoordinatesMean(int projectID){
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         return databaseManager.removeProjectCoordinatesMean(projectID);
     }
@@ -309,7 +322,7 @@ class GBCoordinateManager {
             coordinate = (GBCoordinateWGS84) getLLCoordinateFromCursor(coordinate, cursor);
             //There are no specific WGS84 properties beyond LL, so no need for an WGS level method
 
-            coordinate.setCoordinateType();
+            coordinate.setCoordinateDBType(coordinateType);
             return coordinate;
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeNAD83) {
@@ -318,7 +331,7 @@ class GBCoordinateManager {
             coordinate = (GBCoordinateNAD83) getLLCoordinateFromCursor(coordinate, cursor);
             //There are no specific NAD83 properties beyond LL, so no need for an NAD level method
 
-            coordinate.setCoordinateType();
+            coordinate.setCoordinateDBType(coordinateType);
             return coordinate;
 
 
@@ -328,7 +341,7 @@ class GBCoordinateManager {
             coordinate = (GBCoordinateUTM) getENCoordinateFromCursor (coordinate, cursor);
             coordinate =                   getUTMCoordinateFromCursor(coordinate, cursor);
 
-            coordinate.setCoordinateType();
+            coordinate.setCoordinateDBType(coordinateType);
             return coordinate;
 
         } else if (coordinateType == GBCoordinate.sCoordinateDBTypeSPCS) {
@@ -337,7 +350,7 @@ class GBCoordinateManager {
             coordinate = (GBCoordinateSPCS) getENCoordinateFromCursor (coordinate, cursor);
             coordinate =                    getSPSCCoordinateFromCursor(coordinate, cursor);
 
-            coordinate.setCoordinateType();
+            coordinate.setCoordinateDBType(coordinateType);
             return coordinate;
 
         }

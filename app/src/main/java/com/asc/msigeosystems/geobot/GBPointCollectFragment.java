@@ -1581,6 +1581,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         if (meanToken == null) {
             meanToken = new GBMeanToken();
         }
+        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
+        meanToken.setProjectID(openProjectID);
         //start the meaning process by setting the proper flags
         meanToken.setMeanInProgress  (true);
         meanToken.setFirstPointInMean(true);
@@ -2291,7 +2293,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         View v = getView();
         //create the point
         GBPoint point = new GBPoint();
-        point.setForProjectID(project.getProjectID());
+        initializePoint(project, point);
         //ID will be assigned when the point is first saved to the DB
         point.setPointID(GBUtilities.ID_DOES_NOT_EXIST);
         point.setPointNotes(mNotes);
@@ -2311,6 +2313,18 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         return point;
 
     }
+
+    private void initializePoint(GBProject project, GBPoint point){
+        point.setForProjectID(project.getProjectID());
+        point.setHeight(project.getHeight());
+        point.setPointNumber(project.getNextPointNumber((GBActivity)getActivity()));
+        //the point number is not incremented until the point is saved for the first time
+        //The SQL Helper is in charge of assigning both
+        // the DB ID and then incrementing the point number
+//project.incrementPointNumber((GBActivity)getActivity());
+        return;
+    }
+
 
     //create coordinate and add to the point
     private void createCoordinateFromWSG(GBProject project,
