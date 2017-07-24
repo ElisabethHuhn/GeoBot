@@ -11,6 +11,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import java.util.Locale;
 
 import static com.asc.msigeosystems.geobot.R.color.colorNegNumber;
 import static com.asc.msigeosystems.geobot.R.color.colorPosNumber;
+import static com.asc.msigeosystems.geobot.R.id.gpsWgs84LatitudeInput;
 import static com.asc.msigeosystems.geobot.R.id.spcScaleFactor;
 
 /**
@@ -38,6 +40,12 @@ import static com.asc.msigeosystems.geobot.R.id.spcScaleFactor;
  * Created by Elisabeth Huhn on 6/15/2016.
  */
 public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listener, LocationListener, GpsStatus.NmeaListener {
+
+    // TODO: 7/20/2017 Make sure that this is removed for production
+    boolean isDebug = false;
+    boolean isFirst = true;
+    boolean showDOP = false;
+
 
     //These must be in the same order as the items are
     // added to the spinner in wireDataSourceSpinner{}
@@ -150,7 +158,49 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
         initializeMeanProgressUI(v);
 
+        // TODO: 7/20/2017 Remove this debug call
+        setInitialTestValues(v);
+        isFirst = true;
+
         return v;
+    }
+
+    void setInitialTestValues(View v){
+        // TODO: 7/20/2017 Remove this debug routine
+        if (!isDebug) return;
+
+        if (v == null){
+            v = getView();
+            if (v == null)return;
+        }
+        EditText latitudeInput  = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText latDegInput    = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
+        EditText latMinInput    = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
+        EditText latSecInput    = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
+        EditText longitudeInput = (EditText) v.findViewById(R.id.gpsWgs84LongitudeInput);
+        EditText longDegInput   = (EditText) v.findViewById(R.id.gpsWgs84LongDegreesInput);
+        EditText longMinInput   = (EditText) v.findViewById(R.id.gpsWgs84LongMinutesInput);
+        EditText longSecInput   = (EditText) v.findViewById(R.id.gpsWgs84LongSecondsInput);
+        EditText zoneInput      = (EditText) v.findViewById(R.id.spcZoneOutput);
+        /*
+        latitudeInput .setText("34.072935");
+        longitudeInput.setText("-84.189707");
+
+        latDegInput.setText("34");
+        latMinInput.setText("4");
+        latSecInput.setText("22.566");
+
+        longDegInput.setText("-84");
+        longMinInput.setText("11");
+        longSecInput.setText("22.9542");
+        */
+
+        EditText northingInput = (EditText) v.findViewById(R.id.spcNorthingMetersOutput);
+        EditText eastingInput  = (EditText) v.findViewById(R.id.spcEastingMetersOutput);
+        northingInput.setText("451593.292");
+        eastingInput .setText("697873.457");
+
+        zoneInput     .setText("1002");
     }
 
 
@@ -330,6 +380,14 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
         //Start / stop Mean Button
         Button startMeanButton = (Button) v.findViewById(R.id.startMeanButton);
+        startMeanButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDOP = !showDOP;
+
+                return true;
+            }
+        });
         startMeanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -392,6 +450,22 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
     }
 
+    private void showDop() {
+        GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
+        String dopValues = String.format(Locale.getDefault(),
+                "HDOP = %.3f     VDOP = %.3f      PDOP = %.3f",
+                satelliteManager.getHdop(),
+                satelliteManager.getVdop(),
+                satelliteManager.getPdop());
+
+        View view = getView();
+        if (view == null)return ;
+
+        Snackbar.make(view, dopValues, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+
+    }
+
 
     private void turnOffViews(View v, boolean isDD, int distUnits){
 
@@ -402,7 +476,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
         //Raw GPS
         //GPS Latitude
-        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(gpsWgs84LatitudeInput);
         TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -699,7 +773,10 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
                 GBUtilities.getInstance().showStatus(getActivity(), msg);
 
-
+                if (isDebug && isFirst){
+                    setInitialTestValues(null);
+                    isFirst = false;
+                }
 
             }
 
@@ -719,11 +796,11 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
     }
 
     private void initializeUI(View v){
-        GBProject openProdject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        int zone = openProdject.getZone();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        int zone = openProject.getZone();
         updateSpcsZone(v, zone);
 
-        String distUnitString = openProdject.getDistUnitString();
+        String distUnitString = openProject.getDistUnitString();
         updateDistUnits(v, distUnitString);
 
     }
@@ -836,6 +913,9 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
     //            Process the received NMEA sentence                    //
     //******************************************************************//
     void handleNmeaReceived(long timestamp, String nmea) {
+        if (showDOP){
+            showDop();
+        }
 
         try {
             //no need to process the sentence if no longer attached to the activity
@@ -1011,7 +1091,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         //TextView TimeOutput   = (TextView) v.findViewById(R.id.gpsWgs84TimeOutput);
         TextView TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(gpsWgs84LatitudeInput);
         TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -1255,7 +1335,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         //TextView TimeOutput   = (TextView) v.findViewById(R.id.gpsWgs84TimeOutput);
         TextView TimestampOutput = (TextView)v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(gpsWgs84LatitudeInput);
         TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -1277,6 +1357,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
         TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
+        EditText ScaleFactorOutput      = (EditText) v.findViewById(R.id.gpsWgs84ScaleFactor);
 
         long timeStamp = coordinateWGS84.getTime();
         String timestampString = GBUtilities.getDateTimeString(timeStamp);
@@ -1290,15 +1371,17 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
             TimestampOutput.setText(timestampString);
         }
 
-        LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
+        LatitudeInput         .setText(doubleToUI(coordinateWGS84.getLatitude()));
 
-        LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
+        LongitudeInput        .setText(doubleToUI(coordinateWGS84.getLongitude()));
 
         ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
         GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
-        ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
-        GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
+        ElevationFeetInput    .setText(doubleToUI(coordinateWGS84.getElevationFeet()));
+        GeoidHeightFeetInput  .setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
 
+        ConvergenceAngleInput .setText(doubleToUI(coordinateWGS84.getConvergenceAngle()));
+        ScaleFactorOutput     .setText(doubleToUI(coordinateWGS84.getScaleFactor()));
 
         //input range check depends on what is being converted
         boolean isCA = false;
@@ -1687,7 +1770,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
                     return;
                 }
                 coordinateWGS84 = new GBCoordinateWGS84(coordinateUTM);
-                if ((coordinateWGS84 == null) || !coordinateWGS84.isValidCoordinate()){
+                if ( !coordinateWGS84.isValidCoordinate()){
                     GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_failed);
                     return;
                 }
@@ -1762,7 +1845,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         //EditText TimeOutput      = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
         TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(gpsWgs84LatitudeInput);
         EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -1809,7 +1892,9 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
                                                 ElevationMetersInput.getText().toString(),
                                                 ElevationFeetInput.getText().toString(),
                                                 GeoidHeightMetersInput.getText().toString(),
-                                                GeoidHeightFeetInput.getText().toString());
+                                                GeoidHeightFeetInput.getText().toString(),
+                                                ConvergenceAngleInput.getText().toString(),
+                                                ScaleFactorInput.getText().toString());
         if (!coordinateWGS84.isValidCoordinate()){
 
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_try_again);
@@ -1874,11 +1959,16 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         TextView spcsElevationFeetInput     = (TextView) v.findViewById(R.id.spcsElevationFeetInput);
         TextView spcsGeoidHeightFeetInput   = (TextView) v.findViewById(R.id.spcsGeoidHeightFeetInput);
 
-        TextView ConvergenceInput      = (TextView) v.findViewById(R.id.spcConvergenceInput);
+        TextView ConvergenceInput       = (TextView) v.findViewById(R.id.spcConvergenceInput);
         TextView CAdegInput             = (TextView) v.findViewById(R.id.spcConvDegreesInput);
         TextView CAminInput             = (TextView) v.findViewById(R.id.spcConvMinutesInput);
         TextView CAsecInput             = (TextView) v.findViewById(R.id.spcConvSecondsInput);
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.spcScaleFactor);
+        EditText ScaleFactorOutput      = (EditText) v.findViewById(R.id.spcScaleFactor);
+
+        String geoidMString           = spcsGeoidHeightMetersInput.getText().toString();
+        String geoidFString           = spcsGeoidHeightFeetInput.getText().toString();
+        String convergenceAngleString = ConvergenceInput.getText().toString();
+        String scaleFactorString      = ScaleFactorOutput.getText().toString();
 
 
 
@@ -2033,7 +2123,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         // EditText TimeOutput   = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
         TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(gpsWgs84LatitudeInput);
         EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -2205,7 +2295,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         TextView TimestampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
 
         //GPS Latitude
-        TextView LatitudeInput   = (TextView) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        TextView LatitudeInput   = (TextView) v.findViewById(gpsWgs84LatitudeInput);
         TextView LatDegreesInput = (TextView) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         TextView LatMinutesInput = (TextView) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         TextView LatSecondsInput = (TextView) v.findViewById(R.id.gpsWgs84LatSecondsInput);
@@ -2344,11 +2434,11 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
 
 
         //convergence & scale factor
-        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.gpsWgs84ConvergenceInput);
-        TextView CAdegInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvDegreesInput);
-        TextView CAminInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvMinutesInput);
-        TextView CAsecInput             = (TextView) v.findViewById(R.id.gpsWgs84ConvSecondsInput);
-        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.gpsWgs84ScaleFactor);
+        TextView ConvergenceAngleInput  = (TextView) v.findViewById(R.id.utmConvergenceInput);
+        TextView CAdegInput             = (TextView) v.findViewById(R.id.utmConvDegreesInput);
+        TextView CAminInput             = (TextView) v.findViewById(R.id.utmConvMinutesInput);
+        TextView CAsecInput             = (TextView) v.findViewById(R.id.utmConvSecondsInput);
+        TextView ScaleFactorOutput      = (TextView) v.findViewById(R.id.utmScaleFactor);
 
 
         utmZoneOutput.          setText("");
@@ -2439,7 +2529,7 @@ public class GBCoordMeasureFragment extends Fragment implements GpsStatus.Listen
         //EditText TimeOutput      = (EditText) v.findViewById(R.id.gpsWgs84TimeOutput);
         TextView TimeStampOutput = (TextView) v.findViewById(R.id.gpsWgs84TimestampOutput);
         //GPS Latitude
-        EditText LatitudeInput   = (EditText) v.findViewById(R.id.gpsWgs84LatitudeInput);
+        EditText LatitudeInput   = (EditText) v.findViewById(gpsWgs84LatitudeInput);
         EditText LatDegreesInput = (EditText) v.findViewById(R.id.gpsWgs84LatDegreesInput);
         EditText LatMinutesInput = (EditText) v.findViewById(R.id.gpsWgs84LatMinutesInput);
         EditText LatSecondsInput = (EditText) v.findViewById(R.id.gpsWgs84LatSecondsInput);

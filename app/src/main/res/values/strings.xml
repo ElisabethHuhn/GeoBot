@@ -132,6 +132,7 @@
     <string name="subtitle_workflow"                >Coordinate Workflow</string>
     <string name="subtitle_measure"                 >Measure Coordinate</string>
     <string name="subtitle_raw_data"                >Raw Meaned Data</string>
+    <string name="subtitle_export"                  >Export Project Points</string>
 
 
 
@@ -306,22 +307,22 @@
 
     <!--      NEW SCREEN                        -->
     <!-- Maintain/List Points Screen Strings -->
-    <string name="point_screen_label"      >All Point Attributes MUST have a value</string>
-    <string name="point_project_name"      >Project:</string>
-    <string name="point_screen_id_label"   >Point Nb: </string>
-    <string name="point_easting_label"     >Easting: </string>
-    <string name="point_northing_label"    >Northing: </string>
-    <string name="point_elevation_label"   >Elevation: </string>
-    <string name="point_feature_code_label">FC: </string>
-    <string name="point_notes_label"       >Notes: </string>
+    <string name="point_screen_label"           >All Point Attributes MUST have a value</string>
+    <string name="point_project_name"           >Project:</string>
+    <string name="point_screen_id_label"        >Point Nb: </string>
+    <string name="point_easting_label"          >Easting: </string>
+    <string name="point_northing_label"         >Northing: </string>
+    <string name="point_elevation_label"        >Elevation: </string>
+    <string name="point_feature_code_label"     >FC: </string>
+    <string name="point_notes_label"             >Notes: </string>
     <string name="point_offset_distance_label"   >Offset Distance: </string>
     <string name="point_offset_heading_label"    >Offset Heading: </string>
     <string name="point_offset_elevation_label"  >Offset Elevation: </string>
     <string name="point_height_label"            >Height: </string>
-    <string name="point_num_raw"           >Nb Raw:</string>
-    <string name="unk_coord_type"          >Unknown Coordinate Type</string>
+    <string name="point_num_raw"                >Nb Raw:</string>
+    <string name="unk_coord_type"               >Unknown Coordinate Type</string>
 
-    <string name="unknown_process">UNKNOWN process</string>
+    <string name="unknown_process"              >UNKNOWN process</string>
 
     <string name="cant_view_projects"           >Can not view projects on create path</string>
     <string name="cant_view_points"             >Can not view points on create path</string>
@@ -782,6 +783,7 @@
     <string name="start_stop_mean"          >Start / Stop Mean </string>
     <string name="data_source_label"        >Coordinate Source</string>
     <string name="select_data_source"       >Select Data Source</string>
+    <string name="unknown_data_source"      >Unknown Data Source</string>
     <string name="manual_wgs_data_source"   >Manual WGS84 Entry</string>
     <string name="manual_spcs_data_source"  >Manual SPCS Entry</string>
     <string name="manual_utm_data_source"   >Manual UTM Entry</string>
@@ -879,8 +881,83 @@
     <string name="cancel_pressed"               >Pressed Cancel</string>
 
 
-    <!-- Collect Points Info Window  -->
-    <!-- Menu Items -->
+    <!-- Exchange Screen  -->
+    <string name="export_destinations"        >--------Destination of Exported Information---------</string>
+    <string name="export_radio_email"         >Email</string>
+    <string name="export_radio_text"          >Text</string>
+    <string name="export_radio_file"          >File</string>
+    <string name="export_radio_general"       >General</string>
+    <string name="export_content"             >-------------- Content to be Exported --------------</string>
+    <string name="export_content_readability" >-------------- Content Readability --------------</string>
+    <string name="export_lf_on_comma_off"     >Off = comma deliminated, On = Linefeed for readability</string>
+
+    <string name="exchange_proj_properties"     >---------- Project Properties to export ----------</string>
+    <string name="exc_switch_proj_headers"     >Include Headers?</string>
+    <string name="exc_switch_proj_name"          >Name</string>
+    <string name="exc_switch_proj_create"        >Created</string>
+    <string name="exc_switch_proj_last_touched"  >Last Touched</string>
+    <string name="exc_switch_proj_desc"          >Desc</string>
+
+    <string name="exchange_proj_settings"      >---------- Project Settings Included in Export ----------</string>
+    <string name="exc_switch_proj_height"        >Height</string>
+    <string name="exc_switch_proj_coord_type"    >Coord Type</string>
+    <string name="exc_switch_proj_nb_mean"       >Nb in Mean</string>
+    <string name="exc_switch_proj_zone"          >Zone</string>
+    <string name="exc_switch_proj_dist_units"    >Dist Unitsc</string>
+    <string name="exc_switch_proj_autosave"      >Autosave</string>
+    <string name="exc_switch_proj_rmsVstd"       >RMS v StdDev</string>
+
+    <string name="exc_switch_proj_ui_order"      >UI Order</string>
+    <string name="exc_switch_proj_ddVdms"        >DD v DMS</string>
+    <string name="exc_switch_proj_dirVpm"        >Dir v PlusMinus</string>
+    <string name="exc_switch_proj_data_src"      >Data Source</string>
+
+    <string name="exc_switch_proj_loc_prc"       >Loc Precision</string>
+    <string name="exc_switch_proj_std_prc"       >RMS Precision</string>
+
+    <string name="exchange_point_properties"    >---------- Point Properties to Export ----------</string>
+    <string name="exc_switch_pnt_nb"             >Point Number</string>
+    <string name="exc_switch_pnt_ismeaned"       >Is Meaned</string>
+    <string name="exc_switch_pnt_fc"             >Feature Code</string>
+    <string name="exc_switch_pnt_height"         >Height</string>
+    <string name="exc_switch_pnt_notes"          >Notes</string>
+    <string name="exc_switch_pnt_off_dist"       >Offset Dist</string>
+    <string name="exc_switch_pnt_off_head"       >Offset Heading</string>
+    <string name="exc_switch_pnt_off_elev"       >Offset Elevation</string>
+    <string name="exc_switch_pnt_hdop"           >HDOP</string>
+    <string name="exc_switch_pnt_vdop"           >VDOP</string>
+    <string name="exc_switch_pnt_pdop"           >PDOP</string>
+    <string name="exc_switch_pnt_tdop"           >TDOP</string>
+    <string name="exc_switch_pnt_hrms"           >HRMS</string>
+    <string name="exc_switch_pnt_vrms"           >VRMS</string>
+
+    <string name="start_pt_nb_label"              >Starting Point Number</string>
+    <string name="end_pt_nb_label"                >Ending Point Number</string>
+
+
+
+
+    <string name="exc_switch_pnt_coord_prop"     >Coordinate Properties</string>
+    <string name="exc_switch_pnt_ll_prop"        >Pt Nb</string>
+
+
+    <string name="export_subject"                 >Export of Project %s</string>
+    <string name="export_label"                   >Export</string>
+    <string name="export_chooser_title"           >Export to:</string>
+    <string name="export_file_written"            >Export file has been written</string>
+    <string name="export_no_app" >No app found on your phone which can perform this export</string>
+
+    <string name="directory_path_label"             >Dir Path:</string>
+    <string name="sub_directory_label"              >Sub-Dir:</string>
+    <string name="filename_extent_label"            >File Suffix:</string>
+    <string name="export_filename_label"            >File Name</string>
+    <string name="export_file_extent"               >.txt</string>
+    <string name="extent_hint"                      >Appended if file name exists</string>
+    <string name="error_writing_file"               >ERROR writing file. Data not saved</string>
+    <string name="error_unable_to_create_file">ERROR unable to create file. Data not saved</string>
+    <string name="error_unable_to_access_storage"   >ERROR: unable to access storage. Data not saved</string>
+
+    <!-- Snackbar display of DOP values -->
 
     <!-- Button Labels -->
 

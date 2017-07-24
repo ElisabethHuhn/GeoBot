@@ -20,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.Locale;
+
 import static com.asc.msigeosystems.geobot.GBPath.sDeleteTag;
 import static com.asc.msigeosystems.geobot.GBPath.sShowTag;
 import static com.asc.msigeosystems.geobot.R.string.action_global_settings;
@@ -56,6 +58,8 @@ public class GBActivity extends AppCompatActivity {
     //private static final String sProjectUpdateTag      = "PROJECT_UPDATE";
     //private static final String sProjectDeleteTag      = "PROJECT_DELETE";
     private static final String sProjectSettingsTag    = "PROJECT_SETTINGS";
+
+    static final String sExportTag             = "EXPORT_TAG";
 
     private static final String sPointTopTag           = "POINT_TOP";
     private static final String sPointCreateTag        = "POINT_CREATE_TOP";
@@ -446,8 +450,18 @@ public class GBActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        if (fragment instanceof  GBTopHomeFragment){
-            Snackbar.make(view, getString(R.string.snackbar_example), Snackbar.LENGTH_LONG)
+        if (fragment instanceof  GBCoordMeasureFragment){
+            GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
+            String dopValues = String.format(Locale.getDefault(),
+                                        "HDOP = %.3f     VDOP = %.3f      PDOP = %.3f",
+                                         satelliteManager.getHdop(),
+                                         satelliteManager.getVdop(),
+                                         satelliteManager.getPdop());
+
+
+
+
+            Snackbar.make(view, dopValues, Snackbar.LENGTH_INDEFINITE)
                     .setAction("Action", null).show();
 
             if (fab.getVisibility() == FloatingActionButton.VISIBLE){
@@ -778,6 +792,21 @@ public class GBActivity extends AppCompatActivity {
 
 
     }
+
+    // ******************************************
+    // * Export
+    // *******************************************/
+    void switchToExportScreen(){
+
+
+        Fragment fragment = new GBExportFragment();
+        String tag        = sExportTag;
+
+        switchScreen(fragment, tag);
+
+
+    }
+
 
     // ******************************************
     // * POINTS

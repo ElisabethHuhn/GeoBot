@@ -524,12 +524,13 @@ public class GBProjectEditFragment extends    Fragment {
                     } else if (oldPosition == GBCoordinate.sCoordinateDBTypeWGS84){
                         orderSpinner.setAdapter(enAdapter);
                         enAdapter.notifyDataSetChanged();
-
+/* leave the dd v dms spinner enabled always
                         ddVdmsSpinner.setBackgroundColor(Color.LTGRAY);
                         ddVdmsSpinner.setEnabled(false);
 
                         dirVplusminusSpinner.setBackgroundColor(Color.LTGRAY);
                         ddVdmsSpinner.setEnabled(false);
+ */
                     }
                 }
 
@@ -638,7 +639,8 @@ public class GBProjectEditFragment extends    Fragment {
             }
         });
 
-
+        // TODO: 7/23/2017 look into when and which spinners should be disabled
+/* for now, leave everything enabled forever
         //The size of a project is it's number of points
         if (mProjectBeingMaintained.getSize() > 0){
             //can't change if any points are on the project
@@ -665,7 +667,7 @@ public class GBProjectEditFragment extends    Fragment {
             dirVplusminusSpinner.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorGray));
         }
         //mPointCoordinateTypePrompt = (TextView) v.findViewById(R.id.coordinate_prompt);
-
+*/
     }
 
 
@@ -909,7 +911,7 @@ public class GBProjectEditFragment extends    Fragment {
         distUnitsSpinner    .setSelection(mProjectBeingMaintained.getDistanceUnits());
         autosaveSpinner     .setSelection(mProjectBeingMaintained.getAutosave());
         rmsVstddevSpinner   .setSelection(mProjectBeingMaintained.getRMSvStD());
-        orderSpinner        .setSelection(mProjectBeingMaintained.getOrderOnUI());
+        orderSpinner        .setSelection(mProjectBeingMaintained.getUIOrder());
         ddVdmsSpinner       .setSelection(mProjectBeingMaintained.getDDvDMS());
         dirVplusminusSpinner.setSelection(mProjectBeingMaintained.getDIRvPlusMinus());
         dataSourceSpinner   .setSelection(mProjectBeingMaintained.getDataSource());
@@ -996,8 +998,8 @@ public class GBProjectEditFragment extends    Fragment {
             GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
             return;
         }
-        //((GBActivity)getActivity()).switchToPointCreateScreen(project);
-        GBUtilities.getInstance().showStatus(getActivity(), "Export of project points not yet supported");
+        ((GBActivity)getActivity()).switchToExportScreen();
+        //GBUtilities.getInstance().showStatus(getActivity(), "Export of project points not yet supported");
 
 
     }

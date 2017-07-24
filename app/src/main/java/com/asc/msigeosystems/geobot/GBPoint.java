@@ -1,5 +1,7 @@
 package com.asc.msigeosystems.geobot;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -33,6 +35,48 @@ class GBPoint {
 
     static final int    sPointNewID   = -2;
     static final String sPointNewDesc = "";
+
+
+    //Tags for shared pref settings for whether the property was exported last time
+    static final String sPointProjectIDExportTag  = "POINT_PROJECT_ID_EXPORT";
+    static final String sPointNameExportTag       = "POINT_NAME_EXPORT";
+    static final String sPointIsMeanedExportTag   = "POINT_IS_MEANED_EXPORT";
+    static final String sPointCoordinateExportTag = "POINT_COORD_EXPORT";
+    static final String sPointNumberExportTag    = "POINT_NUMBER_EXPORT";
+    static final String sPointHeightExportTag    = "POINT_HEIGHT_EXPORT";
+    static final String sPointFCExportTag        = "POINT_FC_EXPORT";
+    static final String sPointNotesExportTag     = "POINT_NOTES_EXPORT";
+    static final String sPointTokenExportTag     = "POINT_TOKEN_EXPORT";
+    static final String sPointOffDistExportTag   = "POINT_OFF_DIST_EXPORT";
+    static final String sPointOffHeadExportTag   = "POINT_OFF_HEAD_EXPORT";
+    static final String sPointOffEleExportTag    = "POINT_OFF_ELE_EXPORT";
+    static final String sPointHdopExportTag      = "POINT_HDOP_EXPORT";
+    static final String sPointVdopExportTag      = "POINT_VDOP_EXPORT";
+    static final String sPointPdopExportTag      = "POINT_PDOP_EXPORT";
+    static final String sPointTdopExportTag      = "POINT_TDOP_EXPORT";
+    static final String sPointHrmsExportTag      = "POINT_HRMS_EXPORT";
+    static final String sPointVrmsExportTag      = "POINT_VRMS_EXPORT";
+
+
+
+    static boolean getPointExport (GBActivity activity, String tag) {
+        if (activity == null){
+            return false;
+        }
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        boolean defaultValue = true;
+        return sharedPref.getBoolean(tag, defaultValue);
+    }
+    static void    setPointExport  (GBActivity activity, String tag, boolean isExported) {
+        if (activity == null){
+            return;
+        }
+        //Store the PersonID for the next time
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(tag, isExported);
+        editor.apply();
+    }
 
 
 

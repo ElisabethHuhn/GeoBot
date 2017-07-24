@@ -61,19 +61,57 @@ class GBCoordinateSPCS extends GBCoordinateEN {
                      String elevationString,
                      String elevationFString,
                      String geoidString,
-                     String geoidFFString,
+                     String geoidFString,
                      String convergenceString,
                      String scaleString){
         initializeDefaultVariables();
 
-        setZone     (Integer.valueOf(zoneString));
+        if (GBUtilities.isEmpty(zoneString)){
+            setZone((int) GBUtilities.ID_DOES_NOT_EXIST);
+        } else {
+            setZone(Integer.valueOf(zoneString));
+        }
         setState    (stateString);
-        setEasting  (getMeters(eastingString,   eastingFString));
-        setNorthing (getMeters(northingString,  northingFString));
-        setElevation(getMeters(elevationString, elevationFString));
-        setGeoid    (getMeters(geoidString    , geoidFFString));
-        setConvergenceAngle(Double.valueOf(convergenceString));
-        setScaleFactor(Double.valueOf(scaleString));
+        if ((!GBUtilities.isEmpty(eastingString))||
+            (!GBUtilities.isEmpty(eastingFString))) {
+
+            setEasting(getMeters(eastingString, eastingFString));
+        } else {
+            setEasting(0d);
+        }
+        if ((!GBUtilities.isEmpty(northingString))||
+            (!GBUtilities.isEmpty(northingFString))) {
+            setNorthing(getMeters(northingString, northingFString));
+        } else {
+            setNorthing(0d);
+        }
+        if ((!GBUtilities.isEmpty(elevationString))||
+            (!GBUtilities.isEmpty(elevationFString))) {
+
+            setElevation(getMeters(elevationString, elevationFString));
+        } else {
+            setElevation(0d);
+        }
+        if ((!GBUtilities.isEmpty(geoidString))||
+            (!GBUtilities.isEmpty(geoidFString))) {
+            setGeoid(getMeters(geoidString, geoidFString));
+        } else {
+            setGeoid(0d);
+        }
+
+        if (!GBUtilities.isEmpty(convergenceString)) {
+
+            setConvergenceAngle(Double.valueOf(convergenceString));
+        } else {
+            setConvergenceAngle(0d);
+        }
+        if (!GBUtilities.isEmpty(scaleString)) {
+
+            setScaleFactor(Double.valueOf(scaleString));
+        } else {
+            setScaleFactor(0d);
+        }
+
         setValidCoordinate(true);
     }
 
@@ -127,6 +165,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
     private void convertWithLambert(GBCoordinateWGS84 coordinateWGS84,
                                     GBCoordinateConstants constants){
         //Convert degrees to radians (radians = degrees * pi/180)
+        //All lat lng values are in decimal degrees
         double latAts  = coordinateWGS84.getLatitude() ;
         double latAtcp = constants.getCentralParallel();
 
@@ -134,6 +173,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double lngAtcm = constants.getCentralMeridian();
 
         //Equ #1  ΔΦ  =  Φ  –  Bo
+        // deltaLatitude is in meters
         double deltaLatitude = latAts - latAtcp;
         double deltaLatitude2 = deltaLatitude * deltaLatitude;
         double deltaLatitude3 = deltaLatitude * deltaLatitude2;
@@ -154,9 +194,12 @@ class GBCoordinateSPCS extends GBCoordinateEN {
                    uTerm5 ;
 
         //Equ #3 R = Ro – u
+
         double RMappingRadiusAtStation = constants.getRoMappingRadiusAtLat() - u;
 
         //Equ #4 Δ λ  =  λo  -  λ
+        //all terms in decimal degrees
+
         // TODO: 6/30/2017 This equation must refer to user Project Preferences. A W value is positive, while a PlusMinus value is negative
         // TODO: 6/30/2017 In any case, this is NOT an absolute value calculation
         //if user preference is directions, a W value is positive,
@@ -168,6 +211,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double sincp    = Math.sin(Math.toRadians(latAtcp));
 
         //Equ #5) 	γ  =  Δ λ x sin (Φo)
+        //convergenceAngle is decimal degrees
         double convergenceAngle = deltaLng * sincp;
 
         double sinCA = Math.sin(Math.toRadians(convergenceAngle));
@@ -176,6 +220,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double E1 = RMappingRadiusAtStation * sinCA;
 
         //Equ #7) 	E  =  E1 + Eo
+        //Units of E are meters
         double easting = E1 + constants.getFalseEasting();
 
         double tanCA = Math.tan(Math.toRadians(convergenceAngle / 2.));
@@ -184,6 +229,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double N1 = u + (E1 * tanCA);
 
         //Equ #9) 	N  =  N1 + No2
+        //units of northing are meters
         double northing = N1 + constants.getFalseNorthing2();
 
         double F1 = constants.getF1();
@@ -200,6 +246,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         super.setEasting(easting);
         super.setScaleFactor(scaleFactor);
         super.setConvergenceAngle(convergenceAngle);
+        super.setValidCoordinate(true);
 
     }
 
@@ -207,61 +254,73 @@ class GBCoordinateSPCS extends GBCoordinateEN {
     private void convertWithMercator(GBCoordinateWGS84 coordinateWGS84,
                                     GBCoordinateConstants constants){
 
-        //Convert degrees to radians (radians = degrees * pi/180)
-        double latAts  = Math.toRadians(coordinateWGS84.getLatitude());
-        double latAtcp = Math.toRadians(constants.getCentralParallel());
+        //All Latitude and Longitude values are in meters
 
-        double lngAts  = Math.toRadians(coordinateWGS84.getLongitude());
+        //Convert degrees to radians (radians = degrees * pi/180)
+        // TODO: 7/20/2017 Need to get the minus sign correct by using the Project Spinner for which hemi is positive
+        double latAts  = Math.toRadians(coordinateWGS84.getLatitude());
+        double latAtcp = Math.toRadians(constants.getGridOriginLatitude());
+
+        double lng = Math.abs(coordinateWGS84.getLongitude());
+        double lngAts  = Math.toRadians(lng);
         double lngAtcm = Math.toRadians(constants.getCentralMeridian());
 
 
         //Equ #11)	e2 	= (a2 –b2) / a2 = [2f – f2] = constant Col G
         double e2 = constants.getEccentricity2();
+
+        //equ #12 e12 	=   (a2 –b2) / b2 	=   [e2 / (1 – e2)]
         double e12 = (e2 / (1. - e2));// (e2 / (1. – e2));
         double major = constants.getSemiMajorAxis();
         double minor = constants.getSemiMinorAxis();
 
-        //Equ #12)	n	= (a – b) / (a +b) = [f / (2-f)]
+        //Equ #13)	n	= (a – b) / (a +b) = [f / (2-f)]
         double n = ((major - minor) / (major + minor));
         double cosLat = Math.cos(latAts);
         double cos2Lat = cosLat * cosLat;
-        double n2 = e12 * cos2Lat;
+
+        //Equ #14 n12 	 =   e12 cos2 Φ
+        double n12 = e12 * cos2Lat;
+        double n2 = n * n;
 
         double n4 = n*n*n*n;
 
-        //Equ #13)	r 	= a (1-n) (1-n12) (1 + 9n12/4 + 225n4/64)
+        /*
+        //Equ #15)	r 	= a (1-n) (1-n12) (1 + 9n12/4 + 225n4/64)
         //But better still is to use the constant from the table.
-        // TODO: 6/30/2017 determine which column r is in
         double oneMinusn       = 1. - n;
         double oneMinusn2      = 1. - (n*n);
         double onePlus9n2Over4 = (1. + ((9.* (n*n))/4.));
         double two25n4Over64   = ((225.*n4)/64.) ;
         double r = ( major * oneMinusn * oneMinusn2 * (onePlus9n2Over4 + two25n4Over64));
                 //(1. - n) *(1. - n2) *(1. + ((9.*n2)/4.) + ((225.*n4)/64.) ));
+        */
         double radiusOfRectifyingSphere = constants.getRadiusOfRectifyingSphere();
-        //radiusOfRectifyingSphere should be equal to r
-        // TODO: 7/3/2017 double check that r = radiusOfRectifyingSphere
+
+        //radiusOfRectifyingSphere is equal to r
+        //Even though the calculated value corresponds, use the constants value
 
 
-        //Equ #14)	ωo 	= Φo + sin Φo cos Φo (Uo + U2cos2 Φo + U4cos4 Φo + U6cos6 Φo)
+        //Equ #16)	ωo 	= Φo + sin Φo cos Φo (Uo + U2cos2 Φo + U4cos4 Φo + U6cos6 Φo)
         double rectifyingLatitudeAtCP = rectifyingLatitude(latAtcp, constants);
 
-        //Equ #15)	ω	= Φ + sin Φ cos Φ (Uo + U2cos2 Φ + U4cos4 Φ + U6cos6 Φ)
+        //Equ #17)	ω	= Φ + sin Φ cos Φ (Uo + U2cos2 Φ + U4cos4 Φ + U6cos6 Φ)
         double rectifyingLatitudeAtst = rectifyingLatitude(latAts,  constants);
 
-        //Equ #16)	L 	= (λ – λo) cos Φ
-        double L = (lngAts - lngAtcm) * cosLat;
+        //Equ #18)	L 	= (λ – λo) cos Φ
+        double deltaLng = lngAts - lngAtcm;
+        double L = deltaLng * cosLat;
 
-        //Equ #17)	So 	= ko ωo r
+        //Equ #19)	So 	= ko ωo r
         double meridionalDistanceCp = constants.getGridScaleFactor() *
                                         rectifyingLatitudeAtCP *
                                         radiusOfRectifyingSphere;
-        //Equ #18)	S 	= ko ω r
+        //Equ #20)	S 	= ko ω r
         double meridionalDistanceSt = constants.getGridScaleFactor() *
                                         rectifyingLatitudeAtst *
                                         radiusOfRectifyingSphere;
 
-        //Equ #19)	R 	= ko a / (1 - e2sin2 Φ)1/2
+        //Equ #21)	R 	= ko a / (1 - e2sin2 Φ)1/2
         double sinLat  = Math.sin(latAts);
         double sin2Lat = sinLat * sinLat;
         double RMappingRadiusSt = ((constants.getGridScaleFactor() * major) /
@@ -273,36 +332,37 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double tan6Lat = tan4Lat * tan2Lat;
 
 
-        //A4 does not look right. I bet it is 4*tan2Lat NOT 4*n2
-
-        //Equ #20)	A1 = - R
+        //Equ #22)	A1 = - R
         double A1 = -RMappingRadiusSt;
 
-        //Equ #21)	A2 = ½ R t
+        //Equ #23)	A2 = ½ R t
         double A2 = (1./2.)    * ( RMappingRadiusSt * tanLat);
 
-        //Equ #22)	A3 = 1/6 (1 - t2 + n12)
-        double A3 = (1./6.)    * ( 1. -    tan2Lat       +            n2 );
+        //Equ #24)	A3 =    1/6 (1 - t2 + n12)
+        double A3 = (1./6.)    * ( 1. -    tan2Lat       +            n12 );
 
-        //Equ #23)	A4 = 1/12 [5 - t2 + n12 (9 + 4n2)]
-        double A4 = (1./12.)   * ( 5. -     tan2Lat      +           (n2 * (9. +   (4.*n2))));
+        //Equ #25)	A4 =   1/12 [5 -   t2 + n12 (9 + 4n2)]
+        double A4 = (1./12.)   * ( 5. -     tan2Lat      +           (n12 * (9. +   (4.*n2))));
 
-        //Equ #24)	A5 = 1/120 [5 - 18t2 + t4 + n12 (14 – 58t2)]
-        double A5 = (1./120.)  * ( 5. -  (18. * tan2Lat) + tan4Lat + (n2 * (14. -  (58. * tan2Lat))));
+        //Equ #26   A5 =  1/120 [5 - 18t2 + t4 + n12 (14 – 58t2)]
+        double A5 = ((1./120.) *
+                            ( 5. -  (18. * tan2Lat) + tan4Lat + (n12 * (14. -  (58. * tan2Lat)))));
 
-        //Equ #25)	A6 = 1/360 [61 - 58t2 + t4 + n12 (270 – 330t2)]
-        double A6 = (1./360.)  * ((61. - (58. * tan2Lat) + tan4Lat + (n2 * (270. - (330. * tan2Lat)))));
+        //Equ #27)	A6 =  1/360 [61 - 58t2 + t4 + n12 (270 – 330t2)]
+        double A6 = (1./360.) *
+                            ((61. - (58. * tan2Lat) + tan4Lat + (n12 * (270. - (330. * tan2Lat)))));
 
-        //Equ #26)	A7 = 1/5040 (61 - 479t2 + 179t4 + t6 )
-        double A7 = (1./5040.) * (61. - (479. * tan2Lat) + (179. * tan4Lat) + tan6Lat);
+        //Equ #28)	A7 = 1/5040 (61 - 479t2 + 179t4 - t6 )
+        double A7 = (1./5040.) * (61. - (479. * tan2Lat) + (179. * tan4Lat) - tan6Lat);
 
         double L2 = L * L;
 
-        //Equ #27)	N = S – So +No + A2L2 [1 + L2 (A4 + A6L2)]
+        //Equ #29)	N = S – So +No + A2L2 [1 + L2 (A4 + A6L2)]
         double northing = ( (meridionalDistanceSt - meridionalDistanceCp) +
                             (constants.getFalseNorthing())                +
                             ((A2 * L2) * ( 1. + (L2 *(A4 + (A6*L2))) )));
 
+        //Equ #30)	E = Eo + A1 +L [1 + L2 (A3 + L2 (A5 + A7L2))]
         double termA7L2 = A7 * L2;
         double termA5A7L2 = A5 + termA7L2;
         double termL2A5A7L2 = L2 * termA5A7L2;
@@ -310,28 +370,38 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         double termL2A3L2A5A7L2 = L2* termA3L2A5A7L2;
         double falseEasting = constants.getFalseEasting();
 
-        // TODO: 6/30/2017 This equation is WRONG!, the + after A1 needs to be *
-        //Equ #28)	E = Eo + A1 +L [1 + L2 (A3 + L2 (A5 + A7L2))]
+        //Equ #30)	E = Eo + A1 +L [1 + L2 (A3 + L2 (A5 + A7L2))]
         double easting = (falseEasting + A1 * (L * (1. + termL2A3L2A5A7L2)));
                         //falseEasting + A1 +(L * (1. + (L2 * (A3 + (L2 * (A5 + (A7 * L2))))))));
 
-        double F2 = n2 / 2.;
-        // TODO: 6/20/2017 I am just guessing what F4 is, it is not in the documentation
-        double F4 = F2 * F2;
-        //Equ #29)	K = ko [1 + F2L2 (1 + F4L2)]
-        double gridScaleFactorAtSt = (constants.getGridScaleFactor() *
-                                                                    (1. + ((F2 * L2)* (1. + F4*L2) )));
-
+        //Equn #31	C1 	=   t x (-1)
         double C1 = -tanLat;
-        double C3 = (1. + (3.*n2) + ((2./3.)*n4));
-        double C5 = 2. - (tan2Lat/15.);
-        //Equ #30)	γ = C1 L [1 + L2 (C3 + C5L2)]
-        double convergenceAngle = (C1*L) * (1. + (L2*(C3 + (C5*L2))));
+
+        //Equn #32	C3 =   1/3 (1 + 3n12 + 2n4)
+        double C3 =    ((1./3.) * (1. + (3.*n12) + (2. * n4)));
+
+        //Eqn #33	C5 =   1/15 (2 – t2)
+        double C5 = ((1./15.) * (2. - tan2Lat));
+
+        //Equ #34)	γ = C1 L [1 + L2 (C3 + C5L2)]
+        double convergenceAngleRad = (C1*L) * (1. + (L2*(C3 + (C5*L2))));
+        double convergenceAngle = Math.toDegrees(convergenceAngleRad);
+
+        //Equ  #35	F2 	=   ½ (1 + n12)
+        double F2 = ((1./ 2.) * (1 + n12));
+
+        //Equ #36	F4  =  1/12 [5 - 4t2 + n12 (9 – 24t2)]
+        double F4 = ((1./12.) * (5 - (4 * tan2Lat) + (n12 * (9 - (24 * tan2Lat)))));
+
+        //Equ #37)	K = ko [1 + F2L2 (1 + F4L2)]
+        double ko = constants.getGridScaleFactor();
+        double gridScaleFactorAtSt = (ko * (1. + ((F2 * L2)* (1. + F4*L2) )));
 
         super.setNorthing(northing);
         super.setEasting(easting);
         super.setScaleFactor(gridScaleFactorAtSt);
         super.setConvergenceAngle(convergenceAngle);
+        super.setValidCoordinate(true);
 
     }
 

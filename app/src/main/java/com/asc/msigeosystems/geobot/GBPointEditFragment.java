@@ -931,6 +931,25 @@ public class GBPointEditFragment extends Fragment  {
             pointGeoidMetersInput    .setVisibility(View.GONE);
 
         }
+
+
+
+        field_container = v.findViewById(R.id.convergenceContainer);
+        EditText pointConvergenceInput = (EditText) field_container.findViewById(R.id.convergenceOutput);
+        EditText pointCAdegInput       = (EditText) v.findViewById(R.id.convDegreesInput);
+        EditText pointCAminInput       = (EditText) v.findViewById(R.id.convMinutesInput);
+        EditText pointCAsecInput       = (EditText) v.findViewById(R.id.convSecondsInput);
+        EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
+
+        if (isDD){
+            pointCAdegInput.setVisibility(View.GONE);
+            pointCAminInput.setVisibility(View.GONE);
+            pointCAsecInput.setVisibility(View.GONE);
+        } else {
+            pointConvergenceInput.setVisibility(View.GONE);
+        }
+
+
     }
 
 
@@ -961,6 +980,7 @@ public class GBPointEditFragment extends Fragment  {
         pointEastingMetersInput.setInputType(InputType.TYPE_CLASS_NUMBER |
                                               InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                               InputType.TYPE_NUMBER_FLAG_SIGNED);
+
         final EditText pointEastingFeetInput   =
                                         (EditText) field_container.findViewById(R.id.feetOutput);
         pointEastingFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
@@ -1619,6 +1639,30 @@ public class GBPointEditFragment extends Fragment  {
             pointGeoidMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
             pointGeoidFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
         }
+
+
+
+        field_container = v.findViewById(R.id.convergenceContainer);
+        EditText pointConvergenceInput = (EditText) field_container.findViewById(R.id.convergenceOutput);
+        EditText pointCAdegInput       = (EditText) field_container.findViewById(R.id.convDegreesInput);
+        EditText pointCAminInput       = (EditText) field_container.findViewById(R.id.convMinutesInput);
+        EditText pointCAsecInput       = (EditText) field_container.findViewById(R.id.convSecondsInput);
+        EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
+
+
+         pointConvergenceInput.setText(String.valueOf(coordinate.getConvergenceAngle()));
+
+        boolean isCA = true;
+        convertDDtoDMS(getActivity(),
+                pointConvergenceInput,
+                pointCAdegInput,
+                pointCAminInput,
+                pointCAsecInput,
+                isCA,
+                false);
+
+
+        pointScaleFactorInput.setText(String.valueOf(coordinate.getScaleFactor()));
 
     }
 

@@ -30,7 +30,7 @@
                 <!-- Row: Point Screen Label -->
 
 
-                <!-- Row : BUTTONS Meaasure, View Existing Points, Save Changes  -->
+                <!-- Row : BUTTONS Measure, View Existing Points, Save Changes  -->
                 <TableRow
 
                     android:layout_height  = "wrap_content"

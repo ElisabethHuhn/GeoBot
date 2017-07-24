@@ -154,8 +154,44 @@ public class GBSplashFragment extends Fragment  {
                 ((GBActivity)getActivity()).switchToPointCreateScreen(project);
             }
         });
+/*
+        //Old Conversion Button
+        Button convertButton = (Button) v.findViewById(R.id.splashOldConvertButton);
+        convertButton.setText(R.string.convert_button_label);
+        //convertButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_002_collect, 0, 0);
+        convertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
 
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+                GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                if (project == null){
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+                    return;
+                }
+                ((GBActivity)getActivity()).switchToConvertScreen();
+            }
+        });
+*/
+        //Export
+        Button exportButton = (Button) v.findViewById(R.id.splashOldConvertButton);
+        exportButton.setText(R.string.exchange_button_label);
+        exportButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_119_exchangefolder, 0, 0);
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
 
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+                GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                if (project == null){
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+                    return;
+                }
+                onExport();
+            }
+        });
     }
 
     private void initializeUI(View v){
@@ -224,6 +260,18 @@ public class GBSplashFragment extends Fragment  {
 
     }
 
+    private void onExport(){
+
+        GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (project == null){
+            GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+            return;
+        }
+        ((GBActivity)getActivity()).switchToExportScreen();
+        //GBUtilities.getInstance().showStatus(getActivity(), "Export of project points not yet supported");
+
+
+    }
 
 
 }

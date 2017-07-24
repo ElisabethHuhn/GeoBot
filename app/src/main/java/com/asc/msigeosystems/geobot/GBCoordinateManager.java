@@ -378,7 +378,7 @@ class GBCoordinateManager {
         coordinate.setConvergenceAngle(cursor.getDouble(
                             cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_CONVERGENCE)));
         coordinate.setScaleFactor(cursor.getDouble(
-                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_ELEVATION)));
+                            cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_SCALE)));
 
 
 

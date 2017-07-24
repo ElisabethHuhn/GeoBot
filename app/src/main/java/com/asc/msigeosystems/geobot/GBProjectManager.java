@@ -385,7 +385,7 @@ class GBProjectManager {
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS,   project.getDistanceUnits());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_AUTOSAVE,     project.getAutosave());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV, project.getRMSvStD());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ORDER,        project.getOrderOnUI());
+        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ORDER,        project.getUIOrder());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DD_V_DMS,     project.getDDvDMS());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIR_V_PM,     project.getDIRvPlusMinus());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DATA_SOURCE,  project.getDataSource());

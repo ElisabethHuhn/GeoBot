@@ -211,6 +211,7 @@ abstract class GBCoordinate {
 
     protected double getMeters(String metersString, String feetString){
         double meters;
+        // TODO: 7/21/2017 need to get rid of commas, and be able to differentiate between 6,0 AND 6.0
         if (GBUtilities.isEmpty(metersString)) {
             if (GBUtilities.isEmpty(feetString)) {
                 //both are empty

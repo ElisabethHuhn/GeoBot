@@ -13,37 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingBottom = "5dp"
+
         >
-        <!-- Dataum -->
-        <TextView
-            android:text="@string/datum_label"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="25"
-            android:gravity="end"
-
-
-            android:textColor="@color/colorTextBlack"
-            android:background="@color/colorScreenBackground"
-            />
-        <EditText
-            android:id="@+id/datumOutput"
-            android:hint="@string/datum_label"
-
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="75"
-
-            android:gravity="center"
-
-            android:layout_marginEnd="@dimen/row_between_fields_margin"
-            android:enabled="false"
-
-
-            android:textColor="@color/colorTextBlack"
-            android:background="@color/colorGrayish"
-            />
-
 
         <!-- Scale Factor -->
         <TextView
@@ -64,8 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="75"
-            android:gravity="center"
 
+            android:gravity="center"
             android:inputType="numberSigned|numberDecimal"
 
              android:layout_marginEnd="@dimen/row_cap_margin"

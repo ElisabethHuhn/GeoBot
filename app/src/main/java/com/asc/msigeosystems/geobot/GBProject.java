@@ -37,6 +37,51 @@ public class GBProject {
 
     private static final String sProjectDefaultName  = "Project ";
 
+    //Tags for shared pref settings for whether the property was exported last time
+    static final String sProjectReadabilityExportTag = "PROJECT_READABILITY_EXPORT";
+    static final String sProjectHeadersExportTag   = "PROJECT_HEADERS_EXPORT";
+    static final String sProjectIDExportTag        = "PROJECT_ID_EXPORT";
+    static final String sProjectNameExportTag      = "PROJECT_NAME_EXPORT";
+    static final String sProjectCreateExportTag    = "PROJECT_CREATION_EXPORT";
+    static final String sProjectLastMaintExportTag = "PROJECT_MAINTAINED_EXPORT";
+    static final String sProjectDescExportTag      = "PROJECT_DESCRIPTION_EXPORT";
+    static final String sProjectHeightExportTag    = "PROJECT_HEIGHT_EXPORT";
+    static final String sProjectCoordTypeExportTag = "PROJECT_COORDINATE_TYPE_EXPORT";
+    static final String sProjectNbMeanExportTag    = "PROJECT_NB_MEAN_EXPORT";
+    static final String sProjectZoneExportTag      = "PROJECT_ZONE_EXPORT";
+    static final String sProjectDistUnitsExportTag = "PROJECT_DIST_UNITS_EXPORT";
+    static final String sProjectAutosaveExportTag  = "PROJECT_AUTOSAVE_EXPORT";
+    static final String sProjectRmsVStdExportTag   = "PROJECT_RMS_V_STD_EXPORT";
+    static final String sProjectUIOrderExportTag   = "PROJECT_UI_ORDER_EXPORT";
+    static final String sProjectDDvDMSExportTag    = "PROJECT_DD_V_DMS_EXPORT";
+    static final String sProjectDirVPMExportTag    = "PROJECT_DIR_V_PM_EXPORT";
+    static final String sProjectDataSrcExportTag   = "PROJECT_DATA_SRC_EXPORT";
+    static final String sProjectLocPrcExportTag    = "PROJECT_LOC_PRC_EXPORT";
+    static final String sProjectStdPrcExportTag    = "PROJECT_STD_PRC_EXPORT";
+
+
+
+    static boolean getProjectExport (GBActivity activity, String tag) {
+        if (activity == null){
+            return false;
+        }
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        boolean defaultValue = true;
+        return sharedPref.getBoolean(tag, defaultValue);
+    }
+    static void    setProjectExport  (GBActivity activity, String tag, boolean isExported) {
+        if (activity == null){
+            return;
+        }
+        //Store the PersonID for the next time
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(tag, isExported);
+        editor.apply();
+    }
+
+
+
 
     //These constants define the order of the corresponding spinner positions
     static final int    sMeters         = 0;//values for Distance Units
@@ -259,6 +304,7 @@ public class GBProject {
         }
     }
 
+
     CharSequence getProjectName() {  return mName;    }
     void         setProjectName(CharSequence name) {
         this.mName = name;
@@ -424,7 +470,7 @@ public class GBProject {
     }
 
 
-    int  getOrderOnUI() {
+    int getUIOrder() {
         return mOrderOnUI;
     }
     void setOrderOnUI(int orderOnUI) {

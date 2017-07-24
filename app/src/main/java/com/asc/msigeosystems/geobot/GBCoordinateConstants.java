@@ -19,13 +19,13 @@ public class GBCoordinateConstants {
     //*+****************************************************************//
 
 
-    static final String CONSTANTS_VERSION = "170628";
+    static final String CONSTANTS_VERSION = "170711";
     private static final String[] rawConstants = {
             "101|Alabama East|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.99996|85.83333333|200000|30.5|0|0|0|0|0|3375406.711|1.23256E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
             "102|Alabama West|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.99993333|87.5|600000|30|0|0|0|0|0|3319892.057|1.23262E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
-            "201|Arizona East|Transverse Mecator|6378137|6356752.314|0.003352811|0.00669438|0.9999|110.1666667|213360|31|0|0|0|0|0|3430631.226|1.23244E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
-            "202|Arizona Central|Transverse Mecator|6378137|6356752.314|0.003352811|0.00669438|0.9999|111.9166667|213360|31|0|0|0|0|0|3430631.226|1.23244E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
-            "203|Arizona West|Transverse Mecator|6378137|6356752.314|0.003352811|0.00669438|0.99993333|113.75|213360|31|0|0|0|0|0|3430745.592|1.23236E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
+            "201|Arizona East|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999|110.1666667|213360|31|0|0|0|0|0|3430631.226|1.23244E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
+            "202|Arizona Central|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999|111.9166667|213360|31|0|0|0|0|0|3430631.226|1.23244E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
+            "203|Arizona West|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.99993333|113.75|213360|31|0|0|0|0|0|3430745.592|1.23236E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
             "301|Arkansas North|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99993594|92|400000|34.33333333|0|34.93333333|36.23333333|35.58422834|138776.1285|0|0|0|13112784.5|9062395.198|8923619.07|6370786|6356634.656|0|0|0|0|0|0|0|0|110944.2037|9.22246|5.64616|0.017597|0.000009014|-6.75356E-15|-3.72463E-20|-9.0676E-28|0.999935935|1.23195E-14|4.52E-22",
             "302|Arkansas South|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99991847|92|400000|32.66666667|400000|33.3|34.76666667|34.03440938|551699.2604|0|0|0|13438989.77|9604584.229|9452884.969|6369591|6354902.029|0|0|0|0|0|0|0|0|110913.9635|9.03498|5.64949|0.016534|0.000009016|-6.62159E-15|-3.73079E-20|-8.5429E-28|0.99991847|1.2324E-14|4.26E-22",
             "401|California 1|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99989464|122|2000000|39.33333333|500000|40|41.66666667|40.83510612|666752.5811|0|0|0|12287826.31|7556554.641|7389802.06|6374328|6362067.28|0|0|0|0|0|0|0|0|111039.0203|9.65524|5.63491|0.021275|0.000009006|-7.0524E-15|-3.70393E-20|-1.1142E-27|0.999894637|1.23062E-14|5.47E-22",
@@ -55,7 +55,6 @@ public class GBCoordinateConstants {
             "1402|Iowa South|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99994837|93.5|500000|40|0|40.61666667|41.78333333|41.20087976|133355.9301|0|0|0|12244655.58|7429044.514|7295688.584|6374941|6362814.276|0|0|0|0|0|0|0|0|111052.0582|9.67367|5.63393|0.021895|0.000009005|-7.06375E-15|-3.70197E-20|-1.1221E-27|0.99994837|1.23041E-14|5.56E-22",
             "1501|Kansas North|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99995685|98|400000|38.33333333|0|38.71666667|39.78333333|39.25068695|101836.7447|0|0|0|12497179.18|7918239.471|7816402.726|6373559|6360718.396|0|0|0|0|0|0|0|0|111015.4786|9.55844|5.6378|0.020306|0.000009008|-6.98626E-15|-3.70994E-20|-1.0424E-27|0.999956851|1.23088E-14|5.18E-22",
             "1502|Kansas South|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99993592|98.5|400000|36.66666667|400000|37.26666667|38.56666667|37.91764006|538838.9936|0|0|0|12697806.8|8336559.047|8197720.053|6372455|6359132.86|0|0|0|0|0|0|0|0|110987.8057|9.45414|5.64091|0.018964|0.00000901|-6.91489E-15|-3.71545E-20|-1.0003E-27|0.999935918|1.2313E-14|4.91E-22",
-            "1600|Kentucky|Lambert|6378137|6356752.314|0.003352811|0.00669438||85.75|1500000|36.33333333|1000000|37.08333333|38.66666667|0|0|0|0|0||||||0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0",
             "1601|Kentucky North|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99996208|84.25|500000|37.5|0|37.96666667|38.96666667|38.46725397|107362.4795|0|0|0|12612341.78|8145306.471|8037943.992|6373021|6359896.121|0|0|0|0|0|0|0|0|111001.1272|9.49969|5.6396|0.019624|0.000009009|-6.94594E-15|-3.71303E-20|-1.014E-27|0.99996208|1.23109E-14|5.03E-22",
             "1602|Kentucky South|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.9999454|85.75|500000|36.33333333|500000|36.73333333|37.93333333|37.33414565|611064.2249|0|0|0|12793783.08|8483079.455|8372015.23|6372094|6358562.756|0|0|0|0|0|0|0|0|110977.8556|9.40195|5.64201|0.018759|0.000009011|-6.87874E-15|-3.71775E-20|-9.7208E-28|0.999945402|1.23142E-14|4.82E-22",
             "1701|Louisiana North|Lambert|6378137|6356752.314|0.003352811|0.00669438|0.99991474|92.5|1000000|30.5|0|31.16666667|32.66666667|31.91770559|157187.8944|0|0|0|13961752.47|10405759.05|10248571.15|6368127|6352722.054|0|0|0|0|0|0|0|0|110875.9156|8.73673|5.65399|0.015313|0.000009019|-6.4097E-15|-3.73877E-20|-7.8031E-28|0.999914741|1.23296E-14|3.93E-22",
@@ -131,10 +130,14 @@ public class GBCoordinateConstants {
             "4901|Wyoming East|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999375|105.1666667|200000|40.5|0|0|0|0|0|4484768.436|1.22983E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
             "4902|Wyoming East Central|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999375|107.3333333|400000|40.5|100000|0|0|0|0|4484768.436|1.22983E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
             "4903|Wyoming West Central|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999375|108.75|600000|40.5|0|0|0|0|0|4484768.436|1.22983E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0",
-            "4904|Wyoming West|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999375|110.0833333|800000|40.5|100000|0|0|0|0|4484768.436|1.22983E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0"};
+            "4904|Wyoming West|Transverse Mercator|6378137|6356752.314|0.003352811|0.00669438|0.9999375|110.0833333|800000|40.5|100000|0|0|0|0|4484768.436|1.22983E-14|6367449.146|0|0|0|0|0|-0.005048251|0.000021259|-1.11423E-07|6.26E-10|0.005022894|0.000029371|2.35059E-07|2.181E-09|0|0|0|0|0|0|0|0|0|0|0"
+        };
 
     static final int sTRANSVERSE_MERCATOR = 0;
     static final int sLAMBERT             = 1;
+
+    static final String sTMString  = "Transverse Mercator";
+    static final String sLamString = "Lambert";
 
 
     //*+****************************************************************//
@@ -142,8 +145,8 @@ public class GBCoordinateConstants {
     //*+****************************************************************//
 
     private int    mZone;                   //col A
-    private String mState;
-    private int    mProjection;
+    private String mState;                  //B
+    private int    mProjection;             //C
     private double mSemiMajorAxis;//a       //D
     private double mSemiMinorAxis;//b       //E
     private double mFlattening;   //f       //F
@@ -151,20 +154,20 @@ public class GBCoordinateConstants {
     private double mGridScaleFactor; //ko   //H
     private double mCentralMeridian; //     //I
     private double mFalseEasting;    //Eo   //J
-    private double mGridOriginLatitude; //     //K
+    private double mGridOriginLatitude; //  //K
     private double mFalseNorthing;   //Nb   //Col L
     private double mSouthernParallel; //    //M
     private double mNorthernParallel; //    //N
     private double mCentralParallel;  //    //O /
-    private double mFalseNorthing2;       //No        //P
-    private double mMeridionalDistance; //So    //Q
+    private double mFalseNorthing2;       //No          //P
+    private double mMeridionalDistance; //So            //Q
     private double mMeridionalOffsets;  //F(1) 1/2ro2   //R
     private double mRadiusOfRectifyingSphere; //r       //Col S
     private double mMappingRadiusAtGridLat;   //K       //T
     private double mMappingRadiusAtGrid; //Rb           //U
-    private double mRoMappingRadiusAtLat; //Ro            //V
-    private double mGeometricMeanRadius; //ro       //Col W
-    private double mScaledRadiusAtLat; //Mo
+    private double mRoMappingRadiusAtLat; //Ro          //V
+    private double mGeometricMeanRadius; //ro           //Col W
+    private double mScaledRadiusAtLat; //Mo             //X
     private double mGPCuo;   //Col Y
     private double mGPCu2;  //Z
     private double mGPCu4;  //AA
@@ -180,7 +183,7 @@ public class GBCoordinateConstants {
     private double mG1;
     private double mG2;
     private double mG3;
-    private double mG4;
+    private double mG4;     //AN
     private double mF1;
     private double mF2;
     private double mF3;
@@ -201,6 +204,10 @@ public class GBCoordinateConstants {
         while (position < last){
             constants = rawConstants[position];
             getZoneConstants(constants);
+            if (getZone() == 1001){
+                int temp = 1;
+                temp++;
+            }
             if (getZone() == zone)return;
 
             position++;
@@ -210,7 +217,7 @@ public class GBCoordinateConstants {
     }
 
     //*+****************************************************************//
-    //             Setters and Getters                                  //
+    //             Getters   This is a constants object so no Setters   //
     //*+****************************************************************//
 
     int  getZone() {
@@ -223,244 +230,140 @@ public class GBCoordinateConstants {
     String getState() {
         return mState;
     }
-    void   setState(String state) {
-        mState = state;
-    }
 
-    int  getProjection() {
+    int    getProjection() {
         return mProjection;
-    }
-    void setProjection(int projection) {
-        mProjection = projection;
     }
 
     double getSemiMajorAxis() {
         return mSemiMajorAxis;
     }
-    void   setSemiMajorAxis(double semiMajorAxis) {
-        mSemiMajorAxis = semiMajorAxis;
-    }
 
     double getSemiMinorAxis() {
         return mSemiMinorAxis;
-    }
-    void   setSemiMinorAxis(double semiMinorAxis) {
-        mSemiMinorAxis = semiMinorAxis;
     }
 
     double getFlattening() {
         return mFlattening;
     }
-    void   setFlattening(double flattening) {
-        mFlattening = flattening;
-    }
 
     double getEccentricity2() {
         return mEccentricity2;
-    }
-    void   setEccentricity2(double eccentricity2) {
-        mEccentricity2 = eccentricity2;
     }
 
     double getGridScaleFactor() {
         return mGridScaleFactor;
     }
-    void   setGridScaleFactor(double gridScaleFactor) {
-        mGridScaleFactor = gridScaleFactor;
-    }
 
     double getCentralMeridian() {
         return mCentralMeridian;
-    }
-    void   setCentralMeridian(double centralMeridian) {
-        mCentralMeridian = centralMeridian;
     }
 
     double getFalseEasting() {
         return mFalseEasting;
     }
-    void   setFalseEasting(double falseEasting) {
-        mFalseEasting = falseEasting;
-    }
 
     double getGridOriginLatitude() {return mGridOriginLatitude;}
-    void   setGridOriginLatitude(double gridOriginLatitude) {mGridOriginLatitude = gridOriginLatitude;}
 
     double getFalseNorthing() {
         return mFalseNorthing;
-    }
-    void   setFalseNorthing(double falseNorthing) {
-        mFalseNorthing = falseNorthing;
     }
 
     double getSouthernParallel() {
         return mSouthernParallel;
     }
-    void   setSouthernParallel(double southernParallel) {
-        mSouthernParallel = southernParallel;
-    }
 
     double getNorthernParallel() {
         return mNorthernParallel;
-    }
-    void   setNorthernParallel(double northernParallel) {
-        mNorthernParallel = northernParallel;
     }
 
     double getCentralParallel() {
         return mCentralParallel;
     }
-    void   setCentralParallel(double centralParallel) {
-        mCentralParallel = centralParallel;
-    }
 
     double getFalseNorthing2() {
         return mFalseNorthing2;
-    }
-    void setFalseNorthing2(double falseNorthing2) {
-        mFalseNorthing2 = falseNorthing2;
     }
 
     double getMeridionalDistance() {
         return mMeridionalDistance;
     }
-    void   setMeridionalDistance(double meridionalDistance) {
-        mMeridionalDistance = meridionalDistance;
-    }
 
     double getMeridionalOffsets() {
         return mMeridionalOffsets;
-    }
-    void   setMeridionalOffsets(double meridionalOffsets) {
-        mMeridionalOffsets = meridionalOffsets;
     }
 
     double getRadiusOfRectifyingSphere() {
         return mRadiusOfRectifyingSphere;
     }
-    void   setRadiusOfRectifyingSphere(double radiusOfRectifyingSphere) {
-        mRadiusOfRectifyingSphere = radiusOfRectifyingSphere;
-    }
 
     double getMappingRadiusAtGridLat() {
         return mMappingRadiusAtGridLat;
-    }
-    void   setMappingRadiusAtGridLat(double mappingRadiusAtGridLat) {
-        mMappingRadiusAtGridLat = mappingRadiusAtGridLat;
     }
 
     double getMappingRadiusAtGrid() {
         return mMappingRadiusAtGrid;
     }
-    void   setMappingRadiusAtGrid(double mappingRadiusAtGrid) {
-        mMappingRadiusAtGrid = mappingRadiusAtGrid;
-    }
 
     double getRoMappingRadiusAtLat() {
         return mRoMappingRadiusAtLat;
-    }
-    void setRoMappingRadiusAtLat(double roMappingRadiusAtLat) {
-        mRoMappingRadiusAtLat = roMappingRadiusAtLat;
     }
 
     double getGeometricMeanRadius() {
         return mGeometricMeanRadius;
     }
-    void   setGeometricMeanRadius(double geometricMeanRadius) {
-        mGeometricMeanRadius = geometricMeanRadius;
-    }
 
     double getScaledRadiusAtLat() {
         return mScaledRadiusAtLat;
-    }
-    void   setScaledRadiusAtLat(double scaledRadiusAtLat) {
-        mScaledRadiusAtLat = scaledRadiusAtLat;
     }
 
     double getGPCuo() {
         return mGPCuo;
     }
-    void   setGPCuo(double GPCuo) {
-        mGPCuo = GPCuo;
-    }
 
     double getGPCu2() {
         return mGPCu2;
-    }
-    void   setGPCu2(double GPCu2) {
-        mGPCu2 = GPCu2;
     }
 
     double getGPCu4() {
         return mGPCu4;
     }
-    void   setGPCu4(double GPCu4) {
-        mGPCu4 = GPCu4;
-    }
 
     double getGPCu6() {
         return mGPCu6;
-    }
-    void   setGPCu6(double GPCu6) {
-        mGPCu6 = GPCu6;
     }
 
     double getZGCvo() {
         return mZGCvo;
     }
-    void   setZGCvo(double ZGCvo) {
-        mZGCvo = ZGCvo;
-    }
 
     double getZGCv2() {
         return mZGCv2;
-    }
-    void   setZGCv2(double ZGCv2) {
-        mZGCv2 = ZGCv2;
     }
 
     double getZGCv4() {
         return mZGCv4;
     }
-    void   setZGCv4(double ZGCv4) {
-        mZGCv4 = ZGCv4;
-    }
 
     double getZGCv6() {
         return mZGCv6;
-    }
-    void   setZGCv6(double ZGCv6) {
-        mZGCv6 = ZGCv6;
     }
 
 
     double getL1() {
         return mL1;
     }
-    void   setL1(double L1) {
-        mL1 = L1;
-    }
-
 
     double getL2() {
         return mL2;
-    }
-    void   setL2(double L2) {
-        mL2 = L2;
     }
 
     double getL3() {
         return mL3;
     }
-    void   setL3(double L3) {
-        mL3 = L3;
-    }
 
     double getL4() {
         return mL4;
-    }
-    void   setL4(double L4) {
-        mL4 = L4;
     }
 
     double getL5() {
@@ -470,58 +373,34 @@ public class GBCoordinateConstants {
     double getG1() {
         return mG1;
     }
-    void   setG1(double G1) {
-        mG1 = G1;
-    }
 
     double getG2() {
         return mG2;
-    }
-    void   setG2(double G2) {
-        mG2 = G2;
     }
 
     double getG3() {
         return mG3;
     }
-    void   setG3(double G3) {
-        mG3 = G3;
-    }
 
     double getG4() {
         return mG4;
-    }
-    void   setG4(double G4) {
-        mG4 = G4;
     }
 
     double getG5() {
         return 0.0;
     }
-    //void   setG5(double G5) {mG5 = G5;}
-
 
     double getF1() {
         return mF1;
-    }
-    void   setF1(double F1) {
-        mF1 = F1;
     }
 
     double getF2() {
         return mF2;
     }
-    void   setF2(double F2) {
-        mF2 = F2;
-    }
 
     double getF3() {
         return mF3;
     }
-    void   setF3(double F3) {
-        mF3 = F3;
-    }
-
 
     //*+****************************************************************//
     //             Member Methods                                       //
@@ -534,9 +413,9 @@ public class GBCoordinateConstants {
         mZone                    = Integer.valueOf(st.nextToken()); //A
         mState                   = st.nextToken();                  //B
         String projection = st.nextToken();                         //C
-        if (projection.equals("Lambert")) {
+        if (projection.equals(sLamString)) {
             mProjection = sLAMBERT;
-        } else if (projection.equals("Transverse Mercator")){
+        } else if (projection.equals(sTMString)){
             mProjection = sTRANSVERSE_MERCATOR;
         }
         mSemiMajorAxis            = Double.valueOf(st.nextToken()); //D
@@ -557,9 +436,9 @@ public class GBCoordinateConstants {
         mRadiusOfRectifyingSphere = Double.valueOf(st.nextToken()); //S
         mMappingRadiusAtGridLat   = Double.valueOf(st.nextToken()); //T
         mMappingRadiusAtGrid      = Double.valueOf(st.nextToken()); //U
-        mRoMappingRadiusAtLat = Double.valueOf(st.nextToken()); //V
+        mRoMappingRadiusAtLat     = Double.valueOf(st.nextToken()); //V
         mGeometricMeanRadius      = Double.valueOf(st.nextToken()); //W
-        mScaledRadiusAtLat = Double.valueOf(st.nextToken());        //X
+        mScaledRadiusAtLat        = Double.valueOf(st.nextToken()); //X
         mGPCuo = Double.valueOf(st.nextToken()); //Y
         mGPCu2 = Double.valueOf(st.nextToken()); //Z
         mGPCu4 = Double.valueOf(st.nextToken()); //AA

@@ -1,0 +1,835 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.asc.msigeosystems.geobot.GBActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorScreenBackground"
+    android:orientation="vertical"
+    >
+    <!-- This layout is for exporting the points of a project -->
+    <!--  -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/row_between_rows_margin"
+            android:paddingStart="@dimen/row_cap_margin"
+            >
+
+            <!-- Row: Screen Label -->
+
+
+            <!-- Row : BUTTONS Measure, View Existing Points, Save Changes  -->
+            <LinearLayout
+
+                android:layout_height  = "wrap_content"
+                android:layout_width   = "match_parent"
+                android:layout_gravity = "center_horizontal"
+                android:orientation="horizontal"
+                android:paddingTop     = "@dimen/row_between_rows_margin"
+
+                >
+
+                <!-- Export Points -->
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/exportButton"
+                    android:text="@string/exchange_button_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center|center_vertical"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+
+                    android:layout_marginStart="@dimen/row_cap_margin"
+                    android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                    android:background="@color/colorGrayer"
+                    android:textColor="@color/colorTextBlack"
+                    />
+
+                <!-- View Existing Points -->
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/exportViewExistingButton"
+                    android:text="@string/point_view_existing_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center|center_vertical"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+
+                    android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                    android:background="@color/colorGrayer"
+                    android:textColor="@color/colorTextBlack"
+                    />
+
+
+            </LinearLayout>
+
+            <!-- Row: Project ID Name -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:labelFor="@+id/exportProjectNameInput"
+                    android:text="@string/point_project_name"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@+id/exportProjectIDInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+                <EditText
+                    android:id="@id/exportProjectNameInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="75"
+                    android:gravity="center"
+
+                    android:inputType="text"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:enabled="false"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorGray"
+                    />
+
+            </LinearLayout>
+
+
+            <!-- Destination Label -->
+            <TextView
+                android:id=           "@+id/exportDestinationsLabel"
+
+                android:layout_height="wrap_content"
+                android:layout_width= "match_parent"
+
+                android:gravity=      "center_horizontal"
+
+                android:freezesText="true"
+
+                android:focusable="false"
+
+                android:paddingTop="@dimen/row_between_rows_margin"
+
+                android:text="@string/export_destinations"
+                android:textColor=    "@color/colorTextBlack"
+                android:background=   "@color/colorScreenBackground"
+                />
+
+            <!-- Radio Group: Destination -->
+            <RadioGroup
+
+                android:id="@+id/radioDestination"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:focusable="true"
+                android:clickable="true"
+
+                android:background="?android:attr/selectableItemBackground">
+
+                <RadioButton
+                    android:id="@+id/radioGeneral"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/export_radio_general"
+                    android:checked="true"
+                    />
+
+                <RadioButton
+                    android:id="@+id/radioEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/export_radio_email"
+                    android:checked="false"/>
+
+                <RadioButton
+                    android:id="@+id/radioText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/export_radio_text" />
+
+                <RadioButton
+                    android:id="@+id/radioFile"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/export_radio_file"
+                    />
+
+
+            </RadioGroup>
+
+
+            <!-- Row : Directory Path -->
+            <LinearLayout
+                android:layout_width=  "match_parent"
+                android:layout_height= "wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop=    "@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:id=           "@+id/directoryPathLabel"
+                    android:labelFor=     "@+id/directoryPath"
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="25"
+                    android:gravity=      "end"
+
+                    android:freezesText="true"
+
+                    android:focusable="false"
+
+                    android:text="@string/directory_path_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id=           "@id/directoryPath"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="100"
+                    android:gravity="center_horizontal"
+
+                    android:freezesText="true"
+
+                    android:enabled="true"
+
+
+                    android:inputType=    "text"
+                    android:imeOptions=   "flagNoExtractUi"
+
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorWhite"
+                    />
+            </LinearLayout>
+
+            <!-- Row : File Name -->
+            <LinearLayout
+                android:layout_width=  "match_parent"
+                android:layout_height= "wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingTop=    "@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:id=           "@+id/fileNameLabel"
+                    android:labelFor=     "@+id/fileName"
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="25"
+                    android:gravity=      "end"
+
+                    android:freezesText="true"
+
+                    android:focusable="false"
+
+                    android:text="@string/export_filename_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id=           "@id/fileName"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="100"
+                    android:gravity="center_horizontal"
+
+                    android:freezesText="true"
+
+                    android:enabled="true"
+
+
+                    android:inputType=    "text"
+                    android:imeOptions=   "flagNoExtractUi"
+
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorWhite"
+                    />
+            </LinearLayout>
+
+            <!-- Row : File Extent -->
+            <LinearLayout
+                android:layout_width=  "match_parent"
+                android:layout_height= "wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop=    "@dimen/row_between_rows_margin"
+
+                >
+                <TextView
+                    android:id=           "@+id/fileExtentLabel"
+                    android:labelFor=     "@+id/fileExtent"
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="25"
+                    android:gravity=      "end"
+
+                    android:freezesText="true"
+
+                    android:focusable="false"
+
+                    android:text="@string/filename_extent_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id=           "@id/fileExtent"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="100"
+                    android:gravity="center_horizontal"
+
+                    android:freezesText="true"
+
+                    android:enabled="true"
+
+
+                    android:inputType=    "text"
+                    android:imeOptions=   "flagNoExtractUi"
+
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorWhite"
+                    />
+            </LinearLayout>
+
+
+
+            <!-- Content Readability -->
+            <TextView
+                android:id=           "@+id/exportContentReadabilityLabel"
+                android:layout_height="wrap_content"
+                android:layout_width= "match_parent"
+
+                android:gravity=      "center_horizontal"
+
+                android:freezesText="true"
+
+                android:focusable="false"
+
+                android:paddingTop="@dimen/row_between_rows_margin"
+
+                android:text="@string/export_content_readability"
+                android:textColor=    "@color/colorTextBlack"
+                android:background=   "@color/colorScreenBackground"
+                />
+            <!--  Comma (off) v Linefeed (on) -->
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switchReadability"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_lf_on_comma_off"
+                android:checked="true"
+                />
+
+
+            <!-- Content Label -->
+            <TextView
+                android:id=           "@+id/exportContentLabel"
+                android:layout_height="wrap_content"
+                android:layout_width= "match_parent"
+
+                android:gravity=      "center_horizontal"
+
+                android:freezesText="true"
+
+                android:focusable="false"
+
+                android:paddingTop="@dimen/row_between_rows_margin"
+
+                android:text="@string/export_content"
+                android:textColor=    "@color/colorTextBlack"
+                android:background=   "@color/colorScreenBackground"
+                />
+
+
+            <!-- Row : Filter Start Point Number -->
+            <LinearLayout
+                android:layout_width=  "match_parent"
+                android:layout_height= "wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop=    "@dimen/row_between_rows_margin"
+                 >
+                <TextView
+                    android:id=           "@+id/filterStartingPtNbLabel"
+                    android:labelFor=     "@+id/filterStartingPtNb"
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="25"
+                    android:gravity=      "end"
+
+                    android:freezesText="true"
+
+                    android:focusable="false"
+
+                    android:text="@string/start_pt_nb_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id=           "@id/filterStartingPtNb"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="100"
+                    android:gravity="center_horizontal"
+
+                    android:freezesText="true"
+
+                    android:enabled="true"
+
+                    android:inputType=    "number"
+                    android:imeOptions=   "flagNoExtractUi"
+
+                    android:layout_marginEnd="2dp"
+                    android:hint="@string/start_pt_nb_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- Row : Filter End Point Number -->
+            <LinearLayout
+                android:layout_width=  "match_parent"
+                android:layout_height= "wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop=    "@dimen/row_between_rows_margin"
+                android:paddingBottom="@dimen/row_between_rows_margin"
+                >
+                <TextView
+                    android:id=           "@+id/filterEndingPt_NbLabel"
+                    android:labelFor=     "@+id/filterEndingPtNb"
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="25"
+                    android:gravity=      "end"
+
+                    android:freezesText="true"
+
+                    android:focusable="false"
+
+                    android:text="@string/end_pt_nb_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorScreenBackground"
+                    />
+
+                <EditText
+                    android:id=           "@id/filterEndingPtNb"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width= "0dp"
+                    android:layout_weight="100"
+                    android:gravity="center_horizontal"
+
+                    android:freezesText="true"
+                    android:enabled="true"
+
+                    android:inputType=    "number"
+                    android:imeOptions=   "flagNoExtractUi"
+
+                    android:layout_marginEnd="2dp"
+
+                    android:hint="@string/end_pt_nb_label"
+                    android:textColor=    "@color/colorTextBlack"
+                    android:background=   "@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+
+
+
+
+            <!-- Project properties to export -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/row_between_rows_margin"
+                >
+
+
+                <!--  Group: Project Properties -->
+                <TextView
+                    android:labelFor="@+id/exchange_proj_properties_label"
+                    android:text="@string/exchange_proj_properties"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+
+
+                <!--  Project Headers -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjHeaders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_headers"
+                    android:checked="true"
+                    />
+                <!--  Project Name -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_name"
+                    android:checked="true"
+                    />
+
+                <!--  Project Creation Date -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjCreate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_create"
+                    android:checked="true"/>
+
+                <!--  Project Last Touched -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjLast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_last_touched"
+                    android:checked="true"/>
+
+                <!--  Project Description -->
+                <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/switchProjDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exc_switch_proj_desc"
+                        android:checked="true" />
+
+
+                <!-- Group: Project Settings -->
+
+                <TextView
+                    android:labelFor="@+id/exchange_proj_settings_label"
+                    android:text="@string/exchange_proj_settings"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:paddingTop="@dimen/row_between_rows_margin"
+
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+
+                <!--  Project Height -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjHeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_height"
+                    />
+
+                <!--  Project Coordinate Type -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjCoordType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_coord_type"
+                    android:checked="true"/>
+
+                <!--  Project Nb in Mean -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjNbMean"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_nb_mean"
+                    />
+
+                <!--  SPCS Zone -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjZone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_zone"
+                    android:checked="true"/>
+
+                <!--  Project Distance Units -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjDistUnits"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_dist_units"
+                    android:checked="true"/>
+
+
+                <!--  Project Autosave -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjAutosave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_autosave"
+                    />
+
+
+                <!--  Project RMS v StdDev -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjRMSvSTD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_rmsVstd"
+                    />
+
+
+                <!--  Project UI Order -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjUIOrder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_ui_order"
+                    />
+
+
+                <!--  Project DD v DMS -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjDDvDMS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_ddVdms"
+                    />
+
+
+                <!--  Project Dir v Plus Minus -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjDirVPM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_dirVpm"
+                    />
+
+
+                <!--  Project Data Source -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjDataSrc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_data_src"
+                    android:checked="true"/>
+
+
+                <!--  Project Location Precision -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjLocPrecision"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_loc_prc"
+                    />
+
+
+                <!--  Project Std Dev Precision -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchProjStdPrc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_proj_std_prc"
+                    />
+
+
+
+                <!-- Group: Point Properties -->
+
+                <TextView
+                    android:labelFor="@+id/exchange_point_properties_label"
+                    android:text="@string/exchange_point_properties"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:paddingTop="@dimen/row_between_rows_margin"
+
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+                <!--  Point Number -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_nb"
+                    android:checked="true"
+                    />
+
+                <!--  Point Is Meaned -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntIsMeaned"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_ismeaned"
+                    android:checked="false"/>
+
+                <!--  Point Feature code -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntFC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_fc"
+                    android:checked="true"
+                    />
+
+                <!--  Point Height -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntHeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_height"
+                    />
+
+                <!--  Point Notes -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntNotes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_notes"
+                    />
+
+
+                <!--  Point Offset Distance -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntOffDist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_off_dist"
+                    />
+
+                <!--  Point Offset Heading -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntOffHead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_off_head"
+                    android:checked="false"/>
+
+                <!--  Point Offset Elevation -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntOffEle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_off_elev"
+                    android:checked="false"/>
+
+
+                <!--  Point HDOP -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntHdop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_hdop"
+                    />
+
+
+                <!--  Point VDOP -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntVdop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_vdop"
+                    />
+
+
+                <!--  Point PDOP -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntPDOP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_pdop"
+                    android:checked="false"/>
+
+
+                <!--  Point TDOP -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntTdop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_tdop"
+                    />
+
+
+                <!--  Point HRMS / Std Dev  -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntHrms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_hrms"
+                    />
+
+                <!--  Point VRMS / Std Dev  -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchPntVrms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_pnt_vrms"
+                    />
+
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+</ScrollView>
+

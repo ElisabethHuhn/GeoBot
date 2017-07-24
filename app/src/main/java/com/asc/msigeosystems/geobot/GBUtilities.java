@@ -2,8 +2,11 @@ package com.asc.msigeosystems.geobot;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -481,7 +484,7 @@ public class GBUtilities {
     //******** Member Methods   *********/
     //***********************************/
 
-    public int getOrientation(Context activity){
+    int getOrientation(Context activity){
         int orientation = Configuration.ORIENTATION_PORTRAIT;
         if (activity.getResources().getDisplayMetrics().widthPixels >
             activity.getResources().getDisplayMetrics().heightPixels) {
@@ -493,9 +496,97 @@ public class GBUtilities {
 
 
     //************************************/
+    /*         Send with Intents         */
+    //************************************/
+
+    void exportEmail(Context context, String subject, String emailAddr, String body, String chooser_title){
+
+        Intent intent2 = new Intent();
+        intent2.setAction(Intent.ACTION_SEND);
+        intent2.setType("message/rfc822");
+        intent2.putExtra(Intent.EXTRA_EMAIL,   emailAddr);
+        intent2.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent2.putExtra(Intent.EXTRA_TEXT,    chooser_title );
+        context.startActivity(intent2);
+    }
+
+    void exportText(Context context,String subject,String body, String chooser_title){
+        Intent exportIntent = new Intent(Intent.ACTION_SEND);
+        exportIntent.setType("text/plain");
+
+        exportIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+        exportIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+
+        //always display the chooser
+        if (exportIntent.resolveActivity(context.getPackageManager()) != null)
+            context.startActivity(Intent.createChooser(exportIntent, chooser_title ));
+        else {
+            GBUtilities.getInstance().showStatus(context, R.string.export_no_app);
+        }
+    }
+
+    void exportSMS(Context context, String subject, String body){
+        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+        sendIntent.putExtra("sms_body", body);
+        sendIntent.setType("vnd.android-dir/mms-sms");
+        context.startActivity(sendIntent);
+    }
+
+    //************************************/
+    /*         Send Email using Intent   */
+    //************************************/
+    void sendEmail(Context context, String subject, String toAddress, String msg) {
+
+        String[] TO = {toAddress};     //{"someone@gmail.com"};
+        //String[] CC = {"elisabethhuhn@gmail.com"};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+
+
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+        //emailIntent.putExtra(Intent.EXTRA_CC, CC);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, msg);
+
+        try {
+            context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            ((GBActivity)context).finish();
+
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context,
+                    "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    //************************************/
+    /*             File utilities        */
+    //************************************/
+
+    /* Checks if external storage is available for read and write */
+    boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    //************************************/
     /*         Widget Utilities          */
     //************************************/
-    public  void enableButton(Context context, Button button, boolean enable){
+    void enableButton(Context context, Button button, boolean enable){
         button.setEnabled(enable);
         if (enable == BUTTON_ENABLE) {
             button.setTextColor(ContextCompat.getColor(context, R.color.colorTextBlack));
@@ -504,7 +595,7 @@ public class GBUtilities {
         }
     }
 
-    public  void showSoftKeyboard(FragmentActivity context, EditText textField){
+    void showSoftKeyboard(FragmentActivity context, EditText textField){
         //Give the view the focus, then show the keyboard
 
         textField.requestFocus();
@@ -515,7 +606,7 @@ public class GBUtilities {
 
     }
 
-    public  void hideSoftKeyboard(FragmentActivity context){
+    void hideSoftKeyboard(FragmentActivity context){
         // Check if no view has focus:
         View view = context.getCurrentFocus();
         if (view != null) {
@@ -531,7 +622,7 @@ public class GBUtilities {
         context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
-    public  void toggleSoftKeyboard(FragmentActivity context){
+    void toggleSoftKeyboard(FragmentActivity context){
         //hide the soft keyboard
         // Check if no view has focus:
         View view = context.getCurrentFocus();
@@ -546,7 +637,7 @@ public class GBUtilities {
     }
 
 
-    public  void clearFocus(FragmentActivity context){
+    void clearFocus(FragmentActivity context){
         //hide the soft keyboard
         // Check if no view has focus:
         View view = context.getCurrentFocus();
