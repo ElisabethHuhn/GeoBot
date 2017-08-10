@@ -19,31 +19,101 @@ import java.util.ArrayList;
  */
 class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
-
     private ArrayList<GBPoint> mPointList;
+    private GBActivity         mActivity;
 
     //implement the ViewHolder as an inner class
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView projectID,    pointID, pointNb,
-                        pointEasting, pointNorthing, pointElevation, pointFeatureCode;
+        TextView  pointNb, pointEHemi, pointEasting, pointNHemi, pointNorthing,
+                  pointElevation, pointFeatureCode;
+        TextView  pointLatDeg, pointLatMin, pointLatSec, pointLngDeg, pointLngMin, pointLngSec;
 
         MyViewHolder(View v) {
             super(v);
 
-            //projectID        = (TextView) v.findViewById(R.id.pointRowProjectID);
-            //pointID          = (TextView) v.findViewById(R.id.pointRowPointID);
+            boolean isPM     = GBGeneralSettings.isPM(mActivity);
+            boolean isLngLat = GBGeneralSettings.isLngLat(mActivity);
+            boolean isEN     = GBGeneralSettings.isEN(mActivity);
+            boolean isDD     = GBGeneralSettings.isLocDD(mActivity);
+            boolean isDMS    = GBGeneralSettings.isLocDMS(mActivity);
+
+            GBProject openProject = GBUtilities.getInstance().getOpenProject(mActivity);
+            int coordType    = GBUtilities.getCoordinateTypeFromProject(openProject);
+
+
             pointNb          = (TextView) v.findViewById(R.id.pointRowPointNb);
+            pointEHemi       = (TextView) v.findViewById(R.id.pointRowLatHemiLabel);
+            pointNHemi       = (TextView) v.findViewById(R.id.pointRowLngHemiLabel);
             pointEasting     = (TextView) v.findViewById(R.id.pointRowEasting);
             pointNorthing    = (TextView) v.findViewById(R.id.pointRowNorthing) ;
             pointElevation   = (TextView) v.findViewById(R.id.pointRowElevation);
             pointFeatureCode = (TextView) v.findViewById(R.id.pointRowFeatureCode);
+
+            pointLatDeg = (TextView) v.findViewById(R.id.pointRowLatitudeDeg);
+            pointLatMin = (TextView) v.findViewById(R.id.pointRowLatitudeMin);
+            pointLatSec = (TextView) v.findViewById(R.id.pointRowLatitudeSec);
+            pointLngDeg = (TextView) v.findViewById(R.id.pointRowLongitudeDeg);
+            pointLngMin = (TextView) v.findViewById(R.id.pointRowLongitudeMin);
+            pointLngSec = (TextView) v.findViewById(R.id.pointRowLongitudeSec);
+
+            //Determine if the order of the fields must be reversed
+            if (((coordType == GBCoordinate.sLLWidgets) && (isLngLat)) ||
+                ((coordType == GBCoordinate.sNEWidgets) && (isEN))){
+                //reverse the order of the fields on the screen
+                pointEasting     = (TextView) v.findViewById(R.id.pointRowNorthing);
+                pointNorthing    = (TextView) v.findViewById(R.id.pointRowEasting) ;
+
+                pointLatDeg = (TextView) v.findViewById(R.id.pointRowLongitudeDeg);
+                pointLatMin = (TextView) v.findViewById(R.id.pointRowLongitudeMin);
+                pointLatSec = (TextView) v.findViewById(R.id.pointRowLongitudeSec);
+                pointLngDeg = (TextView) v.findViewById(R.id.pointRowLatitudeDeg);
+                pointLngMin = (TextView) v.findViewById(R.id.pointRowLatitudeMin);
+                pointLngSec = (TextView) v.findViewById(R.id.pointRowLatitudeSec);
+            }
+
+            //Determine which fields must be removed from the screen
+            if (coordType == GBCoordinate.sNEWidgets) {
+                //no need for hemisphere directions
+                pointNHemi.setVisibility(View.GONE);
+                pointEHemi.setVisibility(View.GONE);
+
+                //no need for DMS fields
+                pointLatDeg.setVisibility(View.GONE);
+                pointLatMin.setVisibility(View.GONE);
+                pointLatSec.setVisibility(View.GONE);
+                pointLngDeg.setVisibility(View.GONE);
+                pointLngMin.setVisibility(View.GONE);
+                pointLngSec.setVisibility(View.GONE);
+
+            }
+            if ((coordType == GBCoordinate.sLLWidgets) && (isPM)){
+                //no need for hemisphere directions
+                pointNHemi.setVisibility(View.GONE);
+                pointEHemi.setVisibility(View.GONE);
+
+            }
+            if ((coordType == GBCoordinate.sLLWidgets) && (isDD)){
+                //show DD, get rid of DMS
+                pointLatDeg.setVisibility(View.GONE);
+                pointLatMin.setVisibility(View.GONE);
+                pointLatSec.setVisibility(View.GONE);
+                pointLngDeg.setVisibility(View.GONE);
+                pointLngMin.setVisibility(View.GONE);
+                pointLngSec.setVisibility(View.GONE);
+
+            } else if ((coordType == GBCoordinate.sLLWidgets) && (isDMS)) {
+                //show DMS, get rid of DD
+                pointEasting.setVisibility(View.GONE);
+                pointNorthing.setVisibility(View.GONE);
+            }
         }
 
     } //end inner class MyViewHolder
 
     //Constructor for GBPointAdapter
-    GBPointAdapter(ArrayList<GBPoint> pointList){
+    GBPointAdapter(GBActivity activity, ArrayList<GBPoint> pointList){
         this.mPointList = pointList;
+        this.mActivity  = activity;
     }
 
     @Override
@@ -54,35 +124,31 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
 
     }
 
-    void removeItem(int position, long projectID) {
-        GBPoint point = mPointList.get(position);
-
-        //remove the pictures from the point
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        projectManager.removePicturesFromPoint(point);
-
-        //Can't maintain the project's point list directly
-        //Have to ask the pointManager to do it
-        GBPointManager pointsManager = GBPointManager.getInstance();
-        pointsManager.removePoint(projectID, point);
-
-        notifyItemRemoved(position); //update the UI
-
-
-    }
-
     ArrayList<GBPoint> getPointList(){
         return mPointList;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position){
+        boolean isDD      = GBGeneralSettings.isLocDD(mActivity);
+        boolean isDir     = GBGeneralSettings.isDir(mActivity);
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(mActivity);
+        int coordType    = GBUtilities.getCoordinateTypeFromProject(openProject);
+        int distUnits    = openProject.getDistanceUnits();
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(mActivity);
+
         String no_coordinate = "No Location";
-        if (mPointList != null ) {
+        if (mPointList == null ) {
+            //point list is null
+
+            holder.pointNb.setText("");
+            holder.pointFeatureCode.setText("");
+            holder.pointEasting.setText(no_coordinate);
+            holder.pointNorthing.setText(no_coordinate);
+            holder.pointElevation.setText(no_coordinate);
+        } else {
             GBPoint point = mPointList.get(position);
 
-            //holder.projectID       .setText(String.valueOf(point.getForProjectID()));
-            //holder.pointID         .setText(String.valueOf(point.getPointID()));
             holder.pointNb         .setText(String.valueOf(point.getPointNumber()));
             holder.pointFeatureCode.setText(point.getPointFeatureCode().toString());
 
@@ -93,31 +159,57 @@ class GBPointAdapter extends RecyclerView.Adapter<GBPointAdapter.MyViewHolder> {
                 holder.pointNorthing.setText(no_coordinate);
                 holder.pointElevation.setText(no_coordinate);
             }else {
-                CharSequence coordinateType = coordinate.getCoordinateType();
-                if ((coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)) ||
-                    (coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83))){
-                    holder.pointEasting.setText(String.valueOf(((GBCoordinateLL)coordinate).getLatitude()));
-                    holder.pointNorthing.setText(String.valueOf(((GBCoordinateLL)coordinate).getLongitude()));
-                    holder.pointElevation.setText(String.valueOf(((GBCoordinateLL)coordinate).getElevation()));
+
+                if (coordType == GBCoordinate.sLLWidgets) {
+                    if (isDD) {
+                        double latitude = ((GBCoordinateLL) coordinate).getLatitude();
+                        double longitude = ((GBCoordinateLL) coordinate).getLongitude();
+                        int posHemi = R.string.hemisphere_N;
+                        int negHemi = R.string.hemisphere_S;
+                        GBUtilities.locDD(mActivity, latitude, locDigOfPrecision,
+                                isDir, posHemi, negHemi,
+                                holder.pointEHemi, holder.pointEasting);
+                        posHemi = R.string.hemisphere_E;
+                        negHemi = R.string.hemisphere_W;
+                        GBUtilities.locDD(mActivity, longitude, locDigOfPrecision,
+                                            isDir, posHemi, negHemi,
+                                            holder.pointNHemi, holder.pointNorthing);
+                    } else {
+                        int deg = ((GBCoordinateLL) coordinate).getLatitudeDegree();
+                        int min = ((GBCoordinateLL) coordinate).getLatitudeMinute();
+                        double sec = ((GBCoordinateLL) coordinate).getLatitudeSecond();
+                        int posHemi = R.string.hemisphere_N;
+                        int negHemi = R.string.hemisphere_S;
+
+                        GBUtilities.locDMS(mActivity, deg, min, sec, locDigOfPrecision,
+                                        isDir, posHemi, negHemi, holder.pointEHemi,
+                                        holder.pointLatDeg, holder.pointLatMin, holder.pointLatSec);
+
+                        deg = ((GBCoordinateLL) coordinate).getLongitudeDegree();
+                        min = ((GBCoordinateLL) coordinate).getLongitudeMinute();
+                        sec = ((GBCoordinateLL) coordinate).getLongitudeSecond();
+                        posHemi = R.string.hemisphere_E;
+                        negHemi = R.string.hemisphere_W;
+
+                        GBUtilities.locDMS(mActivity, deg, min, sec, locDigOfPrecision,
+                                        isDir, posHemi, negHemi, holder.pointNHemi,
+                                        holder.pointLngDeg, holder.pointLngMin, holder.pointLngSec);
+                    }
+                    double elevation = ((GBCoordinateLL)coordinate).getElevation();
+                    GBUtilities.locDistance(mActivity, elevation, holder.pointElevation);
+
                 }else {
-                    holder.pointEasting.setText(String.valueOf(((GBCoordinateEN)coordinate).getEasting()));
-                    holder.pointNorthing.setText(String.valueOf(((GBCoordinateEN)coordinate).getNorthing()));
-                    holder.pointElevation.setText(String.valueOf(((GBCoordinateEN)coordinate).getElevation()));
-                }
+                    double easting   = ((GBCoordinateEN)coordinate).getEasting();
+                    double northing  = ((GBCoordinateEN)coordinate).getNorthing();
+                    double elevation = ((GBCoordinateEN)coordinate).getElevation();
+
+                    GBUtilities.locDistance(mActivity, northing, holder.pointNorthing);
+                    GBUtilities.locDistance(mActivity, easting, holder.pointEasting);
+                    GBUtilities.locDistance(mActivity, elevation, holder.pointElevation);
+
+                 }
             }
-
-        } else {
-
-            //holder.projectID       .setText(R.string.no_points);
-            //holder.pointID         .setText("");
-            holder.pointNb         .setText("");
-            holder.pointFeatureCode.setText("");
-            holder.pointEasting.setText(no_coordinate);
-            holder.pointNorthing.setText(no_coordinate);
-            holder.pointElevation.setText(no_coordinate);
-
         }
-
     }
 
     @Override

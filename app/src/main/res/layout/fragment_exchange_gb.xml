@@ -54,7 +54,7 @@
                 <Button
                     style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/exportViewExistingButton"
-                    android:text="@string/point_view_existing_label"
+                    android:text="@string/list_points_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
@@ -371,6 +371,15 @@
                 />
 
 
+            <!--  Project Headers -->
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switchProjHeaders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exc_switch_proj_headers"
+                android:checked="true"
+                />
+
             <!-- Content Label -->
             <TextView
                 android:id=           "@+id/exportContentLabel"
@@ -487,6 +496,178 @@
 
 
 
+            <!-- Export Digits of Precision -->
+            <TextView
+
+                android:layout_height="wrap_content"
+                android:layout_width= "match_parent"
+
+                android:gravity=      "center_horizontal"
+
+                android:freezesText="true"
+
+                android:focusable="false"
+
+                android:paddingTop="@dimen/row_between_rows_margin"
+
+                android:text="@string/export_precision"
+                android:textColor=    "@color/colorTextBlack"
+                android:background=   "@color/colorScreenBackground"
+                />
+
+            <!-- Row : Location Precision -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                >
+                <TextView
+                    android:labelFor="@+id/exLocPrecisionInput"
+                    android:text="@string/exc_switch_proj_loc_prc"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/exLocPrecisionInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="100"
+                    android:gravity="center"
+
+                    android:inputType="number"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:enabled="false"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+            <!-- Row : StdDev Precision -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                >
+                <TextView
+                    android:labelFor="@+id/exStdDevPrecisionInput"
+                    android:text="@string/exc_switch_proj_std_prc"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/exStdDevPrecisionInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="100"
+                    android:gravity="center"
+
+                    android:inputType="number"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:enabled="false"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
+
+
+            <!-- Row : Scale Factor Precision -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                >
+                <TextView
+                    android:labelFor="@+id/exSfPrecisionInput"
+                    android:text="@string/exc_switch_proj_sf_prc"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/exSfPrecisionInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="100"
+                    android:gravity="center"
+
+                    android:inputType="number"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:enabled="false"
+                    android:background="@color/colorWhite"
+                    />
+
+
+            </LinearLayout>
+
+            <!-- Row : Convergence Angle Precision -->
+            <LinearLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                >
+                <TextView
+                    android:labelFor="@+id/exCaPrecisionInput"
+                    android:text="@string/exc_switch_proj_ca_prc"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:gravity="end"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+                <EditText
+                    android:id="@id/exCaPrecisionInput"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="100"
+                    android:gravity="center"
+
+                    android:inputType="number"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_marginEnd="@dimen/row_cap_margin"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:enabled="false"
+                    android:background="@color/colorWhite"
+                    />
+
+            </LinearLayout>
 
 
             <!-- Project properties to export -->
@@ -499,7 +680,6 @@
                 android:paddingTop="@dimen/row_between_rows_margin"
                 >
 
-
                 <!--  Group: Project Properties -->
                 <TextView
                     android:labelFor="@+id/exchange_proj_properties_label"
@@ -507,22 +687,12 @@
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
 
-                    android:gravity="end"
+                    android:layout_gravity="center_horizontal"
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorScreenBackground"
                     />
 
-
-
-                <!--  Project Headers -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjHeaders"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_headers"
-                    android:checked="true"
-                    />
                 <!--  Project Name -->
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switchProjName"
@@ -567,7 +737,8 @@
 
                     android:paddingTop="@dimen/row_between_rows_margin"
 
-                    android:gravity="end"
+
+                    android:layout_gravity="center_horizontal"
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorScreenBackground"
@@ -615,51 +786,6 @@
                     android:checked="true"/>
 
 
-                <!--  Project Autosave -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjAutosave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_autosave"
-                    />
-
-
-                <!--  Project RMS v StdDev -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjRMSvSTD"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_rmsVstd"
-                    />
-
-
-                <!--  Project UI Order -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjUIOrder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_ui_order"
-                    />
-
-
-                <!--  Project DD v DMS -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjDDvDMS"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_ddVdms"
-                    />
-
-
-                <!--  Project Dir v Plus Minus -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjDirVPM"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_dirVpm"
-                    />
-
-
                 <!--  Project Data Source -->
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switchProjDataSrc"
@@ -667,25 +793,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/exc_switch_proj_data_src"
                     android:checked="true"/>
-
-
-                <!--  Project Location Precision -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjLocPrecision"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_loc_prc"
-                    />
-
-
-                <!--  Project Std Dev Precision -->
-                <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switchProjStdPrc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exc_switch_proj_std_prc"
-                    />
-
 
 
                 <!-- Group: Point Properties -->
@@ -698,7 +805,7 @@
 
                     android:paddingTop="@dimen/row_between_rows_margin"
 
-                    android:gravity="end"
+                    android:layout_gravity="center_horizontal"
 
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorScreenBackground"
@@ -823,6 +930,86 @@
                     android:layout_height="wrap_content"
                     android:text="@string/exc_switch_pnt_vrms"
                     />
+
+
+
+                <!-- Group: Coordinate Properties -->
+
+                <TextView
+
+                    android:text="@string/exchange_coord_properties"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+
+                    android:paddingTop="@dimen/row_between_rows_margin"
+
+                    android:layout_gravity="center_horizontal"
+
+                    android:textColor="@color/colorTextBlack"
+                    android:background="@color/colorScreenBackground"
+                    />
+
+                <!--  Coordinate Time -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_time"
+                    />
+
+
+                <!--  Coordinate Latitude / Northing -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordNorthing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_northing"
+                    />
+
+
+                <!--  Coordinate Longitude / Easting -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordEasting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_easting"
+                    />
+
+                <!--  Coordinate Elevation -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordEle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_ele"
+                    />
+
+
+                <!--  Coordinate Geoid -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordGeoid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_geoid"
+                    />
+
+
+                <!--  Coordinate Scale Factor -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordSF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_sf"
+                    />
+
+
+                <!--  Coordinate Convergence Angle -->
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchCoordCA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exc_switch_coord_ca"
+                    />
+
 
 
 

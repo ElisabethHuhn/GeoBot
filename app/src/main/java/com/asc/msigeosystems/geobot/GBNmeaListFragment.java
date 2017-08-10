@@ -139,7 +139,7 @@ public class GBNmeaListFragment extends Fragment implements //GpsStatus.Listener
 
 
         //5) Use the data to Create and set the Adapter
-        GBNmeaAdapter adapter = new GBNmeaAdapter(mNmeaList);
+        GBNmeaLocationAdapter adapter = new GBNmeaLocationAdapter(mNmeaList);
         recyclerView.setAdapter(adapter);
 
         //6) create and set the itemAnimator
@@ -330,7 +330,7 @@ public class GBNmeaListFragment extends Fragment implements //GpsStatus.Listener
     @Override
     public void onNmeaReceived (long timestamp, String nmea){
         View v = getView();
-        if (v != null)return;
+        if (v == null)return;
 
         //create an object with all the fields from the string
         //The parser updates the satellite list.
@@ -352,11 +352,6 @@ public class GBNmeaListFragment extends Fragment implements //GpsStatus.Listener
                 try {
                     RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.nmeaList);
                     recyclerView.getAdapter().notifyItemInserted(recyclerView.getAdapter().getItemCount());
-                    //mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
-
-                    //start of list
-                    //mRecyclerView.getAdapter().notifyItemInserted(mRecyclerView.getAdapter().getItemCount());
-                    //mRecyclerView.smoothScrollToPosition(0);
 
                     TextView nmeaListSize = (TextView) v.findViewById(R.id.nmeaSizeList) ;
                     nmeaListSize.setText(String.valueOf( recyclerView.getAdapter().getItemCount()));
@@ -365,11 +360,7 @@ public class GBNmeaListFragment extends Fragment implements //GpsStatus.Listener
                     GBUtilities.getInstance().errorHandler(getActivity(), R.string.programming_error);
                 }
             }
-
         }
-
-
-
     }
 
    //*********************************************************************/

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:focusable="true"
+    android:clickable="true"
+
+    android:paddingTop="@dimen/interum_vertical"
+
+    android:background="?android:attr/selectableItemBackground"
+    >
+
+    <!-- NMEA Type -->
+    <TextView
+        android:id="@+id/nmeaTypeView"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:layout_marginStart="@dimen/row_cap_margin"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- NMEA Latitude -->
+    <TextView
+        android:id="@+id/nmeaLatitudeView"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+    <!-- NMEA Longitude -->
+    <TextView
+        android:id="@+id/nmeaLongitudeView"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:layout_marginEnd="@dimen/row_cap_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+        />
+
+
+</LinearLayout>
+

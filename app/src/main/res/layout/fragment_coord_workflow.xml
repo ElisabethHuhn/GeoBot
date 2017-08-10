@@ -442,7 +442,7 @@
                                 />
                             <TextView
                                 android:id="@+id/gpsWgs84ElevationMetersInput"
-                                android:hint="@string/type_elevation_meters_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -456,7 +456,7 @@
                                 />
                             <TextView
                                 android:id="@+id/gpsWgs84ElevationFeetInput"
-                                android:hint="@string/type_elevation_feet_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -496,7 +496,7 @@
                                 />
                             <TextView
                                 android:id="@+id/gpsWgs84GeoidHeightMetersInput"
-                                android:hint="@string/type_geoid_height_meters_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -510,7 +510,7 @@
                                 />
                             <TextView
                                 android:id="@+id/gpsWgs84GeoidHeightFeetInput"
-                                android:hint="@string/type_geoid_height_feet_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -715,7 +715,7 @@
                             android:background="@color/colorScreenBackground"
                             />
                         <TextView
-                            android:id="@+id/meanWgs84LongSigmaOutput"
+                            android:id="@+id/meanWgs84LngSigmaOutput"
                             android:hint="@string/mean_lng_sigma"
 
                             android:layout_height="wrap_content"
@@ -936,7 +936,7 @@
                                 />
                             <TextView
                                 android:id="@+id/meanWgs84ElevationMetersInput"
-                                android:hint="@string/type_elevation_meters_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -950,7 +950,7 @@
                                 />
                             <TextView
                                 android:id="@+id/meanWgs84ElevationFeetInput"
-                                android:hint="@string/type_elevation_feet_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -990,7 +990,7 @@
 
                             <TextView
                                 android:id="@+id/meanWgs84GeoidHeightMetersInput"
-                                android:hint="@string/type_geoid_height_meters_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -1004,7 +1004,7 @@
                                 />
                             <TextView
                                 android:id="@+id/meanWgs84GeoidHeightFeetInput"
-                                android:hint="@string/type_geoid_height_feet_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -1125,7 +1125,7 @@
                         <!-- Easting Meters -->
                         <TextView
                             android:id="@+id/spcEastingMetersOutput"
-                            android:hint="@string/spc_easting_meters_label"
+                            android:hint="@string/spc_easting_label"
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
                             android:layout_weight="70"
@@ -1140,7 +1140,7 @@
                         <!-- Easting Feet -->
                         <TextView
                             android:id="@+id/spcEastingFeetOutput"
-                            android:hint="@string/spc_easting_feet_label"
+                            android:hint="@string/spc_easting_label"
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
                             android:layout_weight="75"
@@ -1179,7 +1179,7 @@
                         <!-- Northing Meters -->
                         <TextView
                             android:id="@+id/spcNorthingMetersOutput"
-                            android:hint="@string/spc_northing_meters_label"
+                            android:hint="@string/spc_northing_label"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -1195,7 +1195,7 @@
                         <!-- Northing Feet -->
                         <TextView
                             android:id="@+id/spcNorthingFeetOutput"
-                            android:hint="@string/spc_northing_feet_label"
+                            android:hint="@string/spc_northing_label"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -1399,7 +1399,7 @@
                         <!-- Easting Meters -->
                         <TextView
                             android:id="@+id/utmEastingMetersOutput"
-                            android:hint="@string/utm_easting_meters_label"
+                            android:hint="@string/utm_easting_label"
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
                             android:layout_weight="70"
@@ -1415,7 +1415,7 @@
                         <!-- Easting Feet -->
                         <TextView
                             android:id="@+id/utmEastingFeetOutput"
-                            android:hint="@string/utm_easting_feet_label"
+                            android:hint="@string/utm_easting_label"
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
                             android:layout_weight="75"
@@ -1454,7 +1454,7 @@
                         <!-- Northing Meters -->
                         <TextView
                             android:id="@+id/utmNorthingMetersOutput"
-                            android:hint="@string/utm_northing_meters_label"
+                            android:hint="@string/utm_northing_label"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -1470,7 +1470,7 @@
                         <!-- Northing Feet -->
                         <TextView
                             android:id="@+id/utmNorthingFeetOutput"
-                            android:hint="@string/utm_northing_feet_label"
+                            android:hint="@string/utm_northing_label"
 
                             android:layout_height="wrap_content"
                             android:layout_width="0dp"
@@ -1779,7 +1779,7 @@
                                 />
                             <TextView
                                 android:id="@+id/nad83ElevationMetersInput"
-                                android:hint="@string/type_elevation_meters_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -1793,7 +1793,7 @@
                                 />
                             <TextView
                                 android:id="@+id/nad83ElevationFeetInput"
-                                android:hint="@string/type_elevation_feet_label"
+                                android:hint="@string/type_elevation_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -1832,7 +1832,7 @@
                                 />
                             <TextView
                                 android:id="@+id/nad83GeoidHeightMetersInput"
-                                android:hint="@string/type_geoid_height_meters_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"
@@ -1846,7 +1846,7 @@
                                 />
                             <TextView
                                 android:id="@+id/nad83GeoidHeightFeetInput"
-                                android:hint="@string/type_geoid_height_feet_label"
+                                android:hint="@string/type_geoid_height_label"
                                 android:layout_gravity="center_horizontal"
                                 android:gravity="center"
                                 android:layout_height="wrap_content"

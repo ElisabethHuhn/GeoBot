@@ -20,29 +20,29 @@ class GBCoordinateMean {
     /* ***************************************************/
     /* ******     Static Constants               *********/
     /* ***************************************************/
-    public static final String MEAN_COORDINATE_ID   = "meanCoordinateID";
-    public static final String MEAN_PROJECT_ID      = "meanProjectID";
-    public static final String MEAN_POINT_ID        = "meanPointID";
-    public static final String MEAN_RAW_READINGS    = "meanRaw";
-    public static final String MEAN_FIXED_READINGS  = "meanFixed";
-    public static final String MEAN_MEANED_READINGS = "meanMeaned";
-    public static final String MEAN_LATITUDE        = "meanLatitude";
-    public static final String MEAN_LATITUDE_DEGREE = "meanLatitudeDeg";
-    public static final String MEAN_LATITUDE_MINUTE = "meanLatitudeMin";
-    public static final String MEAN_LATITUDE_STDDEV = "meanLatitudeStD";
-    public static final String MEAN_LATITUDE_SECOND = "meanLatitudeSec";
-    public static final String MEAN_LONGITUDE        = "meanLongitude";
-    public static final String MEAN_LONGITUDE_DEGREE = "meanLongitudeDeg";
-    public static final String MEAN_LONGITUDE_MINUTE = "meanLongitudeMin";
-    public static final String MEAN_LONGITUDE_SECOND = "meanLongitudeSec";
-    public static final String MEAN_LONGITUDE_STDDEV = "meanLongitudeStD";
-    public static final String MEAN_ELEVATION        = "meanElevation";
-    public static final String MEAN_ELEVATION_STDDEV = "meanElevationStD";
-    public static final String MEAN_GEOID            = "meanGeoid";
-    public static final String MEAN_SATELLITES       = "meanSatellites";
-    public static final String MEAN_VALID            = "meanValid";
-    public static final String MEAN_ISFIXED          = "meanIsFixed";
-    public static final String MEAN_TYPE             = "meanType";
+    private static final String MEAN_COORDINATE_ID   = "meanCoordinateID";
+    private static final String MEAN_PROJECT_ID      = "meanProjectID";
+    private static final String MEAN_POINT_ID        = "meanPointID";
+    private static final String MEAN_RAW_READINGS    = "meanRaw";
+    private static final String MEAN_FIXED_READINGS  = "meanFixed";
+    private static final String MEAN_MEANED_READINGS = "meanMeaned";
+    private static final String MEAN_LATITUDE        = "meanLatitude";
+    private static final String MEAN_LATITUDE_DEGREE = "meanLatitudeDeg";
+    private static final String MEAN_LATITUDE_MINUTE = "meanLatitudeMin";
+    private static final String MEAN_LATITUDE_STDDEV = "meanLatitudeStD";
+    private static final String MEAN_LATITUDE_SECOND = "meanLatitudeSec";
+    private static final String MEAN_LONGITUDE        = "meanLongitude";
+    private static final String MEAN_LONGITUDE_DEGREE = "meanLongitudeDeg";
+    private static final String MEAN_LONGITUDE_MINUTE = "meanLongitudeMin";
+    private static final String MEAN_LONGITUDE_SECOND = "meanLongitudeSec";
+    private static final String MEAN_LONGITUDE_STDDEV = "meanLongitudeStD";
+    private static final String MEAN_ELEVATION        = "meanElevation";
+    private static final String MEAN_ELEVATION_STDDEV = "meanElevationStD";
+    private static final String MEAN_GEOID            = "meanGeoid";
+    private static final String MEAN_SATELLITES       = "meanSatellites";
+    private static final String MEAN_VALID            = "meanValid";
+    private static final String MEAN_ISFIXED          = "meanIsFixed";
+    private static final String MEAN_TYPE             = "meanType";
 
 
     /* ***************************************************/
@@ -69,17 +69,11 @@ class GBCoordinateMean {
 
     //Latitude in DD and DMS formats
     private double mLatitude;
-    private int    mLatitudeDegree;
-    private int    mLatitudeMinute;
-    private double mLatitudeSecond;
     private double mLatitudeStdDev;  //RMS
 
 
     //Longitude in DD and DMS formats
     private double mLongitude;
-    private int    mLongitudeDegree;
-    private int    mLongitudeMinute;
-    private double mLongitudeSecond;
     private double mLongitudeStdDev;  //RMS
 
     private double mElevation;        //Orthometric Elevation in Meters
@@ -144,14 +138,10 @@ class GBCoordinateMean {
         setFixedReadings  (1);
 
         setLatitude       (coordinateWGS84.getLatitude());
-        setLatitudeDegree (coordinateWGS84.getLatitudeDegree());
-        setLatitudeMinute (coordinateWGS84.getLatitudeMinute());
-        setLatitudeSecond (coordinateWGS84.getLatitudeSecond());
+
 
         setLongitude      (coordinateWGS84.getLongitude());
-        setLongitudeDegree(coordinateWGS84.getLongitudeDegree());
-        setLongitudeMinute(coordinateWGS84.getLongitudeMinute());
-        setLongitudeSecond(coordinateWGS84.getLongitudeSecond());
+
         setElevation      (coordinateWGS84.getElevation());
 
         setLatitudeStdDev (0);
@@ -180,18 +170,11 @@ class GBCoordinateMean {
         //Latitude in DD and DMS formats
         mLatitude       = 0d;
 
-        mLatitudeDegree = 0;
-        mLatitudeMinute = 0;
-        mLatitudeSecond = 0d;
         mLatitudeStdDev = 0.d;
 
 
         //Longitude in DD and DMS formats
         mLongitude      = 0d;
-
-        mLongitudeDegree = 0;
-        mLongitudeMinute = 0;
-        mLongitudeSecond = 0d;
         mLongitudeStdDev = 0d;
 
         mElevation       = 0d; //Orthometric Elevation in Meters
@@ -232,14 +215,9 @@ class GBCoordinateMean {
     double getLatitude()                            { return mLatitude;        }
     void   setLatitude(double latitude)             { mLatitude = latitude; }
 
-    int    getLatitudeDegree()                      { return mLatitudeDegree;  }
-    void   setLatitudeDegree(int latitudeDegree) { mLatitudeDegree = latitudeDegree; }
-
-    int    getLatitudeMinute()                      { return mLatitudeMinute;  }
-    void   setLatitudeMinute(int latitudeMinute) { mLatitudeMinute = latitudeMinute; }
-
-    double getLatitudeSecond()                      { return mLatitudeSecond;  }
-    void   setLatitudeSecond(double latitudeSecond) { mLatitudeSecond = latitudeSecond; }
+    int    getLatitudeDegree()                      { return GBUtilities.getDegrees(mLatitude);  }
+    int    getLatitudeMinute()                      { return GBUtilities.getMinutes(mLatitude);  }
+    double getLatitudeSecond()                      { return GBUtilities.getSeconds(mLatitude);  }
 
     double getLatitudeStdDev()                      { return mLatitudeStdDev;        }
     void   setLatitudeStdDev(double latitudeStdDev) { mLatitudeStdDev = latitudeStdDev; }
@@ -247,14 +225,9 @@ class GBCoordinateMean {
     double getLongitude()                           { return mLongitude;       }
     void   setLongitude(double longitude)           { mLongitude = longitude; }
 
-    int    getLongitudeDegree()                     { return mLongitudeDegree; }
-    void   setLongitudeDegree(int longitudeDegree) { mLongitudeDegree = longitudeDegree; }
-
-    int    getLongitudeMinute()                     { return mLongitudeMinute; }
-    void   setLongitudeMinute(int longitudeMinute) { mLongitudeMinute = longitudeMinute; }
-
-    double getLongitudeSecond()                     { return mLongitudeSecond; }
-    void   setLongitudeSecond(double longitudeSecond) {mLongitudeSecond = longitudeSecond; }
+    int    getLongitudeDegree()                     { return GBUtilities.getDegrees(mLongitude); }
+    int    getLongitudeMinute()                     { return GBUtilities.getMinutes(mLongitude); }
+    double getLongitudeSecond()                     { return GBUtilities.getSeconds(mLongitude); }
 
     double getLongitudeStdDev()                      { return mLongitudeStdDev;        }
     void   setLongitudeStdDev(double longitudeStdDev) { mLongitudeStdDev = longitudeStdDev; }
@@ -369,29 +342,29 @@ class GBCoordinateMean {
 
         while (position < last){
 
-            meanedLat  = getLatitude();
+
             readingLat = meanValues.getCoordinateAt(position).getLatitude();
-            tempMeanD  = meanedLat  + readingLat;
+            tempMeanD  = getLatitude()  + readingLat;
             setLatitude(tempMeanD);
-            meanedLat  = getLatitude();
 
-            meanedLong  = getLongitude();
+
+
             readingLong = meanValues.getCoordinateAt(position).getLongitude();
-            tempMeanD   = meanedLong + readingLong;
+            tempMeanD   = getLongitude() + readingLong;
             setLongitude(tempMeanD);
-            meanedLong  = getLongitude();
 
-            meanedEle  = getElevation();
+
+
             readingEle = meanValues.getCoordinateAt(position).getElevation();
-            tempMeanD  = meanedEle + readingEle;
+            tempMeanD  = getElevation() + readingEle;
             setElevation(tempMeanD);
-            meanedEle  = getElevation();
 
-            meanedGeo  = getGeoid();
+
+
             readingGeo = meanValues.getCoordinateAt(position).getGeoid();
-            tempMeanD  = meanedGeo + readingGeo;
+            tempMeanD  = getGeoid() + readingGeo;
             setGeoid(tempMeanD);
-            meanedGeo  = getGeoid();
+
 
             position++;
 
@@ -399,16 +372,10 @@ class GBCoordinateMean {
         //Step two: divide by the number in the list
         double sizeD = (double)last;//convert to double as Java is a strongly typed language
 
-        meanedLat = meanedLat / sizeD;
+
         setLatitude (getLatitude()  / sizeD);
-
-        meanedLong = meanedLong / sizeD;
         setLongitude(getLongitude() / sizeD);
-
-        meanedEle = meanedEle / sizeD;
         setElevation(getElevation() / sizeD);
-
-        meanedGeo = meanedGeo / sizeD;
         setGeoid    (getGeoid()     / sizeD);
 
         //calculate the variance of the squared residuals

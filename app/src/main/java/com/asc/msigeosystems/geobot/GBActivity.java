@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -57,7 +56,6 @@ public class GBActivity extends AppCompatActivity {
             static final String sProjectEditTag        = "PROJECT_EDIT";
     //private static final String sProjectUpdateTag      = "PROJECT_UPDATE";
     //private static final String sProjectDeleteTag      = "PROJECT_DELETE";
-    private static final String sProjectSettingsTag    = "PROJECT_SETTINGS";
 
     static final String sExportTag             = "EXPORT_TAG";
 
@@ -73,9 +71,9 @@ public class GBActivity extends AppCompatActivity {
     private static final String sMeanTokenTag          = "MEAM_TOKEN";
 
     private static final String sCollectTopTag         = "COLLECT_TOP";
-     static final String sCollectPointsTag      = "COLLECT_POINTS";
-     static final int    sCollectPointsRequestCode  = 1;
-    //private static final String sCollectPointsMapTag   = "COLLECT_POINTS_MAP";
+    static final String sCollectPointsTag              = "COLLECT_POINTS";
+    static final String sMapPointsTag                  = "MAP_POINTS";
+    static final int    sCollectPointsRequestCode  = 1;
 
     private static final String sStakeoutTopTag        = "STAKEOUT_TOP";
 
@@ -166,8 +164,8 @@ public class GBActivity extends AppCompatActivity {
             if (fragment instanceof GBPointEditFragment) {
                 ((GBPointEditFragment) fragment).onExit();
 
-            } else if (fragment instanceof GBCoordMeasureFragment) {
-                ((GBCoordMeasureFragment) fragment).onExit();
+            } else if (fragment instanceof GBCoordinateMeasureFragment) {
+                ((GBCoordinateMeasureFragment) fragment).onExit();
 
             } else if (fragment instanceof GBProjectEditFragment) {
                 ((GBProjectEditFragment) fragment).onExit();
@@ -325,78 +323,51 @@ public class GBActivity extends AppCompatActivity {
             case R.id.action_home :
                 switchToHomeScreen();
                 return true;
-            case  R.id.action_project_open:
-                switchToProjectOpenScreen();
-                //switchToProjectListScreen(new GBPath(GBPath.sOpenTag));
-                return true;
+
             case  R.id.action_project_create:
                 switchToProjectCreateScreen();
                 return true;
 
-            case  R.id.action_project_edit:
-                switchToProjectEditScreen();
-                //switchToProjectListScreen(new GBPath(GBPath.sEditTag));
+            case  R.id.action_project_open:
+                switchToProjectOpenScreen();
                 return true;
 
-            case  R.id.action_point_list:
-            case  R.id.action_map_points:
-            case  R.id.action_project_export:
-                if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST){
-                    switchToProjectListScreen(new GBPath(GBPath.sShowTag));
-                } else {
-                    switchToProjectEditScreen();
+            case  R.id.action_project_edit:
+                switchToProjectEditScreen();
+                return true;
+
+            case  R.id.action_point_measure:
+                if (openProjectID != GBUtilities.ID_DOES_NOT_EXIST) {
+                    GBProject openProject = GBUtilities.getInstance().getOpenProject(this);
+                    switchToPointCreateScreen(openProject);
                 }
                 return true;
 
+            case  R.id.action_map_points:
+                if (openProjectID != GBUtilities.ID_DOES_NOT_EXIST) {
+                    switchToMapPointsScreen();
+                }
+                return true;
 
-/*
- case  R.id.action_project:
- switchToTopProjectScreen();
- return true;
+            case  R.id.action_point_list:
+                if (openProjectID != GBUtilities.ID_DOES_NOT_EXIST) {
+                    switchToPointsListScreen(new GBPath(GBPath.sEditTag));
+                }
+                return true;
 
- case R.id.action_collect:
- switchToTopCollectScreen();
- return true;
+            case  R.id.action_project_export:
+                if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST){
+                    switchToExportScreen();
+                }
+                return true;
 
- case  R.id.action_stakeout:
- switchToTopStakeoutScreen();
- return true;
+            case  R.id.action_settings:
+                switchToGeneralSettingsScreen();
+                return true;
 
- case R.id.action_cogo:
- switchToTopCogoScreen();
- return true;
 
- case R.id.action_maps:
- Toast.makeText(GBActivity.this,
- R.string.action_maps,
- Toast.LENGTH_SHORT).show();
- return true;
 
- case R.id.action_skyplots:
- switchToTopSkyplotScreen();
- return true;
-
- case R.id.action_config:
- switchToTopConfigScreen();
- return true;
-
- case R.id.action_settings:
- switchToTopSettingsScreen();
- return true;
-
- case R.id.action_help:
- Toast.makeText(GBActivity.this,
- R.string.action_help,
- Toast.LENGTH_SHORT).show();
- return true;
-
- case R.id.action_convert:
- switchToConvertScreen();
- return true;
- ****/
         } //end switch
-
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -450,7 +421,7 @@ public class GBActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        if (fragment instanceof  GBCoordMeasureFragment){
+        if (fragment instanceof GBCoordinateMeasureFragment){
             GBSatelliteManager satelliteManager = GBSatelliteManager.getInstance();
             String dopValues = String.format(Locale.getDefault(),
                                         "HDOP = %.3f     VDOP = %.3f      PDOP = %.3f",
@@ -461,8 +432,7 @@ public class GBActivity extends AppCompatActivity {
 
 
 
-            Snackbar.make(view, dopValues, Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Action", null).show();
+            //Snackbar.make(view, dopValues, Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
 
             if (fab.getVisibility() == FloatingActionButton.VISIBLE){
                 hideFAB();
@@ -642,7 +612,7 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToMeasureScreen(GBPoint point){
 
-        Fragment fragment    = GBCoordMeasureFragment.newInstance(point);
+        Fragment fragment    = GBCoordinateMeasureFragment.newInstance(point);
         String   tag         = sMeasureTag;
 
         switchScreen(fragment, tag);
@@ -782,16 +752,6 @@ public class GBActivity extends AppCompatActivity {
     }
 
 
-    void switchToProjectSettingsScreen(){
-
-        Fragment fragment =  new GBProjectSettingsFragment();
-        String tag        = sProjectSettingsTag;
-        int subTitle      = R.string.subtitle_project_settings;
-
-        switchScreen(fragment, tag, subTitle);
-
-
-    }
 
     // ******************************************
     // * Export
@@ -912,6 +872,16 @@ public class GBActivity extends AppCompatActivity {
     }
 
 
+    void switchToMapPointsScreen(){
+
+        Fragment fragment = new GBPointMapFragment();
+        String tag        = sMapPointsTag;
+
+        switchScreen(fragment, tag);
+
+
+    }
+
 
     // ******************************************
     // * STACKOUT
@@ -953,7 +923,7 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToCoordConvert(){
 
-        Fragment fragment = new GBCoordMeasureFragment();
+        Fragment fragment = new GBCoordinateMeasureFragment();
         String tag        = sConversionTag;
         int subTitle      = R.string.subtitle_measure;
 
@@ -1108,7 +1078,7 @@ public class GBActivity extends AppCompatActivity {
 
     void switchToGeneralSettingsScreen(){
 
-        Fragment fragment = new GBTopSettingsGeneralFragment();
+        Fragment fragment = new GBGeneralSettingsFragment();
         String tag        = sSettingsGeneralTag;
         int subTitle      = subtitle_general_settings;
 
@@ -1116,6 +1086,9 @@ public class GBActivity extends AppCompatActivity {
 
 
     }
+
+
+
 
 
 

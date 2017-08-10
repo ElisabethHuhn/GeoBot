@@ -35,40 +35,29 @@
                 android:background="@color/colorScreenBackground"
                 >
 
-                <!-- Project ID 5-->
+
+                <!-- Point Number 6-->
                 <TextView
-                    android:text="@string/point_row_project_id_label"
-
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="5"
-                    android:layout_marginEnd="8dp"
-
-                    android:textColor="@color/colorTextBlack"
-
-                    />
-
-                <!-- Point ID 6-->
-                <TextView
-                    android:text="@string/point_row_point_id_label"
+                    android:text="@string/point_row_point_nb_label"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="6"
                     android:layout_marginEnd="8dp"
+                    android:gravity="center"
 
                     android:textColor="@color/colorTextBlack"
 
                     />
 
-                <!-- Easting 10-->
+                <!-- Latitude Hemisphere Direction 3 -->
                 <TextView
-                    android:id="@+id/easting_label"
-                    android:text="@string/point_row_easting_label"
+                    android:id="@+id/lat_hemisphere_label"
+                    android:text="@string/type_lat_dir"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="3"
                     android:layout_marginEnd="8dp"
 
                     android:textColor="@color/colorTextBlack"
@@ -84,6 +73,36 @@
                     android:layout_width="0dp"
                     android:layout_weight="10"
                     android:layout_marginEnd="8dp"
+                    android:gravity="center"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Longitude Hemisphere Direction 3 -->
+                <TextView
+                    android:id="@+id/lng_hemisphere_label"
+                    android:text="@string/type_lng_dir"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:layout_marginEnd="8dp"
+
+                    android:textColor="@color/colorTextBlack"
+
+                    />
+
+                <!-- Easting 10-->
+                <TextView
+                    android:id="@+id/easting_label"
+                    android:text="@string/point_row_easting_label"
+
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
 
                     android:textColor="@color/colorTextBlack"
 
@@ -97,12 +116,13 @@
                     android:layout_width="0dp"
                     android:layout_weight="10"
                     android:layout_marginEnd="8dp"
+                    android:gravity="center"
 
                     android:textColor="@color/colorTextBlack"
 
                     />
 
-                <!-- Description 15-->
+                <!-- FC 5-->
                 <TextView
                     android:text="@string/point_row_feature_code_label"
 
@@ -110,6 +130,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="5"
                     android:layout_marginEnd="16dp"
+                    android:gravity="center"
 
                     android:textColor="@color/colorTextBlack"
 

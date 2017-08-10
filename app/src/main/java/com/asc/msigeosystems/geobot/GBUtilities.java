@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
@@ -16,10 +18,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -43,8 +44,8 @@ public class GBUtilities {
     public static final long ID_DOES_NOT_EXIST = -1;
 
 
-    public static final boolean BUTTON_DISABLE = false;
-    public static final boolean BUTTON_ENABLE  = true;
+    static final boolean BUTTON_DISABLE = false;
+    static final boolean BUTTON_ENABLE  = true;
 
     static final int sHundredthsDigitsOfPrecision = 2;
     static final int sMicrometerDigitsOfPrecision = 6;
@@ -184,39 +185,27 @@ public class GBUtilities {
 
     static double convertMetersToFeet(double meters) {
         //function converts Feet to Meters.
-        //truncate to a reasonable number of decimal digits
-        double feet = meters * GBUtilities.feetPerMeter;
-        BigDecimal bd = new BigDecimal(feet).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        feet = bd.doubleValue();
 
-        return (feet);  // official conversion rate of Meters to Feet
-
+        return meters * GBUtilities.feetPerMeter;
     }
 
     static double convertMetersToIFeet(double meters) {
-        //function converts Feet to Meters.
-        //truncate to a reasonable number of decimal digits
-        double feet = meters * GBUtilities.ifeetPerMeter;
-        BigDecimal bd = new BigDecimal(feet).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        feet = bd.doubleValue();
-
-        return (feet);  // official conversion rate of Meters to Feet
-
+        //function converts Meters to Ifeet.
+        return meters * GBUtilities.ifeetPerMeter;
     }
 
     static double convertFeetToMeters(double feet){
-        double meters = feet / GBUtilities.feetPerMeter;
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(meters).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        meters = bd.doubleValue();
-
-        return (meters);
+        return feet / GBUtilities.feetPerMeter;
     }
 
+    static double convertIFeetMeters(double iFeet) {
+        //function converts IFeet to Meters.
+        return iFeet / GBUtilities.ifeetPerMeter;
+    }
 
     static boolean convertMetersToFeet(Context context,
-                                              EditText metersWidget,
-                                              EditText feetWidget){
+                                      EditText metersWidget,
+                                      EditText feetWidget){
         double meters, feet;
         String meterString; //, feetString;
 
@@ -228,11 +217,9 @@ public class GBUtilities {
             return false;
         }
 
+        int locPrecision = GBGeneralSettings.getLocPrecision((GBActivity)context);
         feet = meters * GBUtilities.feetPerMeter;
-        BigDecimal bd = new BigDecimal(feet).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        feet = bd.doubleValue();
-
-        feetWidget.setText(String.valueOf(feet));
+        feetWidget.setText(truncatePrecisionString(feet, locPrecision));
 
         if (meters < 0){
             metersWidget.setTextColor(ContextCompat.getColor(context, R.color.colorNegNumber));
@@ -247,8 +234,8 @@ public class GBUtilities {
     }
 
     static boolean convertFeetToMeters(Context context,
-                                              EditText metersWidget,
-                                              EditText feetWidget){
+                                      EditText metersWidget,
+                                      EditText feetWidget){
         double meters, feet;
         String feetString; //meterString too if needed
 
@@ -262,11 +249,8 @@ public class GBUtilities {
         }
 
         meters = feet  / GBUtilities.feetPerMeter;
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(meters).setScale(sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        meters = bd.doubleValue();
-
-        metersWidget.setText(String.valueOf(meters));
+        int locPrecision = GBGeneralSettings.getLocPrecision((GBActivity)context);
+        metersWidget.setText(truncatePrecisionString(meters, locPrecision));
 
 
         if (feet < 0){
@@ -292,7 +276,7 @@ public class GBUtilities {
     //This is meters per dp, NOT physical pixel
     //There are 160 dp in an inch, so 160 dpPerInch
     //         mapMeters per screenInch = getMetersPerPixel() X PixelsPerInch
-    static double getMetersPerPixel(double latitude, float zoomLevel){
+    private static double getMetersPerPixel(double latitude, float zoomLevel){
         return (getCircumferenceInMetersAtLatitude(latitude) /
                 getCircumferenceInPixelsAtLatitude(latitude, zoomLevel));
         /*
@@ -305,14 +289,13 @@ public class GBUtilities {
     }
 
 
-    static double getCircumferenceInMetersAtLatitude (double latitude){
+    private static double getCircumferenceInMetersAtLatitude(double latitude){
         double radius = getRadiusInMetersAtLatitude(latitude);
-        double circumfrence = 2 * Math.PI * radius;
-        return circumfrence;
+        return 2 * Math.PI * radius;
     }
 
 
-    static double getRadiusInMetersAtLatitude(double latitude) {
+    private static double getRadiusInMetersAtLatitude(double latitude) {
         //latitude in radians
         double latRad = latitude * Math.PI / 180.;
         double equRSqr = sEquatorialRadiusA * sEquatorialRadiusA;//in meters
@@ -324,11 +307,10 @@ public class GBUtilities {
         double denominator = ((sEquatorialRadiusA * cosLat) * (sEquatorialRadiusA * cosLat)) +
                              ((sPolarRadiusB      * cosLat) * (sPolarRadiusB      * cosLat));
 
-        double radius = Math.sqrt(numerator / denominator);
-        return radius;
+        return Math.sqrt(numerator / denominator);
     }
 
-    static double getCircumferenceInPixelsAtLatitude (double latitude, float zoomLevel){
+    private static double getCircumferenceInPixelsAtLatitude(double latitude, float zoomLevel){
 
         //at zoom level N, the circumference at the equator is approximately 256 * (2 to the N) dp
         double nPlus8 = (double)zoomLevel + 8.;
@@ -358,23 +340,101 @@ public class GBUtilities {
     }
 
 
+    static void soundMeanComplete(GBActivity activity){
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(activity.getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static boolean isEmpty(CharSequence str) {
         return (str == null || str.length() == 0);
     }
 
-    DecimalFormat df = new DecimalFormat("#.##");
+
+
+    static String truncatePrecisionString(GBActivity activity, int precisionType, double inputValue){
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+
+        //Default is the precision for locations
+        int digitsOfPrecision = GBGeneralSettings.getLocPrecision(activity);
+        if (precisionType == GBGeneralSettings.sCAPrc){
+            digitsOfPrecision = GBGeneralSettings.getCAPrecision(activity);
+
+        } else if (precisionType == GBGeneralSettings.sSfPrc){
+            digitsOfPrecision = GBGeneralSettings.getSfPrecision(activity);
+
+        } else if (precisionType == GBGeneralSettings.sStdPrc){
+            digitsOfPrecision = GBGeneralSettings.getStdDevPrecision(activity);
+        }
+
+        if (digitsOfPrecision == 0)digitsOfPrecision = GBUtilities.sMicrometerDigitsOfPrecision;
+
+        return truncatePrecisionString(inputValue, digitsOfPrecision);
+    }
+
+    static String truncatePrecisionString(double inputValue, int digitsOfPrecision){
+        String form = "%."+digitsOfPrecision+"f\n";
+        return String.format(form, inputValue);
+    }
+
+    static String getDistanceString(GBActivity activity, int digitsOfPrecision, double distanceValue){
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int distUnits = openProject.getDistanceUnits();
+
+        double distanceMeters = distanceValue;
+        if (distUnits == GBProject.sFeet){
+            distanceMeters = GBUtilities.convertFeetToMeters(distanceValue);
+        }
+        if (distUnits == GBProject.sIntFeet){
+            distanceMeters = GBUtilities.convertIFeetMeters(distanceValue);
+        }
+
+        return GBUtilities.truncatePrecisionString(distanceMeters, digitsOfPrecision);
+    }
+
+
+
+    static double getDecimalDegrees(int degrees, int minutes, double seconds){
+        double dd = degrees + ((minutes + (seconds / 60.))/60.);
+        return dd;
+    }
+
+    static double getSeconds (double decimalDegrees){
+        int degrees = (int)decimalDegrees;
+        double remainderMin = ((decimalDegrees - degrees) * 60.);
+        int minutes = (int) (remainderMin);
+        return (remainderMin - minutes) * 60.; //seconds
+    }
+
+    static int getMinutes (double decimalDegrees){
+        int degrees = (int)decimalDegrees;
+        double remainderMin = ((decimalDegrees - degrees) * 60.);
+        return (int) (remainderMin);//minutes
+    }
+
+    static int getDegrees (double decimalDegrees){
+        return (int)decimalDegrees;
+    }
+
+
     private String convertToFormat(double value){
+        DecimalFormat df = new DecimalFormat("#.##");
 
         return df.format(value);
     }
 
 
-    public static String getDateTimeString(long milliSeconds){
+
+    static String getDateTimeString(long milliSeconds){
         Date date = new Date(milliSeconds);
         return DateFormat.getDateTimeInstance().format(date);
     }
 
-    public static long getDateTimeFromString(Context activity, String timeString){
+    static long getDateTimeFromString(Context activity, String timeString){
         Date date;
         try {
             SimpleDateFormat format = getDateTimeFormat();
@@ -386,8 +446,156 @@ public class GBUtilities {
         return date.getTime();
     }
 
-    static SimpleDateFormat getDateTimeFormat(){
+    private static SimpleDateFormat getDateTimeFormat(){
         return new SimpleDateFormat("MMM d, yyyy hh:mm:ss", Locale.getDefault());
+    }
+
+
+    //***********************************/
+    //****   Location UI conversions ****/
+    //***********************************/
+
+    static void locDD(GBActivity activity, double tude, int locDigOfPrec,
+                      boolean isDir, int posHemi, int negHemi,
+                      TextView dirView, TextView tudeView){
+
+
+        int tudeColor= R.color.colorPosNumber;
+        if (isDir){
+
+            if (tude < 0.){
+                dirView.setText(activity.getString(negHemi));
+                tude = Math.abs(tude);
+            } else {
+                dirView.setText(activity.getString(posHemi));
+            }
+            dirView.setVisibility(View.VISIBLE);
+        } else {
+            dirView.setVisibility(View.GONE);
+            if (tude < 0.) {
+                tudeColor = R.color.colorNegNumber;
+            }
+        }
+
+
+        String tudeString = GBUtilities.truncatePrecisionString(tude, locDigOfPrec);
+        tudeView.setText(tudeString);
+        tudeView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        tudeView .setTextColor(ContextCompat.getColor(activity, tudeColor));
+    }
+
+    static void locDMS(GBActivity activity,
+                       int tudeDeg, int tudeMin, double tudeSec, int locDigOfPrec,
+                       boolean isDir, int posHemi, int negHemi, TextView dirView,
+                       TextView tudeDegView, TextView tudeMinView, TextView tudeSecView){
+        int tudeColor = R.color.colorPosNumber;
+
+        if (isDir){
+
+            if ((tudeDeg < 0) || (tudeMin < 0) || (tudeSec < 0.)){
+                dirView.setText(activity.getString(negHemi));
+                tudeDeg = Math.abs(tudeDeg);
+                tudeMin = Math.abs(tudeMin);
+                tudeSec = Math.abs(tudeSec);
+            } else {
+                dirView.setText(activity.getString(posHemi));
+            }
+        } else if ((tudeDeg < 0) || (tudeMin < 0) || (tudeSec < 0.)){
+            tudeColor = R.color.colorNegNumber;
+        }
+
+        tudeDegView.setText(String.valueOf(tudeDeg));
+        tudeDegView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        tudeDegView .setTextColor(ContextCompat.getColor(activity, tudeColor));
+
+
+        tudeMinView.setText(String.valueOf(tudeMin));
+        tudeMinView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        tudeMinView .setTextColor(ContextCompat.getColor(activity, tudeColor));
+
+
+        String tudeSecString = GBUtilities.truncatePrecisionString(tudeSec, locDigOfPrec);
+        tudeSecView.setText(tudeSecString);
+        tudeSecView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        tudeSecView .setTextColor(ContextCompat.getColor(activity, tudeColor));
+    }
+
+    static void caDD(GBActivity activity, double ca, int locDigOfPrec, TextView caView){
+
+
+        int caColor= R.color.colorPosNumber;
+        if (ca < 0.){
+            caColor = R.color.colorNegNumber;
+        }
+
+
+        String caString = GBUtilities.truncatePrecisionString(ca, locDigOfPrec);
+        caView.setText(caString);
+        caView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        caView .setTextColor(ContextCompat.getColor(activity, caColor));
+    }
+
+    static void caDMS(GBActivity activity,
+                       int caDeg, int caMin, double caSec, int locDigOfPrec,
+                       TextView caDegView, TextView caMinView, TextView caSecView){
+        int caColor = R.color.colorPosNumber;
+
+        if ((caDeg < 0) || (caMin < 0) || (caSec < 0.)){
+            caColor = R.color.colorNegNumber;
+        }
+
+        caDegView.setText(String.valueOf(caDeg));
+        caDegView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        caDegView .setTextColor(ContextCompat.getColor(activity, caColor));
+
+
+        caMinView.setText(String.valueOf(caMin));
+        caMinView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        caMinView .setTextColor(ContextCompat.getColor(activity, caColor));
+
+
+        String caSecString = GBUtilities.truncatePrecisionString(caSec, locDigOfPrec);
+        caSecView.setText(caSecString);
+        caSecView.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorWhite));
+        caSecView .setTextColor(ContextCompat.getColor(activity, caColor));
+    }
+
+    static void locDistance(GBActivity activity, double distance,  TextView distanceView){
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int distUnits    = openProject.getDistanceUnits();
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(activity);
+
+        if (distUnits == GBProject.sFeet){
+            distance   = GBUtilities.convertMetersToFeet(distance);
+        } else if (distUnits == GBProject.sIntFeet){
+            distance   = GBUtilities.convertMetersToIFeet(distance);
+        }
+        String distanceString   = GBUtilities.truncatePrecisionString(distance, locDigOfPrecision);
+
+        distanceView.setText(distanceString);
+    }
+
+
+
+    static int getCoordinateTypeFromProject(GBProject openProject){
+
+        if (openProject == null)return GBCoordinate.sUNKWidgets;
+
+        CharSequence coordinateType = openProject.getProjectCoordinateType();
+
+        int returnCode = GBCoordinate.sUNKWidgets;
+
+        if (!GBUtilities.isEmpty(coordinateType)){
+            if (       coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84) ||
+                    coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83) ){
+                returnCode = GBCoordinate.sLLWidgets;
+            } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM) ||
+                    coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS) ){
+                returnCode = GBCoordinate.sNEWidgets;
+            }
+        }
+        return returnCode;
     }
 
 
@@ -567,20 +775,14 @@ public class GBUtilities {
     /* Checks if external storage is available for read and write */
     boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return (Environment.MEDIA_MOUNTED.equals(state)) ;
     }
 
     /* Checks if external storage is available to at least read */
     boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) ;
     }
 
     //************************************/

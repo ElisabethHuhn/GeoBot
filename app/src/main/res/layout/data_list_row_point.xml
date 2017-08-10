@@ -31,6 +31,20 @@
 
         />
 
+
+    <!-- Latitude Hemisphere Direction 3 -->
+    <TextView
+        android:id="@+id/pointRowLatHemiLabel"
+        android:text="@string/type_hemisphere_label"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+
+        />
     <!-- Easting 10-->
     <TextView
         android:id="@+id/pointRowEasting"
@@ -44,6 +58,66 @@
 
         android:textColor="@color/colorTextBlack"
         android:background="@color/colorWhite"
+
+        />
+    <!-- Latitude Degrees 5 -->
+    <TextView
+        android:id="@+id/pointRowLatitudeDeg"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Latitude Minutes 5 -->
+    <TextView
+        android:id="@+id/pointRowLatitudeMin"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Latitude Seconds 10 -->
+    <TextView
+        android:id="@+id/pointRowLatitudeSec"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
+
+    <!-- Longitude Hemisphere Direction 3 -->
+    <TextView
+        android:id="@+id/pointRowLngHemiLabel"
+        android:text="@string/type_hemisphere_label"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/colorTextBlack"
 
         />
 
@@ -62,6 +136,52 @@
         android:background="@color/colorWhite"
 
         />
+    <!-- Longitude Degrees 5 -->
+    <TextView
+        android:id="@+id/pointRowLongitudeDeg"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Longitude Minutes 5 -->
+    <TextView
+        android:id="@+id/pointRowLongitudeMin"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+    <!-- Longitude Seconds 10 -->
+    <TextView
+        android:id="@+id/pointRowLongitudeSec"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
+
 
     <!-- Elevation 10-->
     <TextView

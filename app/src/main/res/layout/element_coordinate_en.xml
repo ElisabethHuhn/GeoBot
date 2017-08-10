@@ -10,9 +10,9 @@
 
     <!-- Easting/Northing Coordinate -->
 
-    <include android:id="@+id/eastingContainer"     layout="@layout/element_en_label_meters_feet"/>
     <include android:id="@+id/northingContainer"    layout="@layout/element_en_label_meters_feet"/>
-    <!-- elevation -->
+    <include android:id="@+id/eastingContainer"     layout="@layout/element_en_label_meters_feet"/>
+     <!-- elevation -->
     <include android:id="@+id/elevationContainer"   layout="@layout/element_en_elevation"/>
 
     <!-- Zone Hemisphere Latband -->

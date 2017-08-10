@@ -2,18 +2,11 @@
 <LinearLayout
     xmlns:android               = "http://schemas.android.com/apk/res/android"
     android:id                  = "@+id/ll_dms"
-    android:orientation         = "vertical"
+    android:orientation         = "horizontal"
     android:layout_width        = "match_parent"
     android:layout_height       = "wrap_content"
     android:layout_marginBottom = "@dimen/row_between_rows_margin"
     >
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-
 
         <!-- | decimal degrees | degrees | minutes | seconds | -->
         <!-- Latitude Label by default, change text if longitude -->
@@ -29,6 +22,25 @@
 
             android:textColor     = "@color/colorTextBlack"
             android:background    = "@color/colorScreenBackground"
+            />
+
+        <!-- Direction 5 -->
+        <EditText
+            android:id="@+id/ll_dir"
+            android:hint="@string/type_hemisphere_label"
+
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:gravity="center"
+
+            android:enabled="false"
+            android:inputType="textCapCharacters"
+
+            android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+            android:textColor="@color/colorTextBlack"
+            android:background="@color/colorGrayish"
             />
 
         <!-- Decimal Degrees ll_dd_input -->
@@ -103,8 +115,5 @@
             android:textColor     = "@color/colorTextBlack"
             android:background    = "@color/colorGrayish"
         />
-
-
-    </LinearLayout>
 
 </LinearLayout>

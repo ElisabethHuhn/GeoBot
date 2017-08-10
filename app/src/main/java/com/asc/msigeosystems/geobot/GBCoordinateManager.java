@@ -148,7 +148,7 @@ class GBCoordinateManager {
         return last;
     }
 
-    GBCoordinateWGS84 getCoordinateWgsFromTokenReadingsCursor(Cursor cursor, int position){
+    private GBCoordinateWGS84 getCoordinateWgsFromTokenReadingsCursor(Cursor cursor, int position){
 
         int last = cursor.getCount();
         if (position >= last) return null;
@@ -409,26 +409,9 @@ class GBCoordinateManager {
 
         coordinate.setLatitude(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE)));
-  /*
-        coordinate.setLatitudeDegree(cursor.getInt(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE_DEGREE)));
-        coordinate.setLatitudeMinute(cursor.getInt(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE_MINUTE)));
-        coordinate.setLatitudeSecond(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LATITUDE_SECOND)));
-*/
 
         coordinate.setLongitude(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE)));
- /*
-        coordinate.setLongitudeDegree(cursor.getInt(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE_DEGREE)));
-        coordinate.setLongitudeMinute(cursor.getInt(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE_MINUTE)));
-        coordinate.setLongitudeSecond(cursor.getDouble(
-                        cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_LL_LONGITUDE_SECOND)));
-*/
-
 
         //Degrees, minutes, seconds are not stored in the DB
         coordinate.convertDDToDMS();
@@ -577,18 +560,6 @@ class GBCoordinateManager {
 
         coordinate.setLongitude(cursor.getDouble(
                         cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LONGITUDE)));
-
-
-        //convert DD to DMS by creating a new coordinateWGS
-        GBCoordinateWGS84 coordinateWGS84 =
-                new GBCoordinateWGS84(coordinate.getLatitude(), coordinate.getLongitude());
-        coordinate.setLatitudeDegree(coordinateWGS84.getLatitudeDegree());
-        coordinate.setLatitudeMinute(coordinateWGS84.getLatitudeMinute());
-        coordinate.setLatitudeSecond(coordinateWGS84.getLatitudeSecond());
-
-        coordinate.setLongitudeDegree(coordinateWGS84.getLongitudeDegree());
-        coordinate.setLongitudeMinute(coordinateWGS84.getLongitudeMinute());
-        coordinate.setLongitudeSecond(coordinateWGS84.getLongitudeSecond());
 
         coordinate.setLatitudeStdDev(cursor.getDouble(
                 cursor.getColumnIndex(GBDatabaseSqliteHelper.COORDINATE_MEAN_LATITUDE_STD)));

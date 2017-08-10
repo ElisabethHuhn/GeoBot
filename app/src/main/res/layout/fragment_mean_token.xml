@@ -409,43 +409,37 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             >
-            <LinearLayout
-                android:layout_width="match_parent"
+
+            <!-- Final Meaned Title -->
+            <include android:id     = "@+id/meanedCoordinateTitleRow"
+                             layout = "@layout/data_list_row_coordinate_meaned"/>
+
+
+            <!--Values of the mean -->
+            <include android:id     = "@+id/meanedCoordinateRow"
+                             layout = "@layout/data_list_row_coordinate_meaned"/>
+
+
+            <!-- Raw values Label -->
+            <TextView
+                android:id="@+id/rawValueLabel"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:layout_width="match_parent"
+
+                android:layout_marginTop="@dimen/row_between_rows_margin"
+                android:gravity="center"
+                android:layout_gravity="center"
 
 
-                <!-- Final Meaned Title -->
-                <include android:id     = "@+id/meanedCoordinateTitleRow"
-                         layout = "@layout/data_list_row_coordinate_meaned_dms"/>
+                android:text="@string/raw_coordinate_label"
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
 
-
-                <!--title line for raw coordinates list -->
-                <include android:id     = "@+id/meanedCoordinateRow"
-                         layout = "@layout/data_list_row_coordinate_meaned_dms"/>
-
-
-                <!-- Raw values Label -->
-                <TextView
-                    android:id="@+id/rawValueLabel"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-
-                    android:layout_marginTop="@dimen/row_between_rows_margin"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-
-
-                    android:text="@string/raw_coordinate_label"
-                    android:textColor="@color/colorTextBlack"
-                    android:background="@color/colorScreenBackground"
-                    />
-
-                <!--recycler view for the list of projects-->
-                <LinearLayout
+            <!--recycler view for the list of projects-->
+            <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:fillViewport="true"
@@ -454,7 +448,7 @@
 
                     <!--title line for raw coordinates list -->
                     <include android:id     = "@+id/rawCoordinateTitleRow"
-                             layout = "@layout/data_list_row_coordinate_raw_dms"/>
+                                     layout = "@layout/data_list_row_coordinate_raw"/>
 
 
 
@@ -468,8 +462,6 @@
                     </android.support.v7.widget.RecyclerView>
 
                 </LinearLayout>
-
-            </LinearLayout>
 
         </LinearLayout>
 

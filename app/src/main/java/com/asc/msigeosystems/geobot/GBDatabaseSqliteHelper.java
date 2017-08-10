@@ -35,8 +35,8 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     /* ***************************************************/
 
     //Global Column Names
-    static final String KEY_ID = "id";
-    static final String KEY_CREATED_AT = "created_at";
+    private static final String KEY_ID = "id";
+    private static final String KEY_CREATED_AT = "created_at";
 
 
     /* ***************************************************/
@@ -45,7 +45,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
     //Table Names
     static final String TABLE_PROJECT               = "Project";
-    static final String TABLE_PROJECT_SETTINGS      = "ProjectSettings";
     static final String TABLE_POINT                 = "Point";
     static final String TABLE_COORDINATE            = "CoordinateEN";
     static final String TABLE_COORDINATE_MEAN       = "CoordinateMean";
@@ -73,14 +72,7 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String PROJECT_ZONE            = "proj_zone";
     static final String PROJECT_NUM_MEAN        = "proj_num_mean";
     static final String PROJECT_DIST_UNITS      = "proj_dist_units";
-    static final String PROJECT_AUTOSAVE        = "proj_autosave";
-    static final String PROJECT_RMS_V_STDDEV    = "projset_rms_v_stddev";
-    static final String PROJECT_ORDER           = "proj_en_v_ne";
-    static final String PROJECT_DD_V_DMS        = "proj_dd_v_dms";
-    static final String PROJECT_DIR_V_PM        = "proj_dir_v_pm";
     static final String PROJECT_DATA_SOURCE     = "proj_data_source";
-    static final String PROJECT_LOCATION_PRECISION = "projset_location_precision";
-    static final String PROJECT_STDDEV_PRECISION   = "projset_stddev_precision";
 
 
     //create project table
@@ -99,83 +91,15 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
             PROJECT_ZONE                + " INTEGER, "   +
             PROJECT_NUM_MEAN            + " INTEGER, "   +
             PROJECT_DIST_UNITS          + " INTEGER, "   +
-            PROJECT_AUTOSAVE            + " INTEGER, "   +
-            PROJECT_RMS_V_STDDEV        + " INTEGER, "   +
-            PROJECT_ORDER               + " INTEGER, "   +
-            PROJECT_DD_V_DMS            + " INTEGER, "   +
-            PROJECT_DIR_V_PM            + " INTEGER, "   +
             PROJECT_DATA_SOURCE         + " INTEGER, "   +
-            PROJECT_LOCATION_PRECISION  + " INTEGER, "   +
-            PROJECT_STDDEV_PRECISION    + " INTEGER, "   +
             KEY_CREATED_AT              + " DATETIME"    + ")";
 
     /* ***************************************************/
     /* ******  Project Settings   ************************/
     /* ***************************************************/
 
-    //Project Settings Column Names
-    static final String PROJECT_SETTINGS_ID                = "projset_id";
-    /*
-    static final String PROJECT_SETTINGS_DISTANCE_UNITS    = "projset_distance_units";
-    static final String PROJECT_SETTINGS_DECIMAL_DISPLAY   = "projset_decimal_display";
-    static final String PROJECT_SETTINGS_ANGLE_UNITS       = "projset_angle_units";
-    static final String PROJECT_SETTINGS_ANGLE_DISPLAY     = "projset_angle_display";
-    static final String PROJECT_SETTINGS_GRID_DIRECTION    = "projset_grid_direction";
-    static final String PROJECT_SETTINGS_SCALE_FACTOR      = "projset_scale";
-    static final String PROJECT_SETTINGS_SEA_LEVEL         = "projset_sealevel";
-    static final String PROJECT_SETTINGS_REFRACTION        = "projset_refraction";
-    static final String PROJECT_SETTINGS_DATUM             = "projset_datum";
-    static final String PROJECT_SETTINGS_PROJECTION        = "projset_projection";
-    static final String PROJECT_SETTINGS_ZONE              = "projset_zone";
-    static final String PROJECT_SETTINGS_COORDINATE_DISPLAY= "projset_coord_display";
-    static final String PROJECT_SETTINGS_SPC_SCALE_FACTOR  = "projset_spc_scale";
-    static final String PROJECT_SETTINGS_GEOID_MODEL       = "projset_geoid_model";
-    static final String PROJECT_SETTINGS_STARTING_POINT_ID = "projset_starting_point_id";
-    static final String PROJECT_SETTINGS_ALPHANUMERIC      = "projset_alphanumeric";
-    static final String PROJECT_SETTINGS_FEATURE_CODES     = "projset_feature_codes";
-    static final String PROJECT_SETTINGS_FC_CONTROL_FILE   = "projset_fc_control_file";
-    static final String PROJECT_SETTINGS_FC_TIMESTAMP      = "projset_fc_timestamp";
-    */
-    static final String PROJECT_SETTINGS_MEANING_METHOD    = "projset_meaning_method";
-    static final String PROJECT_SETTINGS_MEANING_NUMBER    = "projset_meaning_number";
-    static final String PROJECT_SETTINGS_LOCATION_PRECISION = "projset_location_precision";
-    static final String PROJECT_SETTINGS_STDDEV_PRECISION  = "projset_stddev_precision";
-    static final String PROJECT_SETTINGS_RMS_V_STDDEV      = "projset_rms_v_stddev";
+    //Has been removed
 
-
-
-    //create project settings table
-    private static final String CREATE_TABLE_PROJECT_SETTINGS = "CREATE TABLE " +
-            TABLE_PROJECT_SETTINGS           + "("           +
-            KEY_ID                           + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            PROJECT_SETTINGS_ID              + " INTEGER, "  +
-            /*
-            PROJECT_SETTINGS_DISTANCE_UNITS  + " TEXT, "     +
-            PROJECT_SETTINGS_DECIMAL_DISPLAY + " TEXT, "     +
-            PROJECT_SETTINGS_ANGLE_UNITS     + " TEXT, "     +
-            PROJECT_SETTINGS_GRID_DIRECTION  + " TEXT, "     +
-            PROJECT_SETTINGS_SCALE_FACTOR    + " REAL, "     +
-            PROJECT_SETTINGS_SEA_LEVEL       + " INTEGER, "  + //BOOLEAN  no-0/1-yes
-            PROJECT_SETTINGS_REFRACTION      + " INTEGER, "  + //BOOLEAN  0/1
-            PROJECT_SETTINGS_DATUM           + " TEXT, "     +
-            PROJECT_SETTINGS_PROJECTION      + " TEXT, "     +
-            PROJECT_SETTINGS_ZONE            + " TEXT, "     +
-            PROJECT_SETTINGS_COORDINATE_DISPLAY + " TEXT, "  +
-            PROJECT_SETTINGS_SPC_SCALE_FACTOR + " REAL, "    +
-            PROJECT_SETTINGS_GEOID_MODEL     + " TEXT, "     +
-            PROJECT_SETTINGS_STARTING_POINT_ID + " INTEGER, "+
-            PROJECT_SETTINGS_ALPHANUMERIC    + " INTEGER, "  + //BOOLEAN  no-0/1-yes
-            PROJECT_SETTINGS_FEATURE_CODES   + " TEXT, "     +
-            PROJECT_SETTINGS_FC_CONTROL_FILE + " TEXT, "     +
-            PROJECT_SETTINGS_FC_TIMESTAMP    + " INTEGER, "  + //BOOLEAN  no-0/1-yes
-            */
-            PROJECT_SETTINGS_MEANING_METHOD      + " INTEGER, "  +
-            PROJECT_SETTINGS_MEANING_NUMBER      + " INTEGER, "  +
-            PROJECT_SETTINGS_LOCATION_PRECISION  + " INTEGER, "  +
-            PROJECT_SETTINGS_STDDEV_PRECISION    + " INTEGER, "  +
-            PROJECT_SETTINGS_RMS_V_STDDEV        + " INTEGER, "  +
-
-            KEY_CREATED_AT                   + " INTEGER "  + ")";
 
 
     /* ***************************************************/
@@ -376,14 +300,8 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     static final String COORDINATE_MEAN_FIXED         = "coord_mean_mean_elevation";
     static final String COORDINATE_MEAN_LATITUDE            = "coord_mean_mean_lat";
     static final String COORDINATE_MEAN_LATITUDE_STD        = "coord_mean_mean_lat_std";
-    //static final String COORDINATE_MEAN_LATITUDE_DEGREE   = "coord_mean_mean_lat_degree";
-    //static final String COORDINATE_MEAN_LATITUDE_MINUTE   = "coord_mean_mean_lat_minute";
-    //static final String COORDINATE_MEAN_LATITUDE_SECOND   = "coord_mean_mean_lat_second";
     static final String COORDINATE_MEAN_LONGITUDE           = "coord_mean_mean_lng";
     static final String COORDINATE_MEAN_LONGITUDE_STD       = "coord_mean_mean_lng_std";
-    //static final String COORDINATE_MEAN_LONGITUDE_DEGREE  = "coord_mean_mean_lng_degree";
-    //static final String COORDINATE_MEAN_LONGITUDE_MINUTE  = "coord_mean_mean_lng_minute";
-    //static final String COORDINATE_MEAN_LONGITUDE_SECOND  = "coord_mean_mean_lng_second";
     static final String COORDINATE_MEAN_ELEVATION           = "coord_mean_mean_elev" ;
     static final String COORDINATE_MEAN_ELEVATION_STD       = "coord_mean_mean_elev_std" ;
     static final String COORDINATE_MEAN_GEOID               = "coord_mean_mean_geoid";
@@ -515,16 +433,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
 
 
-
-
-    /* ***************************************************/
-    /* ***************************************************/
-    /* ***************************************************/
-
-
-
-
-
     /* ***************************************************/
     /* *****  Member Variables          ******************/
     /* ***************************************************/
@@ -563,7 +471,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
 
         //create the tables using the pre-defined SQL
         db.execSQL(CREATE_TABLE_PROJECT);
-        db.execSQL(CREATE_TABLE_PROJECT_SETTINGS);
         db.execSQL(CREATE_TABLE_POINT);
 
         db.execSQL(CREATE_TABLE_COORDINATE);
@@ -596,7 +503,6 @@ class GBDatabaseSqliteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int OldVersion, int newVersion){
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT_SETTINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE_MEAN);

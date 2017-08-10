@@ -15,4 +15,6 @@
     <dimen name="button_start_margin"       >16dp</dimen>
     <dimen name="button_end_margin"         >16dp</dimen>
     <dimen name="button_interum_margin"     >8dp</dimen>
+    <dimen name="iw_label_width"            >35dp</dimen>
+    <dimen name="iw_field_width"            >75dp</dimen>
 </resources>

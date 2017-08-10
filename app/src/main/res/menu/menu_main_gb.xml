@@ -9,6 +9,11 @@
         app:showAsAction="never"
         />
     <item
+        android:id="@+id/action_project_create"
+        android:title="@string/action_project_create"
+        app:showAsAction="never"
+        />
+    <item
         android:id="@+id/action_project_open"
         android:title="@string/action_project_open"
         app:showAsAction="never"
@@ -19,13 +24,8 @@
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/action_project_create"
-        android:title="@string/action_project_create"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_point_list"
-        android:title="@string/action_point_list"
+        android:id="@+id/action_point_measure"
+        android:title="@string/action_point_edit"
         app:showAsAction="never"
         />
     <item
@@ -34,64 +34,21 @@
         app:showAsAction="never"
         />
     <item
+        android:id="@+id/action_point_list"
+        android:title="@string/action_point_list"
+        app:showAsAction="never"
+        />
+    <item
         android:id="@+id/action_project_export"
         android:title="@string/action_project_export"
         app:showAsAction="never"
         />
-    <!-- Remove these things from the menu
-    <item
-        android:id="@+id/action_project"
-        android:title="@string/action_project"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_collect"
-        android:title="@string/action_collect"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_stakeout"
-        android:title="@string/action_stakeout"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_cogo"
-        android:title="@string/action_cogo"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_maps"
-        android:title="@string/action_maps"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_skyplots"
-        android:title="@string/action_skyplots"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/action_config"
-        android:title="@string/action_config"
-        app:showAsAction="never"
-        />
+
     <item
         android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+        android:title="@string/action_global_settings"
         app:showAsAction="never"
         />
-    <item
-        android:id="@+id/action_help"
-        android:title="@string/action_help"
-        app:showAsAction="never"
 
-        />
-    <item
-        android:id="@+id/action_convert"
-        android:title="@string/action_convert"
-        app:showAsAction="never"
-
-        />
-
-        End of things removed from the menu -->
 
 </menu>

@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+
+
 /**
  * The List Points Fragment is the UI
  * for the user to see points of a given project
@@ -65,18 +67,14 @@ public class GBPointListFragment extends Fragment {
         mPointPath   = path.getPath();
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         //1) Inflate the layout for this fragment
-        View v = inflater.inflate
-                (R.layout.fragment_point_list_gb, container, false);
+        View v = inflater.inflate(R.layout.fragment_point_list_gb, container, false);
 
-
-        wireWidgets(v);
+        initializeUI(v);
 
         initializeRecyclerView(v);
 
@@ -93,41 +91,49 @@ public class GBPointListFragment extends Fragment {
 
     }
 
-    private void wireWidgets(View v){
+    private void initializeUI(View v){
+        GBActivity myActivity = (GBActivity)getActivity();
+        boolean isPM = GBGeneralSettings.isPM(myActivity);
          //Need a header line for the list, but attributes of coordinate are different
         //depending upon the type of coordinate: Latitude/Longitude or Easting/Northing
-        int coordinateWidgetType = getCoordinateTypeFromProject();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
+        int coordinateWidgetType = GBUtilities.getCoordinateTypeFromProject(openProject);
+
+        TextView latHemiLabel = (TextView) v.findViewById(R.id.lat_hemisphere_label);
+        TextView lngHemiLabel = (TextView) v.findViewById(R.id.lng_hemisphere_label);
+        if ((isPM) || (coordinateWidgetType != GBCoordinate.sLLWidgets)){
+            //Get rid of the hemisphere labels
+            latHemiLabel.setVisibility(View.GONE);
+            lngHemiLabel.setVisibility(View.GONE);
+        }
 
         if (coordinateWidgetType == GBCoordinate.sLLWidgets) {
-            TextView eastingLabel = (TextView) v.findViewById(R.id.easting_label);
-            TextView northingLabel = (TextView) v.findViewById(R.id.northing_label);
 
-            eastingLabel.setText(R.string.point_row_latitude_label);
-            northingLabel.setText(R.string.point_row_longitude_label);
-        }
-
-    }
-
-    private int getCoordinateTypeFromProject(){
-
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        if (openProject == null)return GBCoordinate.sUNKWidgets;
-
-        CharSequence coordinateType = openProject.getProjectCoordinateType();
-
-        int returnCode = GBCoordinate.sUNKWidgets;
-
-        if (!GBUtilities.isEmpty(coordinateType)){
-            if (       coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84) ||
-                       coordinateType.equals(GBCoordinate.sCoordinateTypeNAD83) ){
-                returnCode = GBCoordinate.sLLWidgets;
-            } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM) ||
-                       coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS) ){
-                returnCode = GBCoordinate.sENWidgets;
+            TextView latitudeLabel  = (TextView) v.findViewById(R.id.northing_label);
+            TextView longitudeLabel = (TextView) v.findViewById(R.id.easting_label);
+            if (GBGeneralSettings.isLngLat(myActivity)) {
+                latitudeLabel  = (TextView) v.findViewById(R.id.easting_label);
+                longitudeLabel = (TextView) v.findViewById(R.id.northing_label);
             }
+
+            latitudeLabel .setText(R.string.point_row_latitude_label);
+            longitudeLabel.setText(R.string.point_row_longitude_label);
+
+
+        } else  {
+
+            TextView northingLabel = (TextView) v.findViewById(R.id.northing_label);
+            TextView eastingLabel = (TextView) v.findViewById(R.id.easting_label);
+            if (GBGeneralSettings.isEN(myActivity)) {
+                northingLabel = (TextView) v.findViewById(R.id.easting_label);
+                eastingLabel = (TextView) v.findViewById(R.id.northing_label);
+            }
+
+            northingLabel.setText(R.string.point_row_northing_label);
+            eastingLabel.setText(R.string.easting_label);
         }
-        return returnCode;
     }
+
 
     private void initializeRecyclerView(View v){
 
@@ -146,6 +152,7 @@ public class GBPointListFragment extends Fragment {
          *
          * 9) return the view
          */
+        GBActivity myActivity = (GBActivity)getActivity();
         v.setTag(TAG);
 
         //2) find and remember the RecyclerView
@@ -154,29 +161,29 @@ public class GBPointListFragment extends Fragment {
 
         // The RecyclerView.LayoutManager defines how elements are laid out.
         //3) create and assign a layout manager to the recycler view
-        RecyclerView.LayoutManager mLayoutManager  = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager  = new LinearLayoutManager(myActivity);
         recyclerView.setLayoutManager(mLayoutManager);
 
         //4) Get points from the open Project
 
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
         if (openProject == null)return;
 
         //5) Use the data to Create and set out points Adapter
-        GBPointAdapter adapter = new GBPointAdapter(openProject.getPoints());
+        GBPointAdapter adapter = new GBPointAdapter(myActivity, openProject.getPoints());
         recyclerView.setAdapter(adapter);
 
         //6) create and set the itemAnimator
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //7) create and add the item decorator
-        recyclerView.addItemDecoration(new DividerItemDecoration(
-                getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(myActivity,
+                                                                 LinearLayoutManager.VERTICAL));
 
 
         //8) add event listeners to the recycler view
         recyclerView.addOnItemTouchListener(
-                new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
+                new RecyclerTouchListener(myActivity, recyclerView, new ClickListener() {
 
                     @Override
                     public void onClick(View view, int position) {
@@ -263,7 +270,7 @@ public class GBPointListFragment extends Fragment {
         private GestureDetector gestureDetector;
         private GBPointListFragment.ClickListener clickListener;
 
-        public RecyclerTouchListener(Context context,
+         RecyclerTouchListener(Context context,
                                      final RecyclerView recyclerView,
                                      final GBPointListFragment.ClickListener
                                              clickListener) {

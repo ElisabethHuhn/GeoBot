@@ -751,7 +751,7 @@
                 <!-- Easting Meters -->
                 <TextView
                     android:id="@+id/spcEastingMetersOutput"
-                    android:hint="@string/spc_easting_meters_label"
+                    android:hint="@string/spc_easting_label"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="70"
@@ -766,7 +766,7 @@
                 <!-- Easting Feet -->
                 <TextView
                     android:id="@+id/spcEastingFeetOutput"
-                    android:hint="@string/spc_easting_feet_label"
+                    android:hint="@string/spc_easting_label"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="75"
@@ -805,7 +805,7 @@
                 <!-- Northing Meters -->
                 <TextView
                     android:id="@+id/spcNorthingMetersOutput"
-                    android:hint="@string/spc_northing_meters_label"
+                    android:hint="@string/spc_northing_label"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
@@ -821,7 +821,7 @@
                 <!-- Northing Feet -->
                 <TextView
                     android:id="@+id/spcNorthingFeetOutput"
-                    android:hint="@string/spc_northing_feet_label"
+                    android:hint="@string/spc_northing_label"
 
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"

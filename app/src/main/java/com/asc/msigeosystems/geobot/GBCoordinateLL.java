@@ -4,9 +4,6 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.widget.EditText;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 /**
  * Created by Elisabeth Huhn on 6/17/2016.
  *
@@ -31,19 +28,11 @@ abstract class GBCoordinateLL extends GBCoordinate {
     /* ***************************************************/
 
      //Latitude in DD and DMS formats
-    protected double mLatitude;
-
-    protected int    mLatitudeDegree;
-    protected int    mLatitudeMinute;
-    protected double mLatitudeSecond;
-
+    double mLatitude;
 
     //Longitude in DD and DMS formats
-    protected double mLongitude;
+    double mLongitude;
 
-    protected int    mLongitudeDegree;
-    protected int    mLongitudeMinute;
-    protected double mLongitudeSecond;
 
 
 
@@ -115,15 +104,12 @@ abstract class GBCoordinateLL extends GBCoordinate {
             tudeSecond = 0. - tudeSecond;
         }
 
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(tudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                                                                            RoundingMode.HALF_UP);
-        tudeSecond = bd.doubleValue();
-
+        int locPrecision = GBGeneralSettings.getLocPrecision((GBActivity)context);
         //show the user the result
+        tudeDDInput.setText(GBUtilities.truncatePrecisionString(tude, locPrecision));
         tudeDInput.setText(String.valueOf(tudeDegree));
         tudeMInput.setText(String.valueOf(tudeMinute));
-        tudeSInput.setText(String.valueOf(tudeSecond));
+        tudeSInput.setText(GBUtilities.truncatePrecisionString(tudeSecond,  locPrecision));
 
         tudeDDInput.setTextColor(ContextCompat.getColor(context, tudeColor));
         tudeDInput .setTextColor(ContextCompat.getColor(context, tudeColor));
@@ -132,7 +118,6 @@ abstract class GBCoordinateLL extends GBCoordinate {
 
         return true;
     }
-
 
 
     //last parameter indicates whether latitude (true) or longitude (false)
@@ -207,31 +192,23 @@ abstract class GBCoordinateLL extends GBCoordinate {
      *
      **********/
 
-    double getLatitude()        { return mLatitude;        }
-    void setLatitude(double latitude) { mLatitude = latitude; }
+    double getLatitude()                { return mLatitude;        }
+    void   setLatitude(double latitude) { mLatitude = latitude; }
 
-    int getLatitudeDegree()     { return mLatitudeDegree;  }
-    void setLatitudeDegree(int latitudeDegree) { mLatitudeDegree = latitudeDegree; }
+    int    getLatitudeDegree()  { return GBUtilities.getDegrees(mLatitude);  }
+    int    getLatitudeMinute()  { return GBUtilities.getMinutes(mLatitude);  }
+    double getLatitudeSecond()  { return GBUtilities.getSeconds(mLatitude);  }
 
-    int getLatitudeMinute()     { return mLatitudeMinute;  }
-    void setLatitudeMinute(int latitudeMinute) { mLatitudeMinute = latitudeMinute; }
-
-    double getLatitudeSecond()  { return mLatitudeSecond;  }
-    void setLatitudeSecond(double latitudeSecond) { mLatitudeSecond = latitudeSecond; }
 
     double getLongitude()       { return mLongitude;       }
     void setLongitude(double longitude) { mLongitude = longitude; }
 
-    int getLongitudeDegree()    { return mLongitudeDegree; }
-    void setLongitudeDegree(int longitudeDegree) { mLongitudeDegree = longitudeDegree; }
-
-    int getLongitudeMinute()    { return mLongitudeMinute; }
-    void setLongitudeMinute(int longitudeMinute) { mLongitudeMinute = longitudeMinute; }
-
+    int    getLongitudeDegree() { return GBUtilities.getDegrees(mLongitude); }
+    int    getLongitudeMinute() { return GBUtilities.getMinutes(mLongitude); }
     double getLongitudeSecond() {
-        return mLongitudeSecond;
+        return GBUtilities.getSeconds(mLongitude);
     }
-    void setLongitudeSecond(double longitudeSecond) {mLongitudeSecond = longitudeSecond; }
+
 
     /* ******
      *
@@ -268,106 +245,18 @@ abstract class GBCoordinateLL extends GBCoordinate {
         //Latitude in DD and DMS formats
         mLatitude       = 0d;
 
-        mLatitudeDegree = 0;
-        mLatitudeMinute = 0;
-        mLatitudeSecond = 0d;
-
-
         //Longitude in DD and DMS formats
         mLongitude      = 0d;
 
-        mLongitudeDegree = 0;
-        mLongitudeMinute = 0;
-        mLongitudeSecond = 0d;
+        setElevation( 0); //Orthometric Elevation in Meters
+        setGeoid(0);     //Mean Sea Level in Meters
 
-        mElevation       = 0; //Orthometric Elevation in Meters
-        mGeoid           = 0;     //Mean Sea Level in Meters
+        setScaleFactor( 0d);
+        setConvergenceAngle(0d);
 
-        mScaleFactor      = 0d;
-        mConvergenceAngle = 0d;
-
-        mValidCoordinate = false;
+        setValidCoordinate(false);
     }
 
-    /* ************************************************************/
-    /* ************************************************************/
-    /*                                                            */
-    /*       Create the LL Coordinate with Lat / Long             */
-    /*     Automatically convert DD to DMS values as well         */
-    /*                                                            */
-    /* ************************************************************/
-    /* ************************************************************/
-    GBCoordinateLL(double latitude, double longitude) {
-        initializeDefaultVariables();
-        latLongDD(latitude, longitude);
-    }
-
-
-    /* ************************************************************/
-    /* ************************************************************/
-    /*                                                            */
-    /*      Create the LL Coordinate with Lat DMS / Long DMS      */
-    /*      Automatically convert DMS to DD values as well        */
-    /*                                                            */
-    /* ************************************************************/
-    /* ************************************************************/
-    GBCoordinateLL(int latitudeDegree,
-                  int latitudeMinute,
-                  double latitudeSecond,
-                  int longitudeDegree,
-                  int longitudeMinute,
-                  double longitudeSecond) {
-        initializeDefaultVariables();
-
-        latLongDMS(latitudeDegree,
-                    latitudeMinute,
-                    latitudeSecond,
-                    longitudeDegree,
-                    longitudeMinute,
-                    longitudeSecond);
-    }
-
-
-    /* ************************************************************/
-    /* ************************************************************/
-    /*                                                            */
-    /*       Create the LL Coordinate with Lat / Long Strings     */
-    /*       Automatically convert to numbers AND                 */
-    /*        convert DD to DMS values as well                    */
-    /*                                                            */
-    /* ************************************************************/
-    /* ************************************************************/
-    GBCoordinateLL(CharSequence latitudeString, CharSequence longitudeString) {
-        initializeDefaultVariables();
-        latLongDDStrings(latitudeString, longitudeString);
-    }
-
-
-
-    /* ************************************************************/
-    /* ************************************************************/
-    /*                                                            */
-    /*      Create the LL Coordinate with                         */
-    /*         Lat DMS / Long DMS String values                   */
-    /*      Automatically convert to number AND                   */
-    /*         convert DMS to DD values as well                   */
-    /*                                                            */
-    /* ************************************************************/
-    /* ************************************************************/
-    GBCoordinateLL(CharSequence latitudeDegreeString,
-                          CharSequence latitudeMinuteString,
-                          CharSequence latitudeSecondString,
-                          CharSequence longitudeDegreeString,
-                          CharSequence longitudeMinuteString,
-                          CharSequence longitudeSecondString) {
-        initializeDefaultVariables();
-        latLongDMSStrings(latitudeDegreeString,
-                          latitudeMinuteString,
-                          latitudeSecondString,
-                          longitudeDegreeString,
-                          longitudeMinuteString,
-                          longitudeSecondString);
-    }
 
     /* *************
      * constructor utilities
@@ -375,25 +264,20 @@ abstract class GBCoordinateLL extends GBCoordinate {
      */
 
     boolean latLongDD(double latitude, double longitude) {
-        this.mLatitude  = latitude;
-        this.mLongitude = longitude;
+        setLatitude(latitude);
+        setLongitude(longitude);
 
-        mValidCoordinate = convertDDToDMS ();
-        return mValidCoordinate;
+        setValidCoordinate(convertDDToDMS ());
+        return isValidCoordinate();
     }
 
     void latLongDMS(int latitudeDegree,  int latitudeMinute,  double latitudeSecond,
                     int longitudeDegree, int longitudeMinute, double longitudeSecond) {
 
-        this.mLatitudeDegree = latitudeDegree;
-        this.mLatitudeMinute = latitudeMinute;
-        this.mLatitudeSecond = latitudeSecond;
+        setLatitude (GBUtilities.getDecimalDegrees(latitudeDegree, latitudeMinute, latitudeSecond));
+        setLongitude(GBUtilities.getDecimalDegrees(longitudeDegree, longitudeMinute, longitudeSecond));
 
-        this.mLongitudeDegree = longitudeDegree;
-        this.mLongitudeMinute = longitudeMinute;
-        this.mLongitudeSecond = longitudeSecond;
-
-        mValidCoordinate = convertDMSToDD ();
+        setValidCoordinate(convertDDToDMS());
 
     }
 
@@ -404,9 +288,9 @@ abstract class GBCoordinateLL extends GBCoordinate {
         if ( longitudeString.toString().isEmpty() ){
             longitudeString = "0.0";
         }
-        this.mLatitude = Double.parseDouble(latitudeString.toString());
-        this.mLongitude = Double.parseDouble(longitudeString.toString());
-        mValidCoordinate = convertDDToDMS ();
+        setLatitude(Double.parseDouble(latitudeString.toString()));
+        setLongitude(Double.parseDouble(longitudeString.toString()));
+        setValidCoordinate(convertDDToDMS ());
     }
 
     void latLongDMSStrings(  CharSequence latitudeDegreeString,
@@ -434,15 +318,13 @@ abstract class GBCoordinateLL extends GBCoordinate {
         if (longitudeSecondString.toString().isEmpty()) {
             longitudeSecondString = "0.0";
         }
-        this.mLatitudeDegree = Integer.valueOf(latitudeDegreeString.toString());
-        this.mLatitudeMinute = Integer.valueOf(latitudeMinuteString.toString());
-        this.mLatitudeSecond = Double.parseDouble(latitudeSecondString.toString());
+        latLongDMS(Integer.valueOf(latitudeDegreeString.toString()),
+                   Integer.valueOf(latitudeMinuteString.toString()),
+                   Double.parseDouble(latitudeSecondString.toString()),
+                   Integer.valueOf(longitudeDegreeString.toString()),
+                   Integer.valueOf(longitudeMinuteString.toString()),
+                   Double.parseDouble(longitudeSecondString.toString()));
 
-        this.mLongitudeDegree = Integer.valueOf(longitudeDegreeString.toString());
-        this.mLongitudeMinute = Integer.valueOf(longitudeMinuteString.toString());
-        this.mLongitudeSecond = Double.parseDouble(longitudeSecondString.toString());
-
-        mValidCoordinate = convertDMSToDD ();
     }
 
 
@@ -457,44 +339,6 @@ abstract class GBCoordinateLL extends GBCoordinate {
         if (mLatitude  < -90.0 || mLatitude  >= 90.0) {
             return false;
         }
-        //
-        //Latitude
-        //
-        boolean isLatPos = true;
-
-
-        if (mLatitude < 0){
-            mLatitude = Math.abs(mLatitude);
-            isLatPos = false;
-        }
-
-        //strip out the decimal parts of mLatitude
-        mLatitudeDegree = (int) mLatitude;
-        double degree = mLatitudeDegree;
-
-        //digital degrees minus degrees will be decimal minutes plus seconds
-        //converting to int strips out the seconds
-        double minuteSec  = mLatitude - degree;
-        double minutes    = minuteSec * 60.;
-        mLatitudeMinute   = (int) minutes;
-        double minuteOnly = (double)mLatitudeMinute;
-
-        //start with the DD, subtract out Degrees, subtract out Minutes
-        //convert the remainder into whole seconds
-        mLatitudeSecond = (mLatitude - degree - (minuteOnly/60.)) * (60. *60.);
-
-        if (!isLatPos){
-            mLatitude       = 0. - mLatitude;
-            mLatitudeDegree = 0  - mLatitudeDegree;
-            mLatitudeMinute = 0  - mLatitudeMinute;
-            mLatitudeSecond = 0. - mLatitudeSecond;
-        }
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd =
-                new BigDecimal(mLatitudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                        RoundingMode.HALF_UP);
-        mLatitudeSecond = bd.doubleValue();
-
 
         return true;
     }
@@ -507,130 +351,7 @@ abstract class GBCoordinateLL extends GBCoordinate {
             return false;
         }
 
-        boolean isLongPos = true;
-
-        //
-        //Longitude
-        //
-        if (mLongitude < 0){
-            mLongitude = Math.abs(mLongitude);
-            isLongPos = false;
-        }
-
-        //strip out the decimal parts of decimal degrees, leaving whole degrees
-        mLongitudeDegree = (int)    mLongitude;
-        double    degree = (double) mLongitudeDegree;
-
-        //digital degrees minus degrees will be decimal minutes plus seconds
-        //converting to int strips out the seconds
-        double minuteSec = mLongitude - degree;
-        double minutes   = minuteSec * 60.;
-        mLongitudeMinute = (int)minutes;
-        double minuteOnly = (double)mLongitudeMinute;
-
-        //start with the DD, subtract out Degrees, subtract out Minutes
-        //convert the remainder into whole seconds
-        mLongitudeSecond = (mLongitude - degree - (minuteOnly/60.)) * (60. *60.);
-
-        if (!isLongPos){
-            mLongitude       = 0. - mLongitude;
-            mLongitudeDegree = 0  - mLongitudeDegree;
-            mLongitudeMinute = 0  - mLongitudeMinute;
-            mLongitudeSecond = 0. - mLongitudeSecond;
-        }
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd =
-                new BigDecimal(mLongitudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                               RoundingMode.HALF_UP);
-        mLongitudeSecond = bd.doubleValue();
         return true;
     }
-
-
-    boolean convertDMSToDD(){
-        return convertLatDMSToDD() && convertLngDMSToDD();
-     }
-
-    boolean convertLatDMSToDD(){
-
-        if (    (mLatitudeDegree <   -90 || mLatitudeDegree >=   90) ||
-                (mLatitudeMinute <   -60 || mLatitudeMinute >    60) ||
-                (mLatitudeSecond <   -60.|| mLatitudeSecond >    60.)) {
-            return false;
-        }
-
-        boolean isLatPos = true;
-
-        if (mLatitudeDegree < 0){
-            isLatPos = false;
-            mLatitudeDegree = Math.abs(mLatitudeDegree);
-        }
-        if (mLatitudeMinute < 0){
-            isLatPos = false;
-            mLatitudeMinute = Math.abs(mLatitudeMinute);
-        }
-        if (mLatitudeSecond < 0){
-            isLatPos = false;
-            mLatitudeSecond = Math.abs(mLatitudeSecond);
-        }
-
-
-        double degrees = (double)mLatitudeDegree;
-        double minutes = (double)mLatitudeMinute ;
-        double seconds =         mLatitudeSecond ;
-        mLatitude =  degrees + (minutes/ 60.) + (seconds/ (60.*60.));
-
-
-
-        if (!isLatPos) {
-            mLatitude       = 0. - mLatitude;
-            mLatitudeDegree = 0  - mLatitudeDegree;
-            mLatitudeMinute = 0  - mLatitudeMinute;
-            mLatitudeSecond = 0. - mLatitudeSecond;
-        }
-
-        return true;
-    }
-
-
-    boolean convertLngDMSToDD(){
-
-        if (    (mLongitudeDegree < -180 || mLongitudeDegree >= 180) ||
-                (mLongitudeMinute <  -60 || mLongitudeMinute >   60) ||
-                (mLongitudeSecond <  -60.|| mLongitudeSecond >   60.)) {
-            return false;
-        }
-
-        boolean isLongPos = true;
-
-        if (mLongitudeDegree < 0){
-            isLongPos = false;
-            mLongitudeDegree = Math.abs(mLongitudeDegree);
-        }
-        if (mLongitudeMinute < 0){
-            isLongPos = false;
-            mLongitudeMinute = Math.abs(mLongitudeMinute);
-        }
-        if (mLongitudeSecond < 0){
-            isLongPos = false;
-            mLongitudeSecond = Math.abs(mLongitudeSecond);
-        }
-
-
-        double degrees = (double)mLongitudeDegree;
-        double minutes = (double)mLongitudeMinute ;
-        double seconds =         mLongitudeSecond ;
-        mLongitude = degrees + (minutes/ 60.) + (seconds/ (60.*60.));
-
-
-        if (!isLongPos) {
-            mLongitude       = 0. - mLongitude;
-            mLongitudeDegree = 0  - mLongitudeDegree;
-            mLongitudeMinute = 0  - mLongitudeMinute;
-            mLongitudeSecond = 0. - mLongitudeSecond;
-        }
-        return true;
-    }
-
 
 }

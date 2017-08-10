@@ -129,7 +129,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
     }
 
 
-    GBCoordinateWGS84(int latitudeDegree, int latitudeMinute, double latitudeSecond,
+    GBCoordinateWGS84(int latitudeDegree,  int latitudeMinute,  double latitudeSecond,
                       int longitudeDegree, int longitudeMinute, double longitudeSecond){
 
         //initialize all variables to their defaults
@@ -150,19 +150,21 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
 
 
 
-    GBCoordinateWGS84(   long   timestamp,
+    GBCoordinateWGS84(  GBActivity activity,
+                        long   timestamp,
+                         boolean isDir,
+                         String latDirString,
                          String latitudeString,
                          String latitudeDegreeString,
                          String latitudeMinuteString,
                          String latitudeSecondString,
+                         String lngDirString,
                          String longitudeString,
                          String longitudeDegreeString,
                          String longitudeMinuteString,
                          String longitudeSecondString,
                          String elevationString,
-                         String elevationFString,
                          String geoidString,
-                         String geoidFString,
                          String convergenceString,
                          String scaleString) {
 
@@ -198,44 +200,61 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
             longitudeSecondString = "0.0";
         }
 
+        this.mLatitude  = Double.parseDouble(latitudeString);
+        double latDMS = GBUtilities.getDecimalDegrees( Integer.valueOf   (latitudeDegreeString),
+                                                       Integer.valueOf   (latitudeMinuteString),
+                                                       Double.parseDouble(latitudeSecondString));
 
-        this.mLatitude       = Double.parseDouble(latitudeString);
-        this.mLatitudeDegree = Integer.valueOf   (latitudeDegreeString);
-        this.mLatitudeMinute = Integer.valueOf   (latitudeMinuteString);
-        this.mLatitudeSecond = Double.parseDouble(latitudeSecondString);
+        this.mLongitude = Double.parseDouble(longitudeString);
+        double lngDMS = GBUtilities.getDecimalDegrees(Integer.valueOf   (longitudeDegreeString),
+                                                      Integer.valueOf   (longitudeMinuteString),
+                                                      Double.parseDouble(longitudeSecondString));
 
-        this.mLongitude       = Double.parseDouble(longitudeString);
-        this.mLongitudeDegree = Integer.valueOf   (longitudeDegreeString);
-        this.mLongitudeMinute = Integer.valueOf   (longitudeMinuteString);
-        this.mLongitudeSecond = Double.parseDouble(longitudeSecondString);
+        if (mLatitude != latDMS){
+            if (mLatitude == 0.)mLatitude = latDMS;
+        }
+        if (mLongitude != lngDMS){
+            if (mLongitude == 0.)mLongitude = lngDMS;
+        }
+
+        if (isDir){
+            //set sign of lat & lng by directional strings
+            //Latitude
+            if (latDirString.equals("S")){
+                //neg
+                if (mLatitude > 0.)     mLatitude        = 0. - mLatitude;
+            } else {
+                //everything else gives a positive number
+                mLatitude       = Math.abs(mLatitude);
+            }
+            //Longitude
+            if (lngDirString.equals("W")){
+                //neg
+                if (mLongitude > 0.)     mLongitude        = 0. - mLongitude;
+            } else {
+                //everything else gives a positive number
+                mLongitude       = Math.abs(mLongitude);
+            }
+        }
 
         boolean latReturnCode = true;
         boolean lngReturnCode = true;
 
         if ((mLatitude != 0.) && (mLongitude != 0.)){
             latReturnCode = latLongDD(mLatitude, mLongitude);
-        } else if ((mLatitude == 0.) &&
-                  ((mLatitudeDegree != 0) || (mLatitudeMinute != 0) || mLatitudeSecond != 0.)){
-            latReturnCode = convertLatDMSToDD();
-            if (mLongitude != 0) {
-                lngReturnCode = convertLngDDToDMS();
-            } else if ((mLongitude == 0) &&
-                    ((mLongitudeDegree != 0) || (mLongitudeMinute != 0) || (mLongitudeSecond != 0.))){
-                lngReturnCode = convertLngDMSToDD();
-            } else {
-                lngReturnCode = false;
-            }
-
         } else {
-            //everything is zero. Special casee, but must handle it
+            //everything is zero. Special case, but must handle it
             latReturnCode = latLongDD(mLatitude, mLongitude);
         }
         setValidCoordinate(latReturnCode && lngReturnCode);
 
         if (!isValidCoordinate())return;
 
-        setElevation(getMeters(elevationString, elevationFString));
-        setGeoid    (getMeters(geoidString    , geoidFString));
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int distUnits = openProject.getDistanceUnits();
+
+        setElevation(getMeters(elevationString, distUnits));
+        setGeoid    (getMeters(geoidString    , distUnits));
 
         if (!GBUtilities.isEmpty(convergenceString)) {
 
@@ -307,7 +326,7 @@ class GBCoordinateWGS84 extends GBCoordinateLL {
         //initialize all variables common to EN coordinates
         super.initializeDefaultVariables();
 
-        mCoordinateDBType = GBCoordinate.sCoordinateDBTypeWGS84;
+        setCoordinateDBType(GBCoordinate.sCoordinateDBTypeWGS84);
 
     }
 

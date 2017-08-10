@@ -300,15 +300,15 @@
                         android:background="@color/colorRedButton"
                         />
                     <Button
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:id="@+id/showAllPointsButton"
-                    android:text="@string/show_all_points_label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/colorTextBlack"
-                    android:background="@color/colorYellowButton"
-                    />
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/showAllPointsButton"
+                        android:text="@string/show_all_points_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorTextBlack"
+                        android:background="@color/colorYellowButton"
+                        />
 
                 </LinearLayout>
 

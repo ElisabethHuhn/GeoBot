@@ -191,7 +191,7 @@
                     />
             </TableRow>
 
-            </TableLayout>
+        </TableLayout>
 
         <Button
             style="?android:attr/buttonBarButtonStyle"

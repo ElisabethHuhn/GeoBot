@@ -101,9 +101,6 @@ class GBProjectManager {
                     databaseManager.addProjectPicturesToDB(newProject);
                 }
 
-                if (!newProject.areSettingsInMemory()) {
-                    databaseManager.addProjectSettingsToDB(newProject);
-                }
             }
         }
 
@@ -300,9 +297,6 @@ class GBProjectManager {
         GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
         databaseManager.removeProjectPictures(projectID);
 
-        //remove project settings
-        databaseManager.removeProjectSettings(projectID);
-
         //finally, remove the project itself
         databaseManager.removeProject(projectID);
     }
@@ -383,97 +377,9 @@ class GBProjectManager {
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_ZONE,         project.getZone());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_NUM_MEAN,     project.getNumMean());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS,   project.getDistanceUnits());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_AUTOSAVE,     project.getAutosave());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV, project.getRMSvStD());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_ORDER,        project.getUIOrder());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DD_V_DMS,     project.getDDvDMS());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_DIR_V_PM,     project.getDIRvPlusMinus());
         cvProject.put(GBDatabaseSqliteHelper.PROJECT_DATA_SOURCE,  project.getDataSource());
 
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION, project.getLocPrecision());
-        cvProject.put(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION,project.getStdDevPrecision());
-
         return cvProject;
-    }
-
-
-    //returns the ContentValues object needed to add/update the PROJECT SETTINGS to/in the DB
-    ContentValues getCVFromProjectSettings(GBProject project){
-        GBProjectSettings projectSettings = project.getSettings();
-        if (projectSettings == null){
-            //use default settings if there are none
-            projectSettings = new GBProjectSettings();
-            //the two objects must point at each other
-            projectSettings.setProjectID(project.getProjectID());
-            project.setSettings(projectSettings);
-        }
-        //convert the GBProject object into a ContentValues object containing a project
-        ContentValues cvProjectSettings = new ContentValues();
-        //put(columnName, value);
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ID,
-                                                    projectSettings.getProjectID());
-        /*
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DISTANCE_UNITS,
-                                                    projectSettings.getDistanceUnits().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DECIMAL_DISPLAY,
-                                                    projectSettings.getDecimalDisplay().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ANGLE_UNITS,
-                                                    projectSettings.getAngleUnits().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ANGLE_DISPLAY,
-                                                    projectSettings.getAngleDisplay().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_GRID_DIRECTION,
-                                                    projectSettings.getGridDirection().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_SCALE_FACTOR,
-                                                    projectSettings.getScaleFactor());
-        int temp = 0;//set default to no
-        if (projectSettings.isSeaLevel())temp = 1;
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_SEA_LEVEL, temp);
-
-        temp = 0;//set default to no
-        if (projectSettings.isRefraction())temp = 1;
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_REFRACTION,temp);
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DATUM,
-                                                    projectSettings.getDatum().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_PROJECTION,
-                                                    projectSettings.getProjection().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ZONE,
-                                                    projectSettings.getZone().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_COORDINATE_DISPLAY,
-                                                    projectSettings.getCoordinateDisplay().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_GEOID_MODEL,
-                                                    projectSettings.getGeoidModel().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_STARTING_POINT_ID,
-                                                    projectSettings.getStartingPointID().toString());
-        temp = 0;//set default to no
-        if (projectSettings.isAlphanumericID())temp = 1;
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ALPHANUMERIC, temp);
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FEATURE_CODES,
-                                                    projectSettings.getFeatureCodes().toString());
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FC_CONTROL_FILE,
-                                                    projectSettings.getFCControlFile().toString());
-        temp = 0;//set default to no
-        if (projectSettings.isFCTimeStamp())temp = 1;
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FC_TIMESTAMP,temp);
-*/
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_METHOD,
-                projectSettings.getProjectID());
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_NUMBER,
-                projectSettings.getProjectID());
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_METHOD,
-                projectSettings.getProjectID());
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_METHOD,
-                projectSettings.getProjectID());
-
-        cvProjectSettings.put(GBDatabaseSqliteHelper.PROJECT_SETTINGS_RMS_V_STDDEV,
-                projectSettings.getRMSvsStdDev());
-
-
-        return cvProjectSettings;
     }
 
 
@@ -545,124 +451,13 @@ class GBProjectManager {
 
         project.setDistanceUnits(
                 cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIST_UNITS)));
-        project.setAutosave(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_AUTOSAVE)));
-        project.setRMSvStD(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_RMS_V_STDDEV)));
-
-        project.setOrderOnUI(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_ORDER)));
-        project.setDDvDMS(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DD_V_DMS)));
-        project.setDIRvPlusMinus(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DIR_V_PM)));
-        project.setDataSource(
+         project.setDataSource(
                 cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_DATA_SOURCE)));
 
-
-        project.setLocPrecision(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_LOCATION_PRECISION)));
-        project.setStdDevPrecision(
-                cursor.getInt(cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_STDDEV_PRECISION)));
 
         return project;
     }
 
-    //totally analogous to same function for project.
-    // Whenever project is fetched from DB, so is Project Settings
-    GBProjectSettings getProjectSettingsFromCursor(Cursor cursor, int position){
-
-        int last = cursor.getCount();
-        if (position >= last) return null;
-
-        //filled with defaults, no ID is assigned
-        GBProjectSettings projectSettings = new GBProjectSettings();
-
-        cursor.moveToPosition(position);
-        projectSettings.setProjectSettingsID(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ID)));
-/*
-        projectSettings.setDistanceUnits (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DISTANCE_UNITS)));
-        projectSettings.setDecimalDisplay (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DECIMAL_DISPLAY)));
-        projectSettings.setAngleUnits (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ANGLE_UNITS)));
-        projectSettings.setAngleDisplay (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ANGLE_DISPLAY)));
-        projectSettings.setGridDirection (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_GRID_DIRECTION)));
-
-        projectSettings.setScaleFactor (cursor.getDouble(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_SCALE_FACTOR)));
-
-
-        int temp = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_SEA_LEVEL));
-        boolean tempBoolean = false;
-        if (temp == 1)tempBoolean = true;
-        projectSettings.setSeaLevel(tempBoolean);
-
-        temp = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_REFRACTION));
-        tempBoolean = false;
-        if (temp == 1)tempBoolean = true;
-        projectSettings.setRefraction(tempBoolean);
-
-        projectSettings.setDatum (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_DATUM)));
-        projectSettings.setProjection (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_PROJECTION)));
-        projectSettings.setZone (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ZONE)));
-        projectSettings.setCoordinateDisplay (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_COORDINATE_DISPLAY)));
-        projectSettings.setGeoidModel (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_GEOID_MODEL)));
-        projectSettings.setStartingPointID (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_STARTING_POINT_ID)));
-
-
-        temp = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_ALPHANUMERIC));
-        tempBoolean = false;
-        if (temp == 1)tempBoolean = true;
-        projectSettings.setAlphanumericID(tempBoolean);
-
-        projectSettings.setFeatureCodes (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FEATURE_CODES)));
-        projectSettings.setFCControlFile (cursor.getString (
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FC_CONTROL_FILE)));
-
-
-        temp = cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_FC_TIMESTAMP));
-        tempBoolean = false;
-        if (temp == 1)tempBoolean = true;
-        projectSettings.setFCTimeStamp(tempBoolean);
-*/
-        projectSettings.setMeaningMethod(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_METHOD)));
-
-
-        projectSettings.setMeaningNumber(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_MEANING_NUMBER)));
-
-
-        projectSettings.setLocationPrecision(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_LOCATION_PRECISION)));
-
-
-        projectSettings.setStdDevPrecision(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_STDDEV_PRECISION)));
-
-        projectSettings.setRMSStdDev(cursor.getInt(
-                cursor.getColumnIndex(GBDatabaseSqliteHelper.PROJECT_SETTINGS_RMS_V_STDDEV)));
-
-
-
-        return projectSettings;
-    }
 
 
     //totally analogous to same function for project.

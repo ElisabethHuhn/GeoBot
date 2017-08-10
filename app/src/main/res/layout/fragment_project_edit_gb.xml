@@ -58,28 +58,29 @@
                 android:background="@color/colorGrayer"
                 android:textColor="@color/colorTextBlack"
                 />
-            <!-- List Points -->
+            <!-- Measure -->
             <Button
                 style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectListPointsButton"
-                android:text="@string/list_points_label"
+                android:id="@+id/projectMeasureButton"
+                android:text="@string/project_measure_button_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
 
                 android:gravity="center|center_vertical"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="end"
 
                 android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                 android:background="@color/colorGrayer"
                 android:textColor="@color/colorTextBlack"
                 />
-            <!-- View Existing Projects -->
+
+            <!-- Map -->
             <Button
                 style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectViewExistingButton"
-                android:text="@string/project_view_existing_label"
+                android:id="@+id/projectMapButton"
+                android:text="@string/project_map_button_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -105,24 +106,6 @@
             android:paddingBottom="@dimen/row_between_rows_margin"
             >
 
-            <!-- Map -->
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectMapButton"
-                android:text="@string/project_map_button_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:gravity="center|center_vertical"
-                android:layout_gravity="end"
-
-                android:layout_marginStart="@dimen/row_cap_margin"
-                android:layout_marginEnd="@dimen/row_between_fields_margin"
-
-                android:background="@color/colorGrayer"
-                android:textColor="@color/colorTextBlack"
-                />
             <!-- Export -->
             <Button
                 style="?android:attr/buttonBarButtonStyle"
@@ -135,16 +118,34 @@
                 android:gravity="center|center_vertical"
                 android:layout_gravity="center_horizontal"
 
+                android:layout_marginStart="@dimen/row_cap_margin"
                 android:layout_marginEnd="@dimen/row_between_fields_margin"
 
                 android:background="@color/colorGrayer"
                 android:textColor="@color/colorTextBlack"
                 />
-            <!-- Measure -->
+            <!-- List Points -->
             <Button
                 style="?android:attr/buttonBarButtonStyle"
-                android:id="@+id/projectMeasureButton"
-                android:text="@string/project_measure_button_label"
+                android:id="@+id/projectListPointsButton"
+                android:text="@string/list_points_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:gravity="center|center_vertical"
+                android:layout_gravity="center_horizontal"
+
+                android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+                android:background="@color/colorGrayer"
+                android:textColor="@color/colorTextBlack"
+                />
+            <!-- View Existing Projects -->
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/projectViewExistingButton"
+                android:text="@string/project_view_existing_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -319,6 +320,7 @@
                 android:gravity="center"
 
                 android:layout_marginEnd="@dimen/row_cap_margin"
+                android:inputType="number"
 
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
@@ -430,44 +432,6 @@
         </TableRow>
 
 
-        <!-- Row : Height  -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/projectHeightOutput"
-                android:text="@string/project_height_label"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-            <EditText
-                android:id="@id/projectHeightOutput"
-
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="75"
-                android:gravity="center"
-
-                android:inputType="numberDecimal|numberSigned"
-
-                android:layout_marginEnd="@dimen/row_cap_margin"
-
-                android:textColor="@color/colorTextBlack"
-                android:enabled="false"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
 
         <!-- Row :  SPCS Zone and State -->
         <TableRow
@@ -532,6 +496,44 @@
                 android:textColor="@color/colorTextBlack"
                 android:enabled="false"
                 android:background="@color/colorGray"
+                />
+
+        </TableRow>
+
+        <!-- Row : Height  -->
+        <TableRow
+
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp"
+            >
+            <TextView
+                android:labelFor="@+id/projectHeightOutput"
+                android:text="@string/project_height_label"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="25"
+                android:gravity="end"
+
+                android:textColor="@color/colorTextBlack"
+                android:background="@color/colorScreenBackground"
+                />
+            <EditText
+                android:id="@id/projectHeightOutput"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="75"
+                android:gravity="center"
+
+                android:inputType="numberDecimal|numberSigned"
+
+                android:layout_marginEnd="@dimen/row_cap_margin"
+
+                android:textColor="@color/colorTextBlack"
+                android:enabled="false"
+                android:background="@color/colorWhite"
                 />
 
         </TableRow>
@@ -680,255 +682,6 @@
                 />
 
         </TableRow>
-
-        <!-- Row : Measure Auto save -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/autosave_spinner"
-                android:text="@string/measure_autosave"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate whether save is automatic on measure screen -->
-            <Spinner
-                android:id            = "@id/autosave_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight ="75"
-                android:gravity       ="center"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-                android:textColor    ="@color/colorTextBlack"
-                android:background   ="@color/colorWhite"
-                />
-
-        </TableRow>
-
-        <!-- Row : ORDER:  EN v NE // LatLng v LngLat -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/order_spinner"
-                android:text="@string/en_order"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate the order of EN or NE to appear on the UI -->
-            <Spinner
-                android:id            = "@id/order_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
-        <!-- Row : DD v DMS -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/dd_v_dms_spinner"
-                android:text="@string/dd_dms_terminology"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate the type of coordinate for the points in this project -->
-            <Spinner
-                android:id            = "@id/dd_v_dms_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
-        <!-- Row : Dir vs PlusMinus -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/dir_v_plusminus_spinner"
-                android:text="@string/dir_pm_terminology"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate the type of coordinate for the points in this project -->
-            <Spinner
-                android:id            = "@id/dir_v_plusminus_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
-
-        <!-- Row : RMS v StdDev -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width ="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/rms_v_stddev_spinner"
-                android:text="@string/rms_stddev_terminology"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-
-            <!--  Spinner to indicate the type of coordinate for the points in this project -->
-            <Spinner
-                android:id            = "@id/rms_v_stddev_spinner"
-                android:layout_width  = "0dp"
-                android:layout_height = "wrap_content"
-                android:layout_weight="75"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorWhite"
-                />
-
-        </TableRow>
-
-        <!-- Row : Location Precision -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/projectLocPrecisionInput"
-                android:text="@string/project_loc_precision"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-            <EditText
-                android:id="@id/projectLocPrecisionInput"
-
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="75"
-                android:gravity="center"
-
-                android:inputType="number"
-                android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-
-                android:textColor="@color/colorTextBlack"
-                android:enabled="false"
-                android:background="@color/colorWhite"
-                />
-
-
-        </TableRow>
-
-        <!-- Row : StdDev Precision -->
-        <TableRow
-
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp"
-            >
-            <TextView
-                android:labelFor="@+id/projectStdDevPrecisionInput"
-                android:text="@string/project_stddev_precision"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="25"
-                android:gravity="end"
-
-                android:textColor="@color/colorTextBlack"
-                android:background="@color/colorScreenBackground"
-                />
-            <EditText
-                android:id="@id/projectStdDevPrecisionInput"
-
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="75"
-                android:gravity="center"
-
-                android:inputType="number"
-                android:imeOptions="flagNoExtractUi"
-                android:layout_marginEnd="@dimen/row_cap_margin"
-
-                android:textColor="@color/colorTextBlack"
-                android:enabled="false"
-                android:background="@color/colorWhite"
-                />
-
-
-        </TableRow>
-
-        <!-- Row : Project Pictures List and image -->
-
-
 
     </TableLayout>
 

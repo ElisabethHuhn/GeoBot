@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_gravity="center_horizontal"
 
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textColor="@color/colorTextBlack"
                     android:background="@color/colorScreenBackground"
                     />
@@ -59,7 +59,7 @@
 
                         android:layout_marginBottom="20dp"
 
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         android:textColor=    "@color/colorTextBlack"
                         android:background=   "@color/colorScreenBackground"
                         />
@@ -104,32 +104,13 @@
 
 
                 <!-- Buttons -->
-                <!-- open, create, edit -->
+                <!-- create, open edit -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingTop="5dp"
                     >
-                    <!-- Open -->
-                    <Button
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:id="@+id/splashOpenButton"
-                        android:text="@string/action_project_open"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-
-                        android:gravity="center"
-
-                        android:layout_weight="25"
-
-                        android:layout_margin="8dp"
-
-
-                        android:background="@color/colorGrayer"
-                        android:textColor="@color/colorTextBlack"
-                        />
-
                     <!-- Create -->
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
@@ -142,9 +123,28 @@
 
                         android:layout_weight="25"
 
-                        android:layout_margin="8dp"
+                        android:layout_margin="@dimen/row_cap_margin"
 
-                        android:background="@color/colorGrayer"
+                        android:background="@color/colorWhite"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+                    <!-- Open -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashOpenButton"
+                        android:text="@string/action_project_open"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+
+                        android:layout_weight="25"
+
+                        android:layout_margin="@dimen/row_cap_margin"
+
+
+                        android:background="@color/colorWhite"
                         android:textColor="@color/colorTextBlack"
                         />
 
@@ -160,38 +160,22 @@
 
                         android:layout_weight="25"
 
-                        android:layout_margin="8dp"
+                        android:layout_margin="@dimen/row_cap_margin"
 
-                        android:background="@color/colorGrayer"
+                        android:background="@color/colorWhite"
                         android:textColor="@color/colorTextBlack"
                         />
 
 
                 </LinearLayout>
 
-                <!-- list, measure, Old convert -->
+                <!--  Measure, Map, Export -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingTop="5dp"
                     >
-                    <!-- List -->
-                    <Button
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:id="@+id/splashListPointsButton"
-                        android:text="@string/list_points_button_label"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-
-                        android:layout_weight="25"
-                        android:gravity="center"
-
-                        android:layout_margin="8dp"
-
-                        android:background="@color/colorGrayer"
-                        android:textColor="@color/colorTextBlack"
-                        />
                     <!-- Measure -->
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
@@ -206,14 +190,15 @@
 
                         android:layout_margin="@dimen/row_cap_margin"
 
-                        android:background="@color/colorGrayer"
+                        android:background="@color/colorWhite"
                         android:textColor="@color/colorTextBlack"
                         />
-                    <!-- Measure -->
+
+                    <!-- Map -->
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
-                        android:id="@+id/splashOldConvertButton"
-                        android:text="@string/convert_button_label"
+                        android:id="@+id/splashMapButton"
+                        android:text="@string/project_map_button_label"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
@@ -221,12 +206,77 @@
 
                         android:gravity="center"
 
-                        android:layout_margin="8dp"
+                        android:layout_margin="@dimen/row_cap_margin"
 
-                        android:background="@color/colorGrayer"
+                        android:background="@color/colorWhite"
                         android:textColor="@color/colorTextBlack"
                         />
+
+                    <!-- Export -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashExportButton"
+                        android:text="@string/export_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="25"
+
+                        android:gravity="center"
+
+                        android:layout_margin="@dimen/row_cap_margin"
+
+                        android:background="@color/colorWhite"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
                 </LinearLayout>
+
+                <!-- list, Export, Settings -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp"
+                    >
+
+                    <!-- List -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashListPointsButton"
+                        android:text="@string/list_points_button_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="25"
+                        android:gravity="center"
+
+                        android:layout_margin="@dimen/row_cap_margin"
+
+                        android:background="@color/colorWhite"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+                    <!-- Settings -->
+                    <Button
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/splashSettingsButton"
+                        android:text="@string/subtitle_general_settings"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="25"
+
+                        android:gravity="center"
+
+                        android:layout_margin="@dimen/row_cap_margin"
+
+                        android:background="@color/colorWhite"
+                        android:textColor="@color/colorTextBlack"
+                        />
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </ScrollView>

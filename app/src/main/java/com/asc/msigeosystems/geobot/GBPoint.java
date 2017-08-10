@@ -1,7 +1,5 @@
 package com.asc.msigeosystems.geobot;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -57,26 +55,6 @@ class GBPoint {
     static final String sPointHrmsExportTag      = "POINT_HRMS_EXPORT";
     static final String sPointVrmsExportTag      = "POINT_VRMS_EXPORT";
 
-
-
-    static boolean getPointExport (GBActivity activity, String tag) {
-        if (activity == null){
-            return false;
-        }
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        boolean defaultValue = true;
-        return sharedPref.getBoolean(tag, defaultValue);
-    }
-    static void    setPointExport  (GBActivity activity, String tag, boolean isExported) {
-        if (activity == null){
-            return;
-        }
-        //Store the PersonID for the next time
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(tag, isExported);
-        editor.apply();
-    }
 
 
 

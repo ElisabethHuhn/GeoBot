@@ -1,5 +1,7 @@
 package com.asc.msigeosystems.geobot;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 
 /**
  * Created by Elisabeth Huhn on 2/4/2017.
@@ -48,7 +51,7 @@ public class GBExportFragment extends Fragment {
 
     private static final String sCDF_FILENAME_TAG  = "cdfFilenameTag" ;
     private static final String sCDF_PATH_TAG      = "cdfPathTag" ;
-   // private static final String sCDF_TIMESTAMP_TAG = "cdfTimestampTag" ;
+
 
     //**********************************************/
     /*          Member Variables                   */
@@ -247,23 +250,37 @@ public class GBExportFragment extends Fragment {
         fileNameInput          .setEnabled(false);
         fileNameExtentInput    .setEnabled(false);
 
+        EditText exLocPrecision = (EditText) v.findViewById(R.id.exLocPrecisionInput);
+        EditText exStdPrecision = (EditText) v.findViewById(R.id.exStdDevPrecisionInput);
+        EditText exSfPrecision  = (EditText) v.findViewById(R.id.exSfPrecisionInput);
+        EditText exCaPrecision  = (EditText) v.findViewById(R.id.exCaPrecisionInput);
+
+        exLocPrecision.setEnabled(true);
+        exStdPrecision.setEnabled(true);
+        exSfPrecision.setEnabled(true);
+        exCaPrecision.setEnabled(true);
+
+
     }
 
 
     private void   initializeUI(View v){
         //determine if a project is yet associated with the fragment
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        if (openProject == null)return;
+
         long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
         if (openProjectID != GBUtilities.ID_DOES_NOT_EXIST){
-            GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+
             //if there is a project corresponding to the projectID, put the name up on the screen
-            if (project != null) {
-                EditText projectIDView = (EditText) v.findViewById(R.id.exportProjectIDInput);
-                projectIDView.setText(String.valueOf(openProjectID));
-                //Project Nick Name
-                TextView projectNameView = (TextView) v.findViewById(R.id.exportProjectNameInput);
-                //There are no events associated with this field
-                projectNameView.setText(project.getProjectName().toString().trim());
-            }
+
+            EditText projectIDView = (EditText) v.findViewById(R.id.exportProjectIDInput);
+            projectIDView.setText(String.valueOf(openProjectID));
+            //Project Nick Name
+            TextView projectNameView = (TextView) v.findViewById(R.id.exportProjectNameInput);
+            //There are no events associated with this field
+            projectNameView.setText(openProject.getProjectName().toString().trim());
+
         }
 
         EditText directoryPath = (EditText) v.findViewById(R.id.directoryPath);
@@ -291,160 +308,176 @@ public class GBExportFragment extends Fragment {
 
         //Get slider settings from the preferences
 
+        GBActivity myActivity = (GBActivity)getActivity();
+
         SwitchCompat projReadabilitySwitch = (SwitchCompat) v.findViewById(R.id.switchReadability);
-        boolean isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                                    GBProject.sProjectReadabilityExportTag);
+        boolean isSet = getExport(myActivity ,GBProject.sProjectReadabilityExportTag);
         projReadabilitySwitch.setChecked(isSet);
 
         SwitchCompat projHeadersSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeaders);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectHeadersExportTag);
+        isSet = getExport(myActivity, GBProject.sProjectHeadersExportTag);
         projHeadersSwitch.setChecked(isSet);
 
         SwitchCompat projNameSwitch = (SwitchCompat) v.findViewById(R.id.switchProjName);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectNameExportTag);
+        isSet = getExport(myActivity,GBProject.sProjectNameExportTag);
         projNameSwitch.setChecked(isSet);
 
         SwitchCompat projCreateSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCreate);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectCreateExportTag);
+        isSet = getExport(myActivity, GBProject.sProjectCreateExportTag);
         projCreateSwitch.setChecked(isSet);
 
         SwitchCompat projLastSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLast);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectLastMaintExportTag);
+        isSet = getExport(myActivity, GBProject.sProjectLastMaintExportTag);
         projLastSwitch.setChecked(isSet);
 
         SwitchCompat projDescSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDesc);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectDescExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectDescExportTag);
         projDescSwitch.setChecked(isSet);
 
         SwitchCompat projHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeight);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectHeightExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectHeightExportTag);
         projHeightSwitch.setChecked(isSet);
 
         SwitchCompat projCoordTypeSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCoordType);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectCoordTypeExportTag);
+        isSet = getExport(myActivity,   GBProject.sProjectCoordTypeExportTag);
         projCoordTypeSwitch.setChecked(isSet);
 
         SwitchCompat projNbMeanSwitch = (SwitchCompat) v.findViewById(R.id.switchProjNbMean);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectNbMeanExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectNbMeanExportTag);
         projNbMeanSwitch.setChecked(isSet);
 
         SwitchCompat projZoneSwitch = (SwitchCompat) v.findViewById(R.id.switchProjZone);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectZoneExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectZoneExportTag);
         projZoneSwitch.setChecked(isSet);
 
         SwitchCompat projDistUnitsSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDistUnits);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectDistUnitsExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectDistUnitsExportTag);
         projDistUnitsSwitch.setChecked(isSet);
 
-        SwitchCompat projAutosaveSwitch = (SwitchCompat) v.findViewById(R.id.switchProjAutosave);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectAutosaveExportTag);
-        projAutosaveSwitch.setChecked(isSet);
-
-        SwitchCompat projRMSvSTDSwitch = (SwitchCompat) v.findViewById(R.id.switchProjRMSvSTD);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectAutosaveExportTag);
-        projRMSvSTDSwitch.setChecked(isSet);
-
-        SwitchCompat projUIOrderSwitch = (SwitchCompat) v.findViewById(R.id.switchProjUIOrder);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectUIOrderExportTag);
-        projUIOrderSwitch.setChecked(isSet);
-
-        SwitchCompat projDDvDMSSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDDvDMS);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectDDvDMSExportTag);
-        projDDvDMSSwitch.setChecked(isSet);
-
-        SwitchCompat projDirVPMSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDirVPM);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectDirVPMExportTag);
-        projDirVPMSwitch.setChecked(isSet);
-
         SwitchCompat projDataSrcSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDataSrc);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectDataSrcExportTag);
+        isSet = getExport(myActivity,  GBProject.sProjectDataSrcExportTag);
         projDataSrcSwitch.setChecked(isSet);
-
-        SwitchCompat projLocPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLocPrecision);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectLocPrcExportTag);
-        projLocPrecisionSwitch.setChecked(isSet);
-
-        SwitchCompat projStdPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjStdPrc);
-        isSet = GBProject.getProjectExport((GBActivity)getActivity(),
-                                            GBProject.sProjectStdPrcExportTag);
-        projStdPrecisionSwitch.setChecked(isSet);
 
 
 
         SwitchCompat pntNumberSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNumber);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointNumberExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointNumberExportTag);
         pntNumberSwitch.setChecked(isSet);
 
         SwitchCompat pntIsMeanedSwitch = (SwitchCompat) v.findViewById(R.id.switchPntIsMeaned);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointIsMeanedExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointIsMeanedExportTag);
         pntIsMeanedSwitch.setChecked(isSet);
 
         SwitchCompat pntOffDistSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffDist);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointOffDistExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointOffDistExportTag);
         pntOffDistSwitch.setChecked(isSet);
 
         SwitchCompat pntOffHeadSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffHead);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointOffHeadExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointOffHeadExportTag);
         pntOffHeadSwitch.setChecked(isSet);
 
         SwitchCompat pntOffEleSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffEle);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointOffEleExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointOffEleExportTag);
         pntOffEleSwitch.setChecked(isSet);
 
         SwitchCompat pntHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHeight);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointHeightExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointHeightExportTag);
         pntHeightSwitch.setChecked(isSet);
 
         SwitchCompat pntFCSwitch = (SwitchCompat) v.findViewById(R.id.switchPntFC);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointFCExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointFCExportTag);
         pntFCSwitch.setChecked(isSet);
 
         SwitchCompat pntNotesSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNotes);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointNotesExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointNotesExportTag);
         pntNotesSwitch.setChecked(isSet);
 
         SwitchCompat pntHdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHdop);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointHdopExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointHdopExportTag);
         pntHdopSwitch.setChecked(isSet);
 
         SwitchCompat pntVdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVdop);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointVdopExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointVdopExportTag);
         pntVdopSwitch.setChecked(isSet);
 
         SwitchCompat pntPdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntPDOP);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointPdopExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointPdopExportTag);
         pntPdopSwitch.setChecked(isSet);
 
         SwitchCompat pntTdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntTdop);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointTdopExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointTdopExportTag);
         pntTdopSwitch.setChecked(isSet);
 
         SwitchCompat pntHrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHrms);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointHrmsExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointHrmsExportTag);
         pntHrmsSwitch.setChecked(isSet);
 
         SwitchCompat pntVrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVrms);
-        isSet = GBPoint.getPointExport((GBActivity)getActivity(), GBPoint.sPointVrmsExportTag);
+        isSet = getExport(myActivity, GBPoint.sPointVrmsExportTag);
         pntVrmsSwitch.setChecked(isSet);
+
+
+        SwitchCompat coordTimeSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordTime);
+        coordTimeSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateTimeExportTag));
+
+        SwitchCompat coordNorthingSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordNorthing);
+        coordNorthingSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateNorthingExportTag));
+
+        SwitchCompat coordEastingSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordEasting);
+        coordEastingSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateEastingExportTag));
+
+        int coordinateType = openProject.getCoordinateType();
+        if ((coordinateType == GBCoordinate.sCoordinateDBTypeWGS84)||
+            (coordinateType == GBCoordinate.sCoordinateDBTypeNAD83)){
+            coordNorthingSwitch.setText(R.string.exc_switch_coord_lat);
+            coordEastingSwitch.setText(R.string.exc_switch_coord_lng);
+        }
+
+        SwitchCompat coordEleSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordEle);
+        coordEleSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateElevationExportTag));
+
+        SwitchCompat coordGeoidSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordGeoid);
+        coordGeoidSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateGeoidExportTag));
+
+        SwitchCompat coordSFSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordSF);
+        coordSFSwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateScaleFactorExportTag));
+
+        SwitchCompat coordCASwitch = (SwitchCompat) v.findViewById(R.id.switchCoordCA);
+        coordCASwitch.setChecked(getExport(myActivity, GBCoordinate.sCoordinateCAngleExportTag));
+
+
+        EditText exLocPrecision = (EditText) v.findViewById(R.id.exLocPrecisionInput);
+        EditText exStdPrecision = (EditText) v.findViewById(R.id.exStdDevPrecisionInput);
+        EditText exSfPrecision  = (EditText) v.findViewById(R.id.exSfPrecisionInput);
+        EditText exCaPrecision  = (EditText) v.findViewById(R.id.exCaPrecisionInput);
+
+        exLocPrecision.setText(String.valueOf(GBGeneralSettings.getExLocPrecision   (myActivity)));
+        exStdPrecision.setText(String.valueOf(GBGeneralSettings.getExStdDevPrecision(myActivity)));
+        exSfPrecision .setText(String.valueOf(GBGeneralSettings.getExSfPrecision    (myActivity)));
+        exCaPrecision .setText(String.valueOf(GBGeneralSettings.getCAPrecision      (myActivity)));
+
     }
 
+
+
+    static boolean getExport (GBActivity activity, String tag) {
+        if (activity == null){
+            return false;
+        }
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        boolean defaultValue = true;
+        return sharedPref.getBoolean(tag, defaultValue);
+    }
+    static void    setExport  (GBActivity activity, String tag, boolean isExported) {
+        if (activity == null){
+            return;
+        }
+
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(tag, isExported);
+        editor.apply();
+    }
 
 
 
@@ -453,7 +486,7 @@ public class GBExportFragment extends Fragment {
         View v = getView();
         if (v == null)return;
 
-        saveSwitchSettings();
+        onSave();
 
         GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
         if (openProject == null) return;
@@ -506,164 +539,178 @@ public class GBExportFragment extends Fragment {
     }
 
 
-    private void saveSwitchSettings(){
+    private void onSave(){
         View v = getView();
         if (v == null)return;
 
+        GBActivity myActivity = (GBActivity)getActivity();
+
         SwitchCompat projReadabilitySwitch = (SwitchCompat) v.findViewById(R.id.switchReadability);
         boolean isSet = projReadabilitySwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                                     GBProject.sProjectReadabilityExportTag,
                                     isSet);
 
 
         SwitchCompat projHeadersSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeaders);
         isSet = projHeadersSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(), GBProject.sProjectHeadersExportTag, isSet);
+        setExport(myActivity, GBProject.sProjectHeadersExportTag, isSet);
 
 
         SwitchCompat projNameSwitch = (SwitchCompat) v.findViewById(R.id.switchProjName);
         isSet = projNameSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),GBProject.sProjectNameExportTag, isSet);
+        setExport(myActivity,GBProject.sProjectNameExportTag, isSet);
 
 
         SwitchCompat projCreateSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCreate);
         isSet = projCreateSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),GBProject.sProjectCreateExportTag, isSet);
+        setExport(myActivity,GBProject.sProjectCreateExportTag, isSet);
 
 
         SwitchCompat projLastSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLast);
         isSet = projLastSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectLastMaintExportTag, isSet);
 
         SwitchCompat projDescSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDesc);
         isSet = projDescSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectDescExportTag, isSet);
 
         SwitchCompat projHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeight);
         isSet = projHeightSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectHeightExportTag, isSet);
 
         SwitchCompat projCoordTypeSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCoordType);
         isSet = projCoordTypeSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectCoordTypeExportTag, isSet);
 
         SwitchCompat projNbMeanSwitch = (SwitchCompat) v.findViewById(R.id.switchProjNbMean);
         isSet = projNbMeanSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectNbMeanExportTag, isSet);
 
         SwitchCompat projZoneSwitch = (SwitchCompat) v.findViewById(R.id.switchProjZone);
         isSet = projZoneSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectZoneExportTag, isSet);
 
         SwitchCompat projDistUnitsSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDistUnits);
         isSet = projDistUnitsSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectDistUnitsExportTag, isSet);
 
-        SwitchCompat projAutosaveSwitch = (SwitchCompat) v.findViewById(R.id.switchProjAutosave);
-        isSet = projAutosaveSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectAutosaveExportTag, isSet);
-
-        SwitchCompat projRMSvSTDSwitch = (SwitchCompat) v.findViewById(R.id.switchProjRMSvSTD);
-        isSet = projRMSvSTDSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectAutosaveExportTag, isSet);
-
-        SwitchCompat projUIOrderSwitch = (SwitchCompat) v.findViewById(R.id.switchProjUIOrder);
-        isSet = projUIOrderSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectUIOrderExportTag, isSet);
-
-        SwitchCompat projDDvDMSSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDDvDMS);
-        isSet = projDDvDMSSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectDDvDMSExportTag, isSet);
-
-        SwitchCompat projDirVPMSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDirVPM);
-        isSet = projDirVPMSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectDirVPMExportTag, isSet);
 
         SwitchCompat projDataSrcSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDataSrc);
         isSet = projDataSrcSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
+        setExport(myActivity,
                 GBProject.sProjectDataSrcExportTag, isSet);
-
-        SwitchCompat projLocPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLocPrecision);
-        isSet = projLocPrecisionSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),
-                GBProject.sProjectLocPrcExportTag, isSet);
-
-        SwitchCompat projStdPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjStdPrc);
-        isSet = projStdPrecisionSwitch.isChecked();
-        GBProject.setProjectExport((GBActivity)getActivity(),GBProject.sProjectStdPrcExportTag, isSet);
 
 
 
         SwitchCompat pntNumberSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNumber);
         isSet = pntNumberSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointNumberExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointNumberExportTag, isSet);
 
         SwitchCompat pntIsMeanedSwitch = (SwitchCompat) v.findViewById(R.id.switchPntIsMeaned);
         isSet = pntIsMeanedSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointIsMeanedExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointIsMeanedExportTag, isSet);
 
         SwitchCompat pntOffDistSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffDist);
         isSet = pntOffDistSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointOffDistExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointOffDistExportTag, isSet);
 
         SwitchCompat pntOffHeadSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffHead);
         isSet = pntOffHeadSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointOffHeadExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointOffHeadExportTag, isSet);
 
         SwitchCompat pntOffEleSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffEle);
         isSet = pntOffEleSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointOffEleExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointOffEleExportTag, isSet);
 
         SwitchCompat pntHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHeight);
         isSet = pntHeightSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointHeightExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointHeightExportTag, isSet);
 
         SwitchCompat pntFCSwitch = (SwitchCompat) v.findViewById(R.id.switchPntFC);
         isSet = pntFCSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointFCExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointFCExportTag, isSet);
 
         SwitchCompat pntNotesSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNotes);
         isSet = pntNotesSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointNotesExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointNotesExportTag, isSet);
 
         SwitchCompat pntHdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHdop);
         isSet = pntHdopSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointHdopExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointHdopExportTag, isSet);
 
         SwitchCompat pntVdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVdop);
         isSet = pntVdopSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointVdopExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointVdopExportTag, isSet);
 
         SwitchCompat pntPdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntPDOP);
         isSet = pntPdopSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointPdopExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointPdopExportTag, isSet);
 
         SwitchCompat pntTdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntTdop);
         isSet = pntTdopSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointTdopExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointTdopExportTag, isSet);
 
         SwitchCompat pntHrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHrms);
         isSet = pntHrmsSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointHrmsExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointHrmsExportTag, isSet);
 
         SwitchCompat pntVrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVrms);
         isSet = pntVrmsSwitch.isChecked();
-        GBPoint.setPointExport((GBActivity)getActivity(), GBPoint.sPointVrmsExportTag, isSet);
+        setExport(myActivity, GBPoint.sPointVrmsExportTag, isSet);
 
+
+
+        SwitchCompat coordTimeSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordTime);
+        isSet = coordTimeSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateTimeExportTag, isSet);
+
+        SwitchCompat coordNorthingSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordNorthing);
+        isSet = coordNorthingSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateNorthingExportTag, isSet);
+
+        SwitchCompat coordEastingSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordEasting);
+        isSet = coordEastingSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateEastingExportTag, isSet);
+
+        SwitchCompat coordEleSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordEle);
+        isSet = coordEleSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateElevationExportTag, isSet);
+
+        SwitchCompat coordGeoidSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordGeoid);
+        isSet = coordGeoidSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateGeoidExportTag, isSet);
+
+        SwitchCompat coordSFSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordSF);
+        isSet = coordSFSwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateScaleFactorExportTag, isSet);
+
+        SwitchCompat coordCASwitch = (SwitchCompat) v.findViewById(R.id.switchCoordCA);
+        isSet = coordCASwitch.isChecked();
+        setExport(myActivity, GBCoordinate.sCoordinateCAngleExportTag, isSet);
+
+
+        EditText exLocPrecision = (EditText) v.findViewById(R.id.exLocPrecisionInput);
+        EditText exStdPrecision = (EditText) v.findViewById(R.id.exStdDevPrecisionInput);
+        EditText exSfPrecision  = (EditText) v.findViewById(R.id.exSfPrecisionInput);
+        EditText exCaPrecision  = (EditText) v.findViewById(R.id.exCaPrecisionInput);
+
+
+        GBGeneralSettings.setExLocPrecision(myActivity,
+                                            Integer.valueOf(exLocPrecision.getText().toString()));
+        GBGeneralSettings.setExStdDevPrecision(myActivity,
+                                            Integer.valueOf(exStdPrecision.getText().toString()));
+        GBGeneralSettings.setExSfPrecision(myActivity,
+                                            Integer.valueOf(exSfPrecision.getText().toString()));
+        GBGeneralSettings.setExCAPrecision(myActivity,
+                                            Integer.valueOf(exCaPrecision.getText().toString()));
 
     }
 
@@ -838,48 +885,50 @@ public class GBExportFragment extends Fragment {
         String ls = System.getProperty("line.separator");
         String comma = ",";
 
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        GBActivity myActivity = (GBActivity)getActivity();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
 
         View v = getView();
         if (v == null)return null;
 
         SwitchCompat projReadabilitySwitch = (SwitchCompat) v.findViewById(R.id.switchReadability);
 
-        SwitchCompat projHeadersSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeaders);
-        SwitchCompat projNameSwitch = (SwitchCompat) v.findViewById(R.id.switchProjName);
-        SwitchCompat projCreateSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCreate);
-        SwitchCompat projLastSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLast);
-        SwitchCompat projDescSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDesc);
-        SwitchCompat projHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchProjHeight);
+        SwitchCompat projHeadersSwitch   = (SwitchCompat) v.findViewById(R.id.switchProjHeaders);
+        SwitchCompat projNameSwitch      = (SwitchCompat) v.findViewById(R.id.switchProjName);
+        SwitchCompat projCreateSwitch    = (SwitchCompat) v.findViewById(R.id.switchProjCreate);
+        SwitchCompat projLastSwitch      = (SwitchCompat) v.findViewById(R.id.switchProjLast);
+        SwitchCompat projDescSwitch      = (SwitchCompat) v.findViewById(R.id.switchProjDesc);
+        SwitchCompat projHeightSwitch    = (SwitchCompat) v.findViewById(R.id.switchProjHeight);
         SwitchCompat projCoordTypeSwitch = (SwitchCompat) v.findViewById(R.id.switchProjCoordType);
-        SwitchCompat projNbMeanSwitch = (SwitchCompat) v.findViewById(R.id.switchProjNbMean);
-        SwitchCompat projZoneSwitch = (SwitchCompat) v.findViewById(R.id.switchProjZone);
+        SwitchCompat projNbMeanSwitch    = (SwitchCompat) v.findViewById(R.id.switchProjNbMean);
+        SwitchCompat projZoneSwitch      = (SwitchCompat) v.findViewById(R.id.switchProjZone);
         SwitchCompat projDistUnitsSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDistUnits);
-        SwitchCompat projAutosaveSwitch = (SwitchCompat) v.findViewById(R.id.switchProjAutosave);
-        SwitchCompat projRMSvSTDSwitch = (SwitchCompat) v.findViewById(R.id.switchProjRMSvSTD);
-        SwitchCompat projUIOrderSwitch = (SwitchCompat) v.findViewById(R.id.switchProjUIOrder);
-        SwitchCompat projDDvDMSSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDDvDMS);
-        SwitchCompat projDirVPMSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDirVPM);
-        SwitchCompat projDataSrcSwitch = (SwitchCompat) v.findViewById(R.id.switchProjDataSrc);
-        SwitchCompat projLocPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjLocPrecision);
-        SwitchCompat projStdPrecisionSwitch = (SwitchCompat) v.findViewById(R.id.switchProjStdPrc);
+        SwitchCompat projDataSrcSwitch   = (SwitchCompat) v.findViewById(R.id.switchProjDataSrc);
 
 
         SwitchCompat pntNumberSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNumber);
 
         SwitchCompat pntIsMeanedSwitch = (SwitchCompat) v.findViewById(R.id.switchPntIsMeaned);
-        SwitchCompat pntOffDistSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffDist);
-        SwitchCompat pntOffHeadSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffHead);
-        SwitchCompat pntOffEleSwitch = (SwitchCompat) v.findViewById(R.id.switchPntOffEle);
-        SwitchCompat pntHeightSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHeight);
-        SwitchCompat pntFCSwitch = (SwitchCompat) v.findViewById(R.id.switchPntFC);
-        SwitchCompat pntNotesSwitch = (SwitchCompat) v.findViewById(R.id.switchPntNotes);
-        SwitchCompat pntHdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHdop);
-        SwitchCompat pntVdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVdop);
-        SwitchCompat pntPdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntPDOP);
-        SwitchCompat pntTdopSwitch = (SwitchCompat) v.findViewById(R.id.switchPntTdop);
-        SwitchCompat pntHrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntHrms);
-        SwitchCompat pntVrmsSwitch = (SwitchCompat) v.findViewById(R.id.switchPntVrms);
+        SwitchCompat pntOffDistSwitch  = (SwitchCompat) v.findViewById(R.id.switchPntOffDist);
+        SwitchCompat pntOffHeadSwitch  = (SwitchCompat) v.findViewById(R.id.switchPntOffHead);
+        SwitchCompat pntOffEleSwitch   = (SwitchCompat) v.findViewById(R.id.switchPntOffEle);
+        SwitchCompat pntHeightSwitch   = (SwitchCompat) v.findViewById(R.id.switchPntHeight);
+        SwitchCompat pntFCSwitch       = (SwitchCompat) v.findViewById(R.id.switchPntFC);
+        SwitchCompat pntNotesSwitch    = (SwitchCompat) v.findViewById(R.id.switchPntNotes);
+        SwitchCompat pntHdopSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntHdop);
+        SwitchCompat pntVdopSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntVdop);
+        SwitchCompat pntPdopSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntPDOP);
+        SwitchCompat pntTdopSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntTdop);
+        SwitchCompat pntHrmsSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntHrms);
+        SwitchCompat pntVrmsSwitch     = (SwitchCompat) v.findViewById(R.id.switchPntVrms);
+
+        SwitchCompat coordTimeSwitch     = (SwitchCompat) v.findViewById(R.id.switchCoordTime);
+        SwitchCompat coordNorthingSwitch = (SwitchCompat) v.findViewById(R.id.switchCoordNorthing);
+        SwitchCompat coordEastingSwitch  = (SwitchCompat) v.findViewById(R.id.switchCoordEasting);
+        SwitchCompat coordEleSwitch      = (SwitchCompat) v.findViewById(R.id.switchCoordEle);
+        SwitchCompat coordGeoidSwitch    = (SwitchCompat) v.findViewById(R.id.switchCoordGeoid);
+        SwitchCompat coordSFSwitch       = (SwitchCompat) v.findViewById(R.id.switchCoordSF);
+        SwitchCompat coordCASwitch       = (SwitchCompat) v.findViewById(R.id.switchCoordCA);
 
 
         try {
@@ -992,7 +1041,6 @@ public class GBExportFragment extends Fragment {
                     state = constants.getState();
                 }
                 projectString.append(state);
-
                 projectString.append(deliminator);
             }
 
@@ -1008,97 +1056,6 @@ public class GBExportFragment extends Fragment {
                     choiceString = GBProject.sFeetString;
                 } else if (choice == GBProject.sIntFeet) {
                     choiceString = GBProject.sIntFeetString;
-                }
-                projectString.append(choiceString);
-                projectString.append(deliminator);
-            }
-
-
-            if (projAutosaveSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_autosave));
-                    projectString.append(" = ");
-                }
-                int choice = openProject.getAutosave();
-                String choiceString = getString(R.string.autosave_item);
-                if (choice != GBProject.sAUTOSAVE) {
-                    choiceString = getString(R.string.manual_item);
-                }
-                projectString.append(choiceString);
-                projectString.append(deliminator);
-            }
-
-
-
-            if (projRMSvSTDSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_rmsVstd));
-                    projectString.append(" = ");
-                }
-                int choice = openProject.getRMSvStD();
-                String choiceString = GBProject.sRMSString;
-                if (choice != GBProject.sRMS) {
-                    choiceString =  GBProject.sStdDevString;
-                }
-                projectString.append(choiceString);
-                projectString.append(deliminator);
-            }
-
-
-
-
-            if (projUIOrderSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_ui_order));
-                    projectString.append(" = ");
-                }
-                int coordinateType = openProject.getCoordinateType();
-                int choice = openProject.getUIOrder();
-                String choiceString = GBProject.sENString;
-                if (coordinateType == GBCoordinate.sCoordinateDBTypeWGS84){
-                    if (choice == GBProject.sLatLng){
-                        choiceString = GBProject.sLatLngString;
-                    } else {
-                        choiceString = GBProject.sLngLatString;
-                    }
-                } else {
-                    if (choice == GBProject.sEN){
-                        choiceString = GBProject.sENString;
-                    } else {
-                        choiceString = GBProject.sNEString;
-                    }
-                }
-
-                projectString.append(choiceString);
-                projectString.append(deliminator);
-            }
-
-
-            if (projDDvDMSSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_ddVdms));
-                    projectString.append(" = ");
-                }
-                int choice = openProject.getDDvDMS();
-                String choiceString = GBProject.sDDString;
-                if (choice != GBProject.sDD) {
-                    choiceString =  GBProject.sDMSString;
-                }
-                projectString.append(choiceString);
-                projectString.append(deliminator);
-            }
-
-
-
-            if (projDirVPMSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_dirVpm));
-                    projectString.append(" = ");
-                }
-                int choice = openProject.getDIRvPlusMinus();
-                String choiceString = GBProject.sDirectionsString;
-                if (choice != GBProject.sDirections) {
-                    choiceString =  GBProject.sPlusMinusString;
                 }
                 projectString.append(choiceString);
                 projectString.append(deliminator);
@@ -1129,27 +1086,6 @@ public class GBExportFragment extends Fragment {
                 projectString.append(deliminator);
             }
 
-
-            if (projLocPrecisionSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_loc_prc));
-                    projectString.append(" = ");
-                }
-
-                projectString.append(String.valueOf(openProject.getLocPrecision()));
-                projectString.append(deliminator);
-            }
-
-
-            if (projStdPrecisionSwitch.isChecked()) {
-                if (projHeadersSwitch.isChecked()) {
-                    projectString.append(getString(R.string.exc_switch_proj_std_prc));
-                    projectString.append(" = ");
-                }
-
-                projectString.append(String.valueOf(openProject.getStdDevPrecision()));
-                projectString.append(deliminator);
-            }
 
             projectString.append(ls);
             projectString.append(ls);
@@ -1317,9 +1253,11 @@ public class GBExportFragment extends Fragment {
                         projectString.append(getString(R.string.exc_switch_pnt_hrms));
                         projectString.append(" = ");
                     }
-
-                    projectString.append(String.valueOf(point.getHrms()));
-                    projectString.append(deliminator);
+                    int digitsOfPrecision = getStdPrecision();
+                    String precisionValue =
+                            GBUtilities.truncatePrecisionString(point.getHrms(), digitsOfPrecision);
+                    projectString.append(precisionValue);
+                    //projectString.append(deliminator);
                 }
 
 
@@ -1329,13 +1267,160 @@ public class GBExportFragment extends Fragment {
                         projectString.append(" = ");
                     }
 
-                    projectString.append(String.valueOf(point.getVrms()));
+                    int digitsOfPrecision = getStdPrecision();
+                    String precisionValue =
+                            GBUtilities.truncatePrecisionString(point.getVrms(), digitsOfPrecision);
+                    projectString.append(precisionValue);
+                   // projectString.append(deliminator);
+                }
+
+
+                int coordType = openProject.getCoordinateType();
+                GBCoordinate coordinate =  point.getCoordinate();
+
+                if (coordTimeSwitch.isChecked()) {
+                    if (projHeadersSwitch.isChecked()) {
+                        projectString.append(getString(R.string.exc_switch_coord_time));
+                        projectString.append(" = ");
+                    }
+
+                    projectString.append(String.valueOf(coordinate.getTime()));
                     projectString.append(deliminator);
+                }
+
+                int distUnits = openProject.getDistanceUnits();
+                boolean isDD  = GBGeneralSettings.isLocDD(myActivity);
+
+
+                //Lat/Lng  Northing/Easting goes here
+
+                double location ;
+                int locHeader  ;
+
+                int coordinateType = openProject.getCoordinateType();
+                if ((coordinateType == GBCoordinate.sCoordinateDBTypeWGS84) ||
+                    (coordinateType == GBCoordinate.sCoordinateDBTypeNAD83)){
+                    location = ((GBCoordinateLL)coordinate).getLatitude();
+                    locHeader   = R.string.exc_switch_coord_lat;
+
+                    //Latitude / longitude
+                    if (coordNorthingSwitch.isChecked()) {
+
+                        if (GBGeneralSettings.isLngLat(myActivity)) {
+                            location = ((GBCoordinateLL) coordinate).getLongitude();
+                            locHeader = R.string.exc_switch_coord_lng;
+                        }
+
+
+                        appendAngle(locHeader, location,
+                                    projectString,
+                                    projHeadersSwitch.isChecked(),
+                                    isDD,
+                                    deliminator, getLocPrecision());
+                    }
+
+                    if (coordEastingSwitch.isChecked()){
+
+                        location  = ((GBCoordinateLL)coordinate).getLongitude();
+                        locHeader = R.string.exc_switch_coord_lng;
+                        if (GBGeneralSettings.isLngLat(myActivity)){
+                            location = ((GBCoordinateLL)coordinate).getLatitude();
+                            locHeader   = R.string.exc_switch_coord_lat;
+                        }
+
+                        appendAngle(locHeader, location,
+                                    projectString,
+                                    projHeadersSwitch.isChecked(),
+                                    isDD,
+                                    deliminator, getLocPrecision());
+
+                    }
+
+
+                } else {
+                    //Northing / Easting
+                    if (coordNorthingSwitch.isChecked()) {
+                        location  = ((GBCoordinateEN)coordinate).getNorthing();
+                        locHeader = R.string.exc_switch_coord_northing;
+
+                        if (GBGeneralSettings.isEN(myActivity)) {
+                            location = ((GBCoordinateEN) coordinate).getEasting();
+                            locHeader = R.string.exc_switch_coord_easting;
+                        }
+
+                        appendDistance(locHeader,
+                                        location,
+                                        projectString,
+                                        projHeadersSwitch.isChecked(),
+                                        deliminator, getLocPrecision());
+                    }
+
+                    if (coordEastingSwitch.isChecked()){
+
+                        location  = ((GBCoordinateEN)coordinate).getEasting();
+                        locHeader = R.string.exc_switch_coord_easting;
+                        if (GBGeneralSettings.isEN(myActivity)){
+                            location = ((GBCoordinateEN)coordinate).getNorthing();
+                            locHeader   = R.string.exc_switch_coord_northing;
+                        }
+
+                        appendDistance(locHeader,
+                                        location,
+                                        projectString,
+                                        projHeadersSwitch.isChecked(),
+                                        deliminator, getLocPrecision());
+
+                    }
+
                 }
 
 
 
 
+                if (coordEleSwitch.isChecked()) {
+
+                    appendDistance(R.string.exc_switch_coord_ele,
+                            coordinate.getElevation(),
+                            projectString,
+                            projHeadersSwitch.isChecked(),
+                            deliminator, getLocPrecision());
+                }
+
+
+                if (coordGeoidSwitch.isChecked()) {
+                    appendDistance(R.string.exc_switch_coord_geoid,
+                            coordinate.getGeoid(),
+                            projectString,
+                            projHeadersSwitch.isChecked(),
+                            deliminator, getLocPrecision());
+                }
+
+
+                if (coordSFSwitch.isChecked()) {
+                    if (projHeadersSwitch.isChecked()) {
+                        projectString.append(getString(R.string.exc_switch_coord_sf));
+                        projectString.append(" = ");
+                    }
+
+                    String precisionValue =
+                            GBUtilities.truncatePrecisionString(coordinate.getScaleFactor(),
+                                                                getSfPrecision());
+                    projectString.append(precisionValue);
+
+                    //projectString.append(deliminator);
+                }
+
+                boolean isCADD = GBGeneralSettings.isCADD(myActivity);
+
+                if (coordCASwitch.isChecked()) {
+
+                    appendAngle(R.string.exc_switch_coord_ca,
+                                coordinate.getConvergenceAngle(),
+                                projectString,
+                                projHeadersSwitch.isChecked(),
+                                isCADD,
+                                deliminator, getCaPrecision());
+                }
                 position++;
 
             }//end all points for this project
@@ -1347,6 +1432,147 @@ public class GBExportFragment extends Fragment {
         return projectString.toString();
     }
 
+    private int getLocPrecision(){
+        View v = getView();
+        if (v == null)return 0;
 
+        EditText exLocPrecision = (EditText) v.findViewById(R.id.exLocPrecisionInput);
+
+        String precisionString = exLocPrecision.getText().toString();
+
+        if (GBUtilities.isEmpty(precisionString))return GBGeneralSettings.sExLocPrcDefault;
+
+        return Integer.valueOf(precisionString);
+    }
+    private int getStdPrecision(){
+        View v = getView();
+        if (v == null)return 0;
+
+        EditText exStdPrecision = (EditText) v.findViewById(R.id.exStdDevPrecisionInput);
+
+        String precisionString = exStdPrecision.getText().toString();
+
+        if (GBUtilities.isEmpty(precisionString))return 0;
+
+        return Integer.valueOf(precisionString);
+    }
+    private int getSfPrecision(){
+        View v = getView();
+        if (v == null)return 0;
+
+        EditText exSfPrecision  = (EditText) v.findViewById(R.id.exSfPrecisionInput);
+
+        String precisionString = exSfPrecision.getText().toString();
+
+        if (GBUtilities.isEmpty(precisionString))return 0;
+
+        return Integer.valueOf(precisionString);
+    }
+    private int getCaPrecision(){
+        View v = getView();
+        if (v == null)return 0;
+
+        EditText exCaPrecision  = (EditText) v.findViewById(R.id.exCaPrecisionInput);
+
+        String precisionString = exCaPrecision.getText().toString();
+
+        if (GBUtilities.isEmpty(precisionString))return 0;
+
+        return Integer.valueOf(precisionString);
+    }
+
+
+    private StringBuilder appendAngle(int header,
+                                      double angleValue,
+                                      StringBuilder projectString,
+                                      boolean isHeaders,
+                                      boolean isDD,
+                                      String deliminator,
+                                      int    digitsOfPrecision){
+
+
+        String precisionValue ;
+
+        if (isHeaders) {
+            projectString.append(getString(header));
+            projectString.append(" = ");
+        }
+
+        if (isDD) {
+            precisionValue = GBUtilities.truncatePrecisionString(angleValue, digitsOfPrecision);
+            projectString.append(precisionValue);
+            if (isHeaders) {
+                projectString.append(" ");
+                projectString.append(getString(R.string.type_decimal_degrees_label));
+            }
+
+        } else {
+            int degrees = GBUtilities.getDegrees(angleValue);
+            int minutes = GBUtilities.getMinutes(angleValue);
+            double seconds = GBUtilities.getSeconds(angleValue);
+
+            projectString.append(String.valueOf(degrees));
+            projectString.append(getString(R.string.degrees_label));
+            projectString.append(" ");
+
+            projectString.append(String.valueOf(minutes));
+            projectString.append(getString(R.string.minutes_label));
+            projectString.append(" ");
+
+            precisionValue = GBUtilities.truncatePrecisionString(seconds, digitsOfPrecision);
+            projectString.append(precisionValue);
+            projectString.append("\" ");
+
+        }
+        projectString.append(deliminator);
+        return projectString;
+    }
+
+    private StringBuilder appendDistance(int header,
+                                         double distValue,
+                                         StringBuilder projectString,
+                                         boolean isHeaders,
+                                         String deliminator, int digitsOfPrecision){
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        int distUnits = openProject.getDistanceUnits();
+
+        String precisionValue;
+
+        if (isHeaders) {
+            projectString.append(getString(header));
+            projectString.append(" = ");
+        }
+
+        if (distUnits == GBProject.sMeters) {
+            precisionValue = GBUtilities.truncatePrecisionString(distValue, digitsOfPrecision);
+            projectString.append(distValue);
+            if (isHeaders) {
+                projectString.append(" ");
+                projectString.append(getString(R.string.meters_label));
+            }
+
+        } else if (distUnits == GBProject.sFeet) {
+            double feetValue = GBUtilities.convertMetersToFeet(distUnits);
+            precisionValue   = GBUtilities.truncatePrecisionString(feetValue, digitsOfPrecision);
+            projectString.append(String.valueOf(precisionValue));
+            if (isHeaders) {
+                projectString.append(" ");
+                projectString.append(getString(R.string.feet_label));
+            }
+
+        } else if (distUnits == GBProject.sIntFeet) {
+            double feetValue = GBUtilities.convertMetersToIFeet(distUnits);
+            precisionValue   = GBUtilities.truncatePrecisionString(feetValue, digitsOfPrecision);
+            projectString.append(String.valueOf(precisionValue));
+            if (isHeaders) {
+                projectString.append(" ");
+                projectString.append(getString(R.string.ifeet_label));
+            }
+
+        }
+        projectString.append(deliminator);
+        return projectString;
+    }
 
 }

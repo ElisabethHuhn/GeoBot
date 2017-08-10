@@ -125,13 +125,12 @@ public class GBSplashFragment extends Fragment  {
             public void onClick(View v){
 
                 GBActivity myActivity = (GBActivity) getActivity();
-                GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
                 if (openProject != null){
                     myActivity.switchToPointsListScreen(new GBPath(GBPath.sEditTag));
+                } else {
+                    GBUtilities.getInstance().showStatus(getActivity(),  R.string.project_not_open_to_list_points);
                 }
-
-                GBUtilities.getInstance().showStatus(getActivity(),
-                        R.string.project_not_open_to_list_points);
             }
         });
 
@@ -154,6 +153,28 @@ public class GBSplashFragment extends Fragment  {
                 ((GBActivity)getActivity()).switchToPointCreateScreen(project);
             }
         });
+
+        //Map Points Button
+        Button mapPointsButton = (Button) v.findViewById(R.id.splashMapButton);
+        mapPointsButton.setText(R.string.project_map_button_label);
+        mapPointsButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_002_collect, 0, 0);
+        mapPointsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+
+                //regardless of whether they actually exit, hide the keyboard
+                GBUtilities.getInstance().hideKeyboard(getActivity());
+                GBProject project = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+                if (project == null){
+                    GBUtilities.getInstance().showStatus(getActivity(), R.string.project_not_open);
+                    return;
+                }
+                ((GBActivity)getActivity()).switchToMapPointsScreen();
+
+            }
+        });
+
 /*
         //Old Conversion Button
         Button convertButton = (Button) v.findViewById(R.id.splashOldConvertButton);
@@ -175,7 +196,7 @@ public class GBSplashFragment extends Fragment  {
         });
 */
         //Export
-        Button exportButton = (Button) v.findViewById(R.id.splashOldConvertButton);
+        Button exportButton = (Button) v.findViewById(R.id.splashExportButton);
         exportButton.setText(R.string.exchange_button_label);
         exportButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_119_exchangefolder, 0, 0);
         exportButton.setOnClickListener(new View.OnClickListener() {
@@ -192,6 +213,19 @@ public class GBSplashFragment extends Fragment  {
                 onExport();
             }
         });
+
+        //settings Button
+        Button settingsButton = (Button) v.findViewById(R.id.splashSettingsButton);
+        settingsButton.setText(R.string.settings_button_label);
+        settingsButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_008_settings, 0, 0);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+
+                ((GBActivity) getActivity()).switchToGeneralSettingsScreen();
+            }
+        });
+
     }
 
     private void initializeUI(View v){

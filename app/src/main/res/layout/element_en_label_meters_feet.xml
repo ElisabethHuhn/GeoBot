@@ -24,7 +24,7 @@
     <!-- Meters -->
     <EditText
         android:id               = "@+id/metersOutput"
-        android:hint             = "@string/meters_label"
+        android:hint             = "@string/in_meters_label"
         android:layout_height    = "wrap_content"
         android:layout_width     = "0dp"
         android:layout_weight    = "75"
@@ -44,7 +44,7 @@
     <!-- Feet -->
     <EditText
         android:id               = "@+id/feetOutput"
-        android:hint             = "@string/feet_label"
+        android:hint             = "@string/in_feet_label"
         android:layout_height    = "wrap_content"
         android:layout_width     = "0dp"
         android:layout_weight    = "75"

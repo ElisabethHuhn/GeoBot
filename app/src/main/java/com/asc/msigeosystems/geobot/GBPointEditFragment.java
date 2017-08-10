@@ -1,6 +1,5 @@
 package com.asc.msigeosystems.geobot;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,12 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-
-import static com.asc.msigeosystems.geobot.R.color.colorNegNumber;
-import static com.asc.msigeosystems.geobot.R.color.colorPosNumber;
 
 /**
  * The Maintain Point Fragment
@@ -57,9 +51,8 @@ public class GBPointEditFragment extends Fragment  {
     private String mPointLongitudeSOld;
 
     private String mPointElevationMetersOld;
-    private String mPointElevationFeetOld;
     private String mPointGeoidMetersOld;
-    private String mPointGeoidFeetOld;
+
 
 
 
@@ -68,10 +61,8 @@ public class GBPointEditFragment extends Fragment  {
     //**********************************************************/
     private String       mPointEastingMetersOld;
     private String       mPointNorthingMetersOld;
-    private String       mPointEastingFeetOld;
-    private String       mPointNorthingFeetOld;
     private String       mPointENElevationMetersOld;
-    private String       mPointENElevationFeetOld;
+
 /*
     private String       mPointZoneOld;
     private String       mPointHemisphereOld;
@@ -177,7 +168,6 @@ public class GBPointEditFragment extends Fragment  {
         //The SQL Helper is in charge of assigning both
         // the DB ID and then incrementing the point number
         //openProject.incrementPointNumber((GBActivity)getActivity());
-        return;
     }
 
     @Override
@@ -202,7 +192,7 @@ public class GBPointEditFragment extends Fragment  {
 
         if (coordinateWidgetType == GBCoordinate.sLLWidgets){
             saveLLFieldsAsOldValues();
-        }else if (coordinateWidgetType == GBCoordinate.sENWidgets) {
+        }else if (coordinateWidgetType == GBCoordinate.sNEWidgets) {
             saveENFieldsAsOldValues();
         }
 
@@ -297,9 +287,6 @@ public class GBPointEditFragment extends Fragment  {
         pointVdopInput.addTextChangedListener(textWatcher);
 
 
-        //Point Quality TDOP
-        EditText pointTdopInput = (EditText) v.findViewById(R.id.pointTdopInput);
-        pointTdopInput.addTextChangedListener(textWatcher);
 
 
         //Point Quality PDOP
@@ -316,6 +303,22 @@ public class GBPointEditFragment extends Fragment  {
         EditText pointVrmsInput = (EditText) v.findViewById(R.id.pointVrmsInput);
         pointVrmsInput.addTextChangedListener(textWatcher);
 
+        //Set the label to Standard Deviation if in settings
+        if (GBGeneralSettings.isStdDev((GBActivity)getActivity())) {
+            GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+            int coordType = openProject.getCoordinateType();
+            int hStdDevLabel = R.string.sd_longitude_label;
+            int vStdDevLabel = R.string.sd_latitude_label;
+            if ((coordType == GBCoordinate.sCoordinateDBTypeSPCS) ||
+                (coordType == GBCoordinate.sCoordinateDBTypeUTM)) {
+                hStdDevLabel = R.string.sd_easting_label;
+                vStdDevLabel = R.string.sd_northing_label;
+            }
+            TextView pointHrmsLabel = (TextView) v.findViewById(R.id.pointHrmsLabel);
+            TextView pointVrmsLabel = (TextView) v.findViewById(R.id.pointVrmsLabel);
+            pointHrmsLabel.setText(hStdDevLabel);
+            pointVrmsLabel.setText(vStdDevLabel);
+        }
 
 
         //Point Offset Distance
@@ -378,6 +381,15 @@ public class GBPointEditFragment extends Fragment  {
                 } else {
                     ((GBActivity) getActivity()).switchToMeasureScreen(mPointBeingMaintained);
                 }
+            }
+        });
+        pointMeasureButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                ((GBActivity)getActivity()).switchToListNmeaScreen();
+
+                return true;
             }
         });
 
@@ -447,26 +459,31 @@ public class GBPointEditFragment extends Fragment  {
             layoutInflater.inflate(R.layout.element_coordinate_ll, coordinatesContainer, true);
             //then wire up the appropriate widgets for this type of coordinate
             wireLLCoordinateWidgets(v);
-        } else if (coordinateWidgetType == GBCoordinate.sENWidgets) {
+        } else if (coordinateWidgetType == GBCoordinate.sNEWidgets) {
             //inflate the coordinates, and
             // attach the coordinates to the LinearLayout which exists to contain the coordinates
             layoutInflater.inflate(R.layout.element_coordinate_en, coordinatesContainer, true);
 
             //then wire up the appropriate widgets for this type of coordinat
-            wireENCoordinateWidgets(v);
+            wireNECoordinateWidgets(v);
         }
         return coordinateWidgetType;
     }
 
     private void wireLLCoordinateWidgets(View v){
 
+        GBActivity myActivity = (GBActivity)getActivity();
         //make DD vs DMS on the project work by making various views invisible
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        boolean isDD = false;
-        if (openProject.getDDvDMS() == GBProject.sDD)isDD = true;
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
+        boolean isDD = GBGeneralSettings.isLocDD(myActivity);
+        boolean isCADD = GBGeneralSettings.isCADD(myActivity);
 
 
         int distUnits = openProject.getDistanceUnits();
+
+        //The location fields order may be reversed on the screen
+        //NOTE TO MAINTENANCE PROGRAMMER:
+        // This can be tricky, so remember the kludge is to just change the names on the UI
 
 
         //***************************************************************************/
@@ -475,8 +492,11 @@ public class GBPointEditFragment extends Fragment  {
         View field_container;
         TextView label;
 
-        //set up the UI widgets for the latitude/longetude coordinates
+        //set up the UI widgets for the latitude/longitude coordinates
         field_container = v.findViewById(R.id.latitudeContainer);
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.longitudeContainer);
+        }
         label = (TextView)field_container.findViewById(R.id.ll_label);
         label.setText(getString(R.string.latitude_label));
         final EditText pointLatitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
@@ -627,6 +647,9 @@ public class GBPointEditFragment extends Fragment  {
 
 
         field_container = v.findViewById(R.id.longitudeContainer);
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.latitudeContainer);
+        }
         label = (TextView)field_container.findViewById(R.id.ll_label);
         label.setText(getString(R.string.longitude_label));
         final EditText pointLongitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
@@ -799,20 +822,12 @@ public class GBPointEditFragment extends Fragment  {
         pointElevationMetersInput.setInputType(InputType.TYPE_CLASS_NUMBER |
                                                InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                                InputType.TYPE_NUMBER_FLAG_SIGNED);
-        final EditText pointElevationFeetInput   =
-                (EditText) field_container.findViewById(R.id.elevationFeetInput) ;
-        pointElevationFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
-                                             InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                                             InputType.TYPE_NUMBER_FLAG_SIGNED);
 
 
         if (mPointPath.equals(GBPath.sEditFromMaps)) {
 
             pointElevationMetersInput.setFocusable(false);
             pointElevationMetersInput.setBackgroundColor(
-                                        ContextCompat.getColor(getActivity(), R.color.colorGray));
-            pointElevationFeetInput.setFocusable(false);
-            pointElevationFeetInput.setBackgroundColor(
                                         ContextCompat.getColor(getActivity(), R.color.colorGray));
 
         }
@@ -825,37 +840,15 @@ public class GBPointEditFragment extends Fragment  {
                     String temp = pointElevationMetersInput.getText().toString();
                     if (!temp.equals(mPointElevationMetersOld)){
                         setPointChangedFlags();
-                        // so convert Meters to Feet
-                        GBUtilities.convertMetersToFeet(getActivity(),
-                                                         pointElevationMetersInput,
-                                                         pointElevationFeetInput);
+
                         mPointElevationMetersOld = temp;
-                        mPointElevationFeetOld = pointElevationFeetInput.getText().toString();
+
                     }
 
                 }
             }
         });
 
-        pointElevationFeetInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    //Feet just lost focus,
-                    // has the value changed
-                    String temp = pointElevationFeetInput.getText().toString();
-                    if (!temp.equals(mPointElevationFeetOld)){
-                        setPointChangedFlags();
-                        // so convert Feet to Meters
-                        GBUtilities.convertFeetToMeters(getActivity(),
-                                                         pointElevationMetersInput,
-                                                         pointElevationFeetInput);
-                        mPointElevationFeetOld = temp;
-                        mPointElevationMetersOld = pointElevationMetersInput.getText().toString();
-                    }
-
-                }
-            }
-        });
 
 
         //***************************************************************************/
@@ -866,19 +859,11 @@ public class GBPointEditFragment extends Fragment  {
         pointGeoidMetersInput.setInputType(InputType.TYPE_CLASS_NUMBER |
                                             InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                             InputType.TYPE_NUMBER_FLAG_SIGNED);
-        final EditText pointGeoidFeetInput   =
-                            (EditText) field_container.findViewById(R.id.geoidHeightFeetInput);
-        pointGeoidFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
-                                        InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                                        InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         if (mPointPath.equals(GBPath.sEditFromMaps)) {
 
             pointGeoidMetersInput.setFocusable(false);
             pointGeoidMetersInput.setBackgroundColor(
-                                        ContextCompat.getColor(getActivity(), R.color.colorGray));
-            pointGeoidFeetInput.setFocusable(false);
-            pointGeoidFeetInput.setBackgroundColor(
                                         ContextCompat.getColor(getActivity(), R.color.colorGray));
 
         }
@@ -891,46 +876,11 @@ public class GBPointEditFragment extends Fragment  {
                     String temp = pointGeoidMetersInput.getText().toString();
                     if (!temp.equals(mPointGeoidMetersOld)){
                         setPointChangedFlags();
-                        // so convert Meters to Feet
-                        GBUtilities.convertMetersToFeet(getActivity(),
-                                                         pointGeoidMetersInput,
-                                                         pointGeoidFeetInput);
                         mPointGeoidMetersOld = temp;
-                        mPointGeoidFeetOld = pointGeoidFeetInput.getText().toString();
                     }
                 }
             }
         });
-
-        pointGeoidFeetInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    //Feet just lost focus,
-                    // has the value changed
-                    String temp = pointGeoidFeetInput.getText().toString();
-                    if (!temp.equals(mPointGeoidFeetOld)){
-                        setPointChangedFlags();
-                        // so convert Feet to Meters
-                        GBUtilities.convertFeetToMeters(getActivity(),
-                                                         pointGeoidMetersInput,
-                                                         pointGeoidFeetInput);
-                        mPointGeoidFeetOld = temp;
-                        mPointGeoidMetersOld = pointGeoidMetersInput.getText().toString();
-                    }
-                }
-            }
-        });
-
-
-        if (distUnits == GBProject.sMeters){
-            pointElevationFeetInput.setVisibility(View.GONE);
-            pointGeoidFeetInput    .setVisibility(View.GONE);
-
-        } else {
-            pointElevationMetersInput.setVisibility(View.GONE);
-            pointGeoidMetersInput    .setVisibility(View.GONE);
-
-        }
 
 
 
@@ -941,7 +891,7 @@ public class GBPointEditFragment extends Fragment  {
         EditText pointCAsecInput       = (EditText) v.findViewById(R.id.convSecondsInput);
         EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
 
-        if (isDD){
+        if (isCADD){
             pointCAdegInput.setVisibility(View.GONE);
             pointCAminInput.setVisibility(View.GONE);
             pointCAsecInput.setVisibility(View.GONE);
@@ -953,12 +903,13 @@ public class GBPointEditFragment extends Fragment  {
     }
 
 
-    private void wireENCoordinateWidgets(View v){
+    private void wireNECoordinateWidgets(View v){
+
+        GBActivity myActivity = (GBActivity)getActivity();
 
         //make DD vs DMS on the project work by making various views invisible
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        boolean isDD = false;
-        if (openProject.getDDvDMS() == GBProject.sDD)isDD = true;
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
+        boolean isDD = GBGeneralSettings.isLocDD(myActivity);
 
         int distUnits = openProject.getDistanceUnits();
 
@@ -966,13 +917,16 @@ public class GBPointEditFragment extends Fragment  {
         View field_container;
         TextView label;
 
-        GBActivity myActivity = (GBActivity)getActivity();
-
-
         //set up the widgets for the easting/northing coordinate
 
+        //The location fields order may be reversed on the screen
+        //NOTE TO MAINTENANCE PROGRAMMER:
+        // This can be tricky, so remember the kludge is to just change the names on the UI
 
         field_container = v.findViewById(R.id.eastingContainer);
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.northingContainer);
+        }
         label = (TextView) field_container.findViewById(R.id.en_label) ;
         label.setText(getString(R.string.easting_label));
         final EditText pointEastingMetersInput =
@@ -981,11 +935,6 @@ public class GBPointEditFragment extends Fragment  {
                                               InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                               InputType.TYPE_NUMBER_FLAG_SIGNED);
 
-        final EditText pointEastingFeetInput   =
-                                        (EditText) field_container.findViewById(R.id.feetOutput);
-        pointEastingFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
-                                            InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                                            InputType.TYPE_NUMBER_FLAG_SIGNED);
 
 
         pointEastingMetersInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -996,12 +945,7 @@ public class GBPointEditFragment extends Fragment  {
                     String temp = pointEastingMetersInput.getText().toString();
                     if (!temp.equals(mPointEastingMetersOld)){
                         setPointChangedFlags();
-                        // so convert Meters to Feet
-                        GBUtilities.convertMetersToFeet(getActivity(),
-                                                         pointEastingMetersInput,
-                                                         pointEastingFeetInput);
                         mPointEastingMetersOld = temp;
-                        mPointEastingFeetOld = pointEastingFeetInput.getText().toString();
                     }
 
                 }
@@ -1009,49 +953,25 @@ public class GBPointEditFragment extends Fragment  {
         });
 
 
-
-        pointEastingFeetInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    //Feet just lost focus,
-                    // has the value changed
-                    String temp = pointEastingFeetInput.getText().toString();
-                    if (!temp.equals(mPointEastingFeetOld)){
-                        setPointChangedFlags();
-                        // so convert Feet to Meters
-                        GBUtilities.convertFeetToMeters(getActivity(),
-                                                         pointEastingMetersInput,
-                                                         pointEastingFeetInput);
-                        mPointEastingFeetOld = temp;
-                        mPointEastingMetersOld = pointEastingMetersInput.getText().toString();
-                    }
-
-                }
-            }
-        });
 
         if (mPointPath.equals(GBPath.sEditFromMaps)) {
 
             pointEastingMetersInput.setFocusable(false);
             pointEastingMetersInput.setBackgroundColor(
-                    ContextCompat.getColor(getActivity(), R.color.colorGray));
-            pointEastingFeetInput.setFocusable(false);
-            pointEastingFeetInput.setBackgroundColor(
-                    ContextCompat.getColor(getActivity(), R.color.colorGray));
-
+                                            ContextCompat.getColor(getActivity(), R.color.colorGray));
         }
 
 
 
         field_container = v.findViewById(R.id.northingContainer);
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.eastingContainer);
+        }
+
         label = (TextView) field_container.findViewById(R.id.en_label) ;
         label.setText(getString(R.string.northing_label));
         final EditText pointNorthingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
         pointNorthingMetersInput.setInputType(InputType.TYPE_CLASS_NUMBER |
-                                            InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                                            InputType.TYPE_NUMBER_FLAG_SIGNED);
-        final EditText pointNorthingFeetInput   = (EditText)field_container.findViewById(R.id.feetOutput);
-        pointNorthingFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
                                             InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                             InputType.TYPE_NUMBER_FLAG_SIGNED);
 
@@ -1063,45 +983,18 @@ public class GBPointEditFragment extends Fragment  {
                     String temp = pointNorthingMetersInput.getText().toString();
                     if (!temp.equals(mPointNorthingMetersOld)){
                         setPointChangedFlags();
-                        // so convert Meters to Feet
-                        GBUtilities.convertMetersToFeet(getActivity(),
-                                                         pointNorthingMetersInput,
-                                                         pointNorthingFeetInput);
-                        mPointNorthingMetersOld = temp;
-                        mPointNorthingFeetOld = pointNorthingFeetInput.getText().toString();
+                         mPointNorthingMetersOld = temp;
                     }
 
                 }
             }
         });
 
-        pointNorthingFeetInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    //Feet just lost focus,
-                    // has the value changed
-                    String temp = pointNorthingFeetInput.getText().toString();
-                    if (!temp.equals(mPointNorthingFeetOld)){
-                        setPointChangedFlags();
-                        // so convert Feet to Meters
-                        GBUtilities.convertFeetToMeters(getActivity(),
-                                                         pointNorthingMetersInput,
-                                                         pointNorthingFeetInput);
-                        mPointNorthingFeetOld = temp;
-                        mPointNorthingMetersOld = pointNorthingMetersInput.getText().toString();
-                    }
-
-                }
-            }
-        });
 
         if (mPointPath.equals(GBPath.sEditFromMaps)) {
 
             pointNorthingMetersInput.setFocusable(false);
             pointNorthingMetersInput.setBackgroundColor(
-                    ContextCompat.getColor(getActivity(), R.color.colorGray));
-            pointNorthingFeetInput.setFocusable(false);
-            pointNorthingFeetInput.setBackgroundColor(
                     ContextCompat.getColor(getActivity(), R.color.colorGray));
 
         }
@@ -1113,10 +1006,6 @@ public class GBPointEditFragment extends Fragment  {
         pointENElevationMetersInput.setInputType(InputType.TYPE_CLASS_NUMBER |
                                                 InputType.TYPE_NUMBER_FLAG_DECIMAL |
                                                 InputType.TYPE_NUMBER_FLAG_SIGNED);
-        final EditText pointENElevationFeetInput   = (EditText)field_container.findViewById(R.id.elevationFeetInput);
-        pointENElevationFeetInput.setInputType(InputType.TYPE_CLASS_NUMBER |
-                                                InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                                                InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         pointENElevationMetersInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             public void onFocusChange(View v, boolean hasFocus) {
@@ -1126,12 +1015,7 @@ public class GBPointEditFragment extends Fragment  {
                     String temp = pointENElevationMetersInput.getText().toString();
                     if (!temp.equals(mPointENElevationMetersOld)){
                         setPointChangedFlags();
-                        // so convert Meters to Feet
-                        GBUtilities.convertMetersToFeet(getActivity(),
-                                                         pointENElevationMetersInput,
-                                                         pointENElevationFeetInput);
                         mPointENElevationMetersOld = temp;
-                        mPointENElevationFeetOld = pointENElevationFeetInput.getText().toString();
                     }
 
                 }
@@ -1139,48 +1023,12 @@ public class GBPointEditFragment extends Fragment  {
         });
 
 
-        pointENElevationFeetInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    //Feet just lost focus,
-                    // has the value changed
-                    String temp = pointENElevationFeetInput.getText().toString();
-                    if (!temp.equals(mPointENElevationFeetOld)){
-                        setPointChangedFlags();
-                        // so convert Feet to Meters
-                        GBUtilities.convertFeetToMeters(getActivity(),
-                                                        pointENElevationMetersInput,
-                                                        pointENElevationFeetInput);
-                        mPointENElevationFeetOld = temp;
-                        mPointENElevationMetersOld = pointENElevationMetersInput.getText().toString();
-                    }
-
-                }
-            }
-        });
 
         if (mPointPath.equals(GBPath.sEditFromMaps)) {
 
             pointENElevationMetersInput.setFocusable(false);
             pointENElevationMetersInput.setBackgroundColor(
                     ContextCompat.getColor(getActivity(), R.color.colorGray));
-            pointENElevationFeetInput.setFocusable(false);
-            pointENElevationFeetInput.setBackgroundColor(
-                    ContextCompat.getColor(getActivity(), R.color.colorGray));
-
-        }
-
-
-        if (distUnits == GBProject.sMeters){
-            pointENElevationFeetInput.setVisibility(View.GONE);
-            pointEastingFeetInput    .setVisibility(View.GONE);
-            pointNorthingFeetInput   .setVisibility(View.GONE);
-
-        } else {
-            pointENElevationMetersInput.setVisibility(View.GONE);
-            pointEastingMetersInput    .setVisibility(View.GONE);
-            pointNorthingMetersInput   .setVisibility(View.GONE);
-
         }
 
 
@@ -1310,7 +1158,7 @@ public class GBPointEditFragment extends Fragment  {
         //show the data that came out of the input arguments bundle
         long projectID = mPointBeingMaintained.getForProjectID();
 
-        return GBCoordinate.getCoordinateTypeFromProjectID(projectID);
+        return GBCoordinate.getCoordinateCategoryFromProjectID(projectID);
     }
 
 
@@ -1412,6 +1260,46 @@ public class GBPointEditFragment extends Fragment  {
         pointOffsetHeadInput.setText(String.valueOf(mPointBeingMaintained.getOffsetHeading()));
         pointOffsetEleInput .setText(String.valueOf(mPointBeingMaintained.getOffsetElevation()));
 
+
+        if (mPointBeingMaintained.getCoordinate() == null){
+            pointOffsetDistInput.setEnabled(true);
+            pointOffsetHeadInput.setEnabled(true);
+            pointOffsetEleInput .setEnabled(true);
+
+            pointOffsetDistInput.setBackgroundColor(Color.WHITE);
+            pointOffsetEleInput.setBackgroundColor(Color.WHITE);
+            pointOffsetHeadInput.setBackgroundColor(Color.WHITE);
+        } else {
+            pointOffsetDistInput.setEnabled(false);
+            pointOffsetHeadInput.setEnabled(false);
+            pointOffsetEleInput .setEnabled(false);
+
+            pointOffsetDistInput.setBackgroundColor(Color.GRAY);
+            pointOffsetEleInput.setBackgroundColor(Color.GRAY);
+            pointOffsetHeadInput.setBackgroundColor(Color.GRAY);
+
+        }
+        EditText hdopView      = (EditText) v.findViewById(R.id.pointHdopInput);
+        EditText vdopView      = (EditText) v.findViewById(R.id.pointVdopInput);
+
+        EditText pdopView      = (EditText) v.findViewById(R.id.pointPdopInput);
+        EditText hrmsView      = (EditText) v.findViewById(R.id.pointHrmsInput);
+        EditText vrmsView      = (EditText) v.findViewById(R.id.pointVrmsInput);
+
+        hdopView.setText(String.valueOf(mPointBeingMaintained.getHdop()));
+        vdopView.setText(String.valueOf(mPointBeingMaintained.getVdop()));
+
+        pdopView.setText(String.valueOf(mPointBeingMaintained.getPdop()));
+
+        int digitsOfPrecision = GBGeneralSettings.getStdDevPrecision((GBActivity)getActivity());
+        String hrmsString = GBUtilities.truncatePrecisionString(mPointBeingMaintained.getHrms(),
+                                                                digitsOfPrecision);
+        String vrmsString = GBUtilities.truncatePrecisionString(mPointBeingMaintained.getVrms(),
+                                                                digitsOfPrecision);
+        hrmsView.setText(hrmsString);
+        vrmsView.setText(vrmsString);
+
+
     }
 
     private boolean initializeSpcsZone(View v, int zone){
@@ -1470,8 +1358,17 @@ public class GBPointEditFragment extends Fragment  {
         View v = getView();
         if (v == null)return;
 
-        View field_container = v.findViewById(R.id.latitudeContainer);
+        //The location fields order may be reversed on the screen
+        //NOTE TO MAINTENANCE PROGRAMMER:
+        // This can be tricky, so remember the kludge is to just change the names on the UI
+        GBActivity myActivity = (GBActivity)getActivity();
 
+
+
+        View field_container = v.findViewById(R.id.latitudeContainer);
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.longitudeContainer);
+        }
         EditText pointLatitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
         EditText pointLatitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
         EditText pointLatitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
@@ -1484,6 +1381,9 @@ public class GBPointEditFragment extends Fragment  {
 
 
         field_container = v.findViewById(R.id.longitudeContainer);
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.latitudeContainer);
+        }
         EditText pointLongitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
         EditText pointLongitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
         EditText pointLongitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
@@ -1496,33 +1396,38 @@ public class GBPointEditFragment extends Fragment  {
 
         field_container = v.findViewById(R.id.elevationGeoidContainer);
         EditText pointElevationMetersInput = (EditText) field_container.findViewById(R.id.elevationMetersInput);
-        EditText pointElevationFeetInput = (EditText) field_container.findViewById(R.id.elevationFeetInput);
         EditText pointGeoidMetersInput = (EditText) field_container.findViewById(R.id.geoidHeightMetersInput);
-        EditText pointGeoidFeetInput = (EditText) field_container.findViewById(R.id.geoidHeightFeetInput);
 
 
         mPointElevationMetersOld = pointElevationMetersInput.getText().toString();
-        mPointElevationFeetOld   = pointElevationFeetInput.getText().toString();
         mPointGeoidMetersOld     = pointGeoidMetersInput.getText().toString();
-        mPointGeoidFeetOld       = pointGeoidFeetInput.getText().toString();
-
     }
 
     private void saveENFieldsAsOldValues(){
         View v = getView();
         if (v ==null)return;
 
+        //The location fields order may be reversed on the screen
+        //NOTE TO MAINTENANCE PROGRAMMER:
+        // This can be tricky, so remember the kludge is to just change the names on the UI
+
+        GBActivity myActivity = (GBActivity)getActivity();
+
+
         View field_container = v.findViewById(R.id.eastingContainer);
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.northingContainer);
+        }
         EditText pointEastingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
-        EditText pointEastingFeetInput = (EditText)field_container.findViewById(R.id.feetOutput);
 
         field_container = v.findViewById(R.id.northingContainer);
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.eastingContainer);
+        }
         EditText pointNorthingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
-        EditText pointNorthingFeetInput = (EditText)field_container.findViewById(R.id.feetOutput);
 
         field_container = v.findViewById(R.id.elevationContainer);
         EditText pointENElevationMetersInput = (EditText)field_container.findViewById(R.id.elevationMetersInput);
-        EditText pointENElevationFeetInput   = (EditText)field_container.findViewById(R.id.elevationFeetInput);
 
         field_container = v.findViewById(R.id.zhlContainer);
         EditText pointZoneInput       = (EditText) field_container.findViewById(R.id.zoneOutput);
@@ -1535,14 +1440,9 @@ public class GBPointEditFragment extends Fragment  {
         EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
 
         mPointEastingMetersOld = pointEastingMetersInput.getText().toString();
-        mPointEastingFeetOld   = pointEastingFeetInput.getText().toString();
-
         mPointNorthingMetersOld = pointNorthingMetersInput.getText().toString();
-        mPointNorthingFeetOld   = pointNorthingFeetInput.getText().toString();
-
         mPointENElevationMetersOld = pointENElevationMetersInput.getText().toString();
-        mPointENElevationFeetOld   = pointENElevationFeetInput.getText().toString();
-/*
+ /*
         mPointZoneOld       = pointZoneInput.getText().toString();
         mPointHemisphereOld = pointHemisphereInput.getText().toString();
         mPointLatbandOld    = pointLatbandInput.getText().toString();
@@ -1560,86 +1460,44 @@ public class GBPointEditFragment extends Fragment  {
         GBCoordinateLL coordinate = (GBCoordinateLL) point.getCoordinate();
         if (coordinate == null) return;
 
-        double latitude = coordinate.getLatitude();
-        double longitude = coordinate.getLongitude();
-        double elevation = coordinate.getElevation();
-        double geoid     = coordinate.getGeoid();
 
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-
-        double eleFeet;
-        double geoidFeet;
-        int distUnits = openProject.getDistanceUnits();
-        if ((distUnits == GBProject.sFeet) || (distUnits == GBProject.sMeters)){
-            eleFeet = coordinate.getElevationFeet();
-            geoidFeet = coordinate.getGeoidFeet();
-        } else {//distance units are international feet
-            eleFeet = coordinate.getElevationIFeet();
-            geoidFeet = coordinate.getGeoidIFeet();
-        }
+        GBActivity myActivity = (GBActivity)getActivity();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
 
 
+
+        //The location fields order may be reversed on the screen
+        //NOTE TO MAINTENAINCE PROGRAMMER:
+        // This can be tricky, so remember the kludge is to just change the names
         View field_container = v.findViewById(R.id.latitudeContainer);
 
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.longitudeContainer);
+        }
+
+        EditText pointLatitudeHemInput = (EditText) field_container.findViewById(R.id.ll_dir);
         EditText pointLatitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
         EditText pointLatitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
         EditText pointLatitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
         EditText pointLatitudeSInput  = (EditText) field_container.findViewById(R.id.ll_s_Input) ;
 
-        field_container = v.findViewById(R.id.elevationGeoidContainer);
-        EditText pointElevationMetersInput =
-                (EditText) field_container.findViewById(R.id.elevationMetersInput);
-        EditText pointElevationFeetInput =
-                (EditText) field_container.findViewById(R.id.elevationFeetInput);
-        EditText pointGeoidMetersInput =
-                (EditText) field_container.findViewById(R.id.geoidHeightMetersInput);
-        EditText pointGeoidFeetInput =
-                (EditText) field_container.findViewById(R.id.geoidHeightFeetInput);
-
-        pointLatitudeDDInput.setText(String.valueOf(latitude));
-        pointLatitudeDInput.setText(String.valueOf(coordinate.getLatitudeDegree()));
-        pointLatitudeMInput.setText(String.valueOf(coordinate.getLatitudeMinute()));
-        pointLatitudeSInput.setText(String.valueOf(coordinate.getLatitudeSecond()));
-
         field_container = v.findViewById(R.id.longitudeContainer);
+        if (GBGeneralSettings.isLngLat(myActivity)) {
+            field_container = v.findViewById(R.id.latitudeContainer);
+        }
+
+        EditText pointLongitudeHemInput = (EditText) field_container.findViewById(R.id.ll_dir);
         EditText pointLongitudeDDInput = (EditText) field_container.findViewById(R.id.ll_dd_input);
         EditText pointLongitudeDInput  = (EditText) field_container.findViewById(R.id.ll_d_Input) ;
         EditText pointLongitudeMInput  = (EditText) field_container.findViewById(R.id.ll_m_Input);
         EditText pointLongitudeSInput  = (EditText) field_container.findViewById(R.id.ll_s_Input) ;
 
-        pointLongitudeDDInput.setText(String.valueOf(longitude));
-        pointLongitudeDInput.setText(String.valueOf(coordinate.getLongitudeDegree()));
-        pointLongitudeMInput.setText(String.valueOf(coordinate.getLongitudeMinute()));
-        pointLongitudeSInput.setText(String.valueOf(coordinate.getLongitudeSecond()));
 
-
-        pointElevationMetersInput.setText(String.valueOf(elevation));
-        pointElevationFeetInput.setText(String.valueOf(eleFeet));
-
-        pointGeoidMetersInput.setText(String.valueOf(geoid));
-        pointGeoidFeetInput.setText(String.valueOf(geoidFeet));
-
-        if (latitude < 0.0){
-            pointLatitudeDDInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLatitudeDInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLatitudeMInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLatitudeSInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-        if (longitude < 0.0){
-            pointLongitudeDDInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLongitudeDInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLongitudeMInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointLongitudeSInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-        if (elevation < 0.0){
-            pointElevationMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointElevationFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-        if (geoid < 0.0){
-            pointGeoidMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointGeoidFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-
+        field_container = v.findViewById(R.id.elevationGeoidContainer);
+        EditText pointElevationMetersInput =
+                (EditText) field_container.findViewById(R.id.elevationMetersInput);
+        EditText pointGeoidMetersInput =
+                (EditText) field_container.findViewById(R.id.geoidHeightMetersInput);
 
 
         field_container = v.findViewById(R.id.convergenceContainer);
@@ -1650,19 +1508,68 @@ public class GBPointEditFragment extends Fragment  {
         EditText pointScaleFactorInput = (EditText) field_container.findViewById(R.id.scaleFactorOutput);
 
 
-         pointConvergenceInput.setText(String.valueOf(coordinate.getConvergenceAngle()));
+        boolean isDD = GBGeneralSettings.isLocDD(myActivity);
+        boolean isDir = GBGeneralSettings.isDir(myActivity);
 
-        boolean isCA = true;
-        convertDDtoDMS(getActivity(),
-                pointConvergenceInput,
-                pointCAdegInput,
-                pointCAminInput,
-                pointCAsecInput,
-                isCA,
-                false);
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        if (isDD){
+            double latitude  = coordinate.getLatitude();
+            int posHemi = R.string.hemisphere_N;
+            int negHemi = R.string.hemisphere_S;
+            GBUtilities.locDD(myActivity, latitude, locDigOfPrecision,
+                    isDir, posHemi, negHemi, pointLatitudeHemInput, pointLatitudeDDInput);
+
+            double longitude = coordinate.getLongitude();
+            posHemi = R.string.hemisphere_E;
+            negHemi = R.string.hemisphere_W;
+            GBUtilities.locDD(myActivity, longitude, locDigOfPrecision,
+                    isDir, posHemi, negHemi, pointLongitudeHemInput, pointLongitudeDDInput);
+
+            double convAngle = coordinate.getConvergenceAngle();
+            GBUtilities.caDD(myActivity, convAngle, locDigOfPrecision, pointConvergenceInput);
+
+        } else {
+            int deg = coordinate.getLatitudeDegree();
+            int min = coordinate.getLatitudeMinute();
+            double sec = coordinate.getLatitudeSecond();
+
+            int posHemi = R.string.hemisphere_N;
+            int negHemi = R.string.hemisphere_S;
+
+            GBUtilities.locDMS(myActivity, deg, min, sec, locDigOfPrecision,
+                    isDir, posHemi, negHemi, pointLatitudeHemInput,
+                    pointLatitudeDInput, pointLatitudeMInput, pointLatitudeSInput);
+
+            deg = coordinate.getLongitudeDegree();
+            min = coordinate.getLongitudeMinute();
+            sec = coordinate.getLongitudeSecond();
+            posHemi = R.string.hemisphere_E;
+            negHemi = R.string.hemisphere_W;
+
+            GBUtilities.locDMS(myActivity, deg, min, sec, locDigOfPrecision,
+                    isDir, posHemi, negHemi, pointLongitudeDInput,
+                    pointLongitudeDInput, pointLongitudeMInput, pointLongitudeSInput);
 
 
-        pointScaleFactorInput.setText(String.valueOf(coordinate.getScaleFactor()));
+            int caDegOfPrecision = GBGeneralSettings.getCAPrecision(myActivity);
+            deg = coordinate.getConvergenceAngleDegree();
+            min = coordinate.getConvergenceAngleMinute();
+            sec = coordinate.getConvergenceAngleSecond();
+            GBUtilities.caDMS(myActivity,deg, min, sec,
+                    caDegOfPrecision,
+                    pointCAdegInput, pointCAminInput, pointCAsecInput);
+
+        }
+
+
+        double elevation = coordinate.getElevation();
+        double geoid     = coordinate.getGeoid();
+
+        GBUtilities.locDistance(myActivity, elevation, pointElevationMetersInput);
+        GBUtilities.locDistance(myActivity, geoid, pointGeoidMetersInput);
+
+        int sfPrecision  = GBGeneralSettings.getSfPrecision(myActivity);
+        pointScaleFactorInput   .setText(truncatePrecisionString(sfPrecision, coordinate.getScaleFactor()));
 
     }
 
@@ -1670,48 +1577,36 @@ public class GBPointEditFragment extends Fragment  {
         GBCoordinateEN coordinate = (GBCoordinateEN)point.getCoordinate();
         if (coordinate == null)return;
 
-        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
-        double easting   = coordinate.getEasting();
-        double northing  = coordinate.getNorthing();
-        double elevation = coordinate.getElevation();
-        double geoid     = coordinate.getGeoid();
+        GBActivity myActivity = (GBActivity)getActivity();
 
-        double eastingFeet;
-        double northingFeet;
-        double eleFeet;
-        double geoidFeet;
-        int distUnits = openProject.getDistanceUnits();
-        if ((distUnits == GBProject.sFeet) || (distUnits == GBProject.sMeters)){
-            eastingFeet  = coordinate.getEastingFeet();
-            northingFeet = coordinate.getNorthingFeet();
-            eleFeet      = coordinate.getElevationFeet();
-            geoidFeet    = coordinate.getGeoidFeet();
-        } else {//distance units are international feet
-            eastingFeet  = coordinate.getEastingIFeet();
-            northingFeet = coordinate.getNorthingIFeet();
-            eleFeet      = coordinate.getElevationIFeet();
-            geoidFeet    = coordinate.getGeoidIFeet();
-        }
-
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(myActivity);
 
         View field_container = v.findViewById(R.id.eastingContainer);
+
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.northingContainer);
+        }
         EditText pointEastingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
-        EditText pointEastingFeetInput = (EditText)field_container.findViewById(R.id.feetOutput);
+
+
 
         field_container = v.findViewById(R.id.northingContainer);
+        if (GBGeneralSettings.isEN(myActivity)) {
+            field_container = v.findViewById(R.id.eastingContainer);
+        }
         EditText pointNorthingMetersInput = (EditText)field_container.findViewById(R.id.metersOutput);
-        EditText pointNorthingFeetInput = (EditText)field_container.findViewById(R.id.feetOutput);
 
         field_container = v.findViewById(R.id.elevationContainer);
         EditText pointENElevationMetersInput = (EditText)field_container.findViewById(R.id.elevationMetersInput);
-        EditText pointENElevationFeetInput   = (EditText)field_container.findViewById(R.id.elevationFeetInput);
 
         field_container = v.findViewById(R.id.zhlContainer);
+        TextView pointZoneLabel       = (TextView) field_container.findViewById(R.id.coord_label);
         EditText pointZoneInput       = (EditText) field_container.findViewById(R.id.zoneOutput);
         EditText pointHemisphereInput = (EditText) field_container.findViewById(R.id.hemisphereOutput);
         EditText pointLatbandInput    = (EditText) field_container.findViewById(R.id.latbandOutput);
 
         field_container = v.findViewById(R.id.convergenceContainer);
+        TextView pointDataumLabel      = (TextView) field_container.findViewById(R.id.datumLabel);
         EditText pointDatumInput       = (EditText) field_container.findViewById(R.id.datumOutput);
         EditText pointConvergenceInput = (EditText) field_container.findViewById(R.id.convergenceOutput);
         EditText pointCAdegInput       = (EditText) field_container.findViewById(R.id.convDegreesInput);
@@ -1721,29 +1616,23 @@ public class GBPointEditFragment extends Fragment  {
 
         field_container = v.findViewById(R.id.elevationContainer);
         EditText pointElevationMetersInput = (EditText) field_container.findViewById(R.id.elevationMetersInput);
-        EditText pointElevationFeetInput = (EditText) field_container.findViewById(R.id.elevationFeetInput);
         EditText pointGeoidMetersInput = (EditText) field_container.findViewById(R.id.geoidHeightMetersInput);
-        EditText pointGeoidFeetInput = (EditText) field_container.findViewById(R.id.geoidHeightFeetInput);
 
 
-        pointEastingMetersInput.setText(String.valueOf(easting));
-        pointEastingFeetInput.setText(String.valueOf(eastingFeet));
+        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        int caPrecision  = GBGeneralSettings.getCAPrecision(myActivity);
+        int sfPrecision  = GBGeneralSettings.getSfPrecision(myActivity);
 
-        pointNorthingMetersInput.setText(String.valueOf(northing));
-        pointNorthingFeetInput.setText(String.valueOf(northingFeet));
 
-        pointENElevationMetersInput.setText(String.valueOf(elevation));
-        pointENElevationFeetInput.setText(String.valueOf(eleFeet));
 
-        // TODO: 7/14/2017 Does UTM really not have geoid???
-       // pointGeoidMetersInput.setText(String.valueOf(geoid));
-       // pointGeoidFeetInput.setText(String.valueOf(geoidFeet));
-
-        pointZoneInput.setText(String.valueOf(coordinate.getZone()));
+        boolean isDD = GBGeneralSettings.isLocDD(myActivity);
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        int caDigOfPrecision  = GBGeneralSettings.getCAPrecision(myActivity);
 
         int coordinateDBType = coordinate.getCoordinateDBType();
         if (coordinateDBType == GBCoordinate.sCoordinateDBTypeUTM){
             //fill in the UTM specific fields
+            pointZoneInput.setText(String.valueOf(coordinate.getZone()));
             GBCoordinateUTM coordinateUTM = (GBCoordinateUTM) point.getCoordinate();
             char latBandChar    = coordinateUTM.getLatBand();
             char hemisphereChar = coordinateUTM.getHemisphere();
@@ -1753,130 +1642,50 @@ public class GBPointEditFragment extends Fragment  {
             pointHemisphereInput.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.colorGrayish));
 
         } else if (coordinateDBType == GBCoordinate.sCoordinateDBTypeSPCS){
-            GBCoordinateSPCS coordinateSPCS = (GBCoordinateSPCS)point.getCoordinate();
-            String stateString = coordinateSPCS.getState().toString();
+            //Zone is already on the screen, so get rid of this row
+            pointZoneLabel      .setVisibility(View.GONE);
+            pointZoneInput      .setVisibility(View.GONE);
+            pointHemisphereInput.setVisibility(View.GONE);
+            pointLatbandInput   .setVisibility(View.GONE);
 
-            pointHemisphereInput.setText(getString(R.string.spc_state_label));
-            pointHemisphereInput.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorScreenBackground));
+            pointDataumLabel    .setVisibility(View.GONE);
+            pointDatumInput     .setVisibility(View.GONE);
+        }
 
-            pointLatbandInput.setText(stateString);
+
+        GBUtilities.locDistance(myActivity, coordinate.getEasting(),  pointEastingMetersInput);
+        GBUtilities.locDistance(myActivity, coordinate.getNorthing(), pointNorthingMetersInput);
+
+        GBUtilities.locDistance(myActivity, coordinate.getElevation(),pointElevationMetersInput);
+        GBUtilities.locDistance(myActivity, coordinate.getGeoid(),    pointGeoidMetersInput);
+
+        if (isDD){
+            double convAngle = coordinate.getConvergenceAngle();
+            GBUtilities.caDD(myActivity, convAngle, caDigOfPrecision, pointConvergenceInput);
+
+        } else {
+
+            int deg = coordinate.getConvergenceAngleDegree();
+            int min = coordinate.getConvergenceAngleMinute();
+            double sec = coordinate.getConvergenceAngleSecond();
+            GBUtilities.caDMS(myActivity,deg, min, sec, caDigOfPrecision,
+                    pointCAdegInput, pointCAminInput, pointCAsecInput);
 
         }
 
+
+        pointScaleFactorInput .setText(truncatePrecisionString(sfPrecision, coordinate.getScaleFactor()));
+
+
+        // TODO: 7/30/2017 is Datum necessiary to the UI? Should the field be eliminated?
         pointDatumInput.setText(String.valueOf(coordinate.getDatum()));
-        pointConvergenceInput.setText(String.valueOf(coordinate.getConvergenceAngle()));
 
-        boolean isCA = true;
-        convertDDtoDMS(getActivity(),
-                pointConvergenceInput,
-                pointCAdegInput,
-                pointCAminInput,
-                pointCAsecInput,
-                isCA,
-                false);
-
-
-
-
-        pointScaleFactorInput.setText(String.valueOf(coordinate.getScaleFactor()));
-
-        if (elevation < 0.0){
-            pointElevationMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointElevationFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-        if (easting < 0.0){
-            pointEastingMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointEastingFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
-        if (northing < 0.0){
-            pointNorthingMetersInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-            pointNorthingFeetInput.setTextColor(ContextCompat.getColor(getActivity(), colorNegNumber));
-        }
 
     }
 
-
-    // TODO: 6/19/2017 figrue out how to use the one on GBCoordinateLL
-    //Conversion for UI fields
-    //last parameter indicates whether latitude (true) or longitude (false)
-    boolean convertDDtoDMS(Context context,
-                           EditText tudeDDInput,
-                           EditText tudeDInput,
-                           EditText tudeMInput,
-                           EditText tudeSInput,
-                           boolean  isCA,
-                           boolean  isLatitude) {
-
-        String tudeString = tudeDDInput.getText().toString().trim();
-        if (tudeString.isEmpty()) {
-            tudeString = context.getString(R.string.zero_decimal_string);
-            tudeDDInput.setText(tudeString);
-        }
-
-        double tude = Double.parseDouble(tudeString);
-
-        //The user inputs have to be within range to be
-        //no range check necessary for convergence angle
-        if (((!isCA) &&   isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
-                ((!isCA) && (!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
-
-            tudeDInput.setText(R.string.zero_decimal_string);
-            tudeMInput.setText(R.string.zero_decimal_string);
-            tudeSInput.setText(R.string.zero_decimal_string);
-            return false;
-        }
-
-        //check sign of tude
-        boolean isTudePos = true;
-        int tudeColor= colorPosNumber;
-        if (tude < 0) {
-            //tude is negative, remember this and work with the absolute value
-            tude = Math.abs(tude);
-            isTudePos = false;
-            tudeColor = colorNegNumber;
-        }
-
-        //strip out the decimal parts of tude
-        int tudeDegree = (int) tude;
-
-        double degree = tudeDegree;
-
-        //digital degrees minus degrees will be decimal minutes plus seconds
-        //converting to int strips out the seconds
-        double minuteSec = tude - degree;
-        double minutes = minuteSec * 60.;
-        int tudeMinute = (int) minutes;
-        double minuteOnly = (double) tudeMinute;
-
-        //start with the DD, subtract out Degrees, subtract out Minutes
-        //convert the remainder into whole seconds
-        double tudeSecond = (tude - degree - (minuteOnly / 60.)) * (60. * 60.);
-        //tudeSecond = (tude - minutes) * (60. *60.);
-
-        //If tude was negative before, restore it to negative
-        if (!isTudePos) {
-            //tude       = 0. - tude;
-            tudeDegree = 0 - tudeDegree;
-            tudeMinute = 0 - tudeMinute;
-            tudeSecond = 0. - tudeSecond;
-        }
-
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(tudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        tudeSecond = bd.doubleValue();
-
-        //show the user the result
-        tudeDInput.setText(String.valueOf(tudeDegree));
-        tudeMInput.setText(String.valueOf(tudeMinute));
-        tudeSInput.setText(String.valueOf(tudeSecond));
-
-        tudeDDInput.setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeDInput .setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeMInput .setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeSInput .setTextColor(ContextCompat.getColor(context, tudeColor));
-
-        return true;
+    //truncate digits of precision
+    private String truncatePrecisionString(int digitsOfPrecision, double reading) {
+        return GBUtilities.truncatePrecisionString(reading, digitsOfPrecision);
     }
 
 
@@ -2035,7 +1844,7 @@ public class GBPointEditFragment extends Fragment  {
             EditText pointOffsetHeadInput  = (EditText) v.findViewById(R.id.pointOffHeadInput);
             EditText pointHdopInput = (EditText) v.findViewById(R.id.pointHdopInput);
             EditText pointVdopInput = (EditText) v.findViewById(R.id.pointVdopInput);
-            EditText pointTdopInput = (EditText) v.findViewById(R.id.pointTdopInput);
+
             EditText pointPdopInput = (EditText) v.findViewById(R.id.pointPdopInput);
             EditText pointHrmsInput = (EditText) v.findViewById(R.id.pointHrmsInput);
             EditText pointVrmsInput = (EditText) v.findViewById(R.id.pointVrmsInput);

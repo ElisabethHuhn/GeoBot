@@ -1,14 +1,11 @@
 package com.asc.msigeosystems.geobot;
 
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 
 /**
@@ -25,14 +22,17 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
 
     private ArrayList<GBCoordinateWGS84> mCoordinateList;
     private GBActivity mActivity;
-    private boolean mDdVdms;       //true = Digital Degrees, False = Degrees, Minutes, Seconds
+    private boolean mIsDD;       //true = Digital Degrees, False = Degrees, Minutes, Seconds
     private int mMetersVfeet;  //0 = Meters, 1 = Feet, 2 = international Feet
+    private boolean mIsDir;   //true Dir field determines sign of location
+
 
     //implement the ViewHolder as an inner class
     class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView timeView, validView, fixedView, latDDView, latDegView, latMinView, latSecView;
         TextView lngDDView, lngDegView, lngMinView, lngSecView, eleView, geoidView;
+        TextView latDirView, lngDirView;
 
         MyViewHolder(View v) {
             super(v);
@@ -43,20 +43,39 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
             eleView    = (TextView) v.findViewById(R.id.coordinateRowElevation);
             geoidView  = (TextView) v.findViewById(R.id.coordinateRowGeoid) ;
 
-            if (mDdVdms){
-                latDDView  = (TextView) v.findViewById(R.id.coordinateRowLatitude) ;
-                lngDDView  = (TextView) v.findViewById(R.id.coordinateRowLongitude) ;
+            latDirView = (TextView) v.findViewById(R.id.coordinateRowLatDir);
+            lngDirView = (TextView) v.findViewById(R.id.coordinateRowLngDir);
+
+            latDDView  = (TextView) v.findViewById(R.id.coordinateRowLatitude) ;
+            lngDDView  = (TextView) v.findViewById(R.id.coordinateRowLongitude) ;
+
+            latDegView = (TextView) v.findViewById(R.id.coordinateRowLatitudeDeg);
+            latMinView = (TextView) v.findViewById(R.id.coordinateRowLatitudeMin);
+            latSecView = (TextView) v.findViewById(R.id.coordinateRowLatitudeSec);
+
+            lngDegView = (TextView) v.findViewById(R.id.coordinateRowLongitudeDeg);
+            lngMinView = (TextView) v.findViewById(R.id.coordinateRowLongitudeMin);
+            lngSecView = (TextView) v.findViewById(R.id.coordinateRowLongitudeSec);
+
+            if (!mIsDir){
+                latDirView.setVisibility(View.GONE);
+                lngDirView.setVisibility(View.GONE);
+            }
+             if (mIsDD){
+
+                latDegView.setVisibility(View.GONE);
+                latMinView.setVisibility(View.GONE);
+                latSecView.setVisibility(View.GONE);
+
+                lngDegView.setVisibility(View.GONE);
+                lngMinView.setVisibility(View.GONE);
+                lngSecView.setVisibility(View.GONE);
 
             } else {
-                latDegView = (TextView) v.findViewById(R.id.coordinateRowLatitudeDeg);
-                latMinView = (TextView) v.findViewById(R.id.coordinateRowLatitudeMin);
-                latSecView = (TextView) v.findViewById(R.id.coordinateRowLatitudeSec);
+                latDDView.setVisibility(View.GONE);
+                lngDDView.setVisibility(View.GONE);
 
-                lngDegView = (TextView) v.findViewById(R.id.coordinateRowLongitudeDeg);
-                lngMinView = (TextView) v.findViewById(R.id.coordinateRowLongitudeMin);
-                lngSecView = (TextView) v.findViewById(R.id.coordinateRowLongitudeSec);
-
-            }
+             }
 
         }
 
@@ -65,24 +84,21 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
     //Constructor for GBRawCoordinateAdapter
     GBCoordinateRawAdapter(GBActivity activity,
                            ArrayList<GBCoordinateWGS84> coordinateList,
-                           boolean ddVdms,
+                           boolean ddVdms, boolean isDir,
                            int metersVfeet){
         this.mActivity       = activity;
         this.mCoordinateList = coordinateList;
-        this.mDdVdms         = ddVdms;
+        this.mIsDD = ddVdms;
+        this.mIsDir          = isDir;
         this.mMetersVfeet    = metersVfeet;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
-        if (mDdVdms) {
-            itemView = LayoutInflater.from(parent.getContext())
-                                .inflate(R.layout.data_list_row_coordinate_raw_dd, parent, false);
-        } else {
-            itemView = LayoutInflater.from(parent.getContext())
-                                .inflate(R.layout.data_list_row_coordinate_raw_dms, parent, false);
-        }
+        itemView = LayoutInflater.from(parent.getContext())
+                                    .inflate(R.layout.data_list_row_coordinate_raw, parent, false);
+
         return new MyViewHolder(itemView);
 
     }
@@ -98,7 +114,7 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
 
         GBCoordinateWGS84 coordinate = mCoordinateList.get(position);
 
-        long timestamp = (long)coordinate.getTime();
+        long timestamp = coordinate.getTime();
         String timeStampString = GBUtilities.getDateTimeString(timestamp);
         holder.timeView .setText(timeStampString);
 
@@ -111,46 +127,48 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
         holder.fixedView.setText(fixedString);
 
 
-        if (mDdVdms){
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(mActivity);
+        if (mIsDD){
             double latitude  = coordinate.getLatitude();
             double longitude = coordinate.getLongitude();
+            int posHemi = R.string.hemisphere_N;
+            int negHemi = R.string.hemisphere_S;
+            GBUtilities.locDD(mActivity, latitude, locDigOfPrecision,
+                              mIsDir, posHemi, negHemi, holder.latDirView, holder.latDDView);
+            posHemi = R.string.hemisphere_E;
+            negHemi = R.string.hemisphere_W;
+            GBUtilities.locDD(mActivity, longitude, locDigOfPrecision,
+                              mIsDir, posHemi, negHemi, holder.lngDirView, holder.lngDDView);
 
-            setDD(latitude, holder.latDDView);
-            setDD(longitude, holder.lngDDView);
 
         } else {
             int deg = coordinate.getLatitudeDegree();
             int min = coordinate.getLatitudeMinute();
             double sec = coordinate.getLatitudeSecond();
+            int posHemi = R.string.hemisphere_N;
+            int negHemi = R.string.hemisphere_S;
 
-            setDMS(deg, min, sec, holder.latDegView, holder.latMinView, holder.latSecView);
+            GBUtilities.locDMS(mActivity, deg, min, sec, locDigOfPrecision,
+                                mIsDir, posHemi, negHemi, holder.latDirView,
+                                holder.latDegView, holder.latMinView, holder.latSecView);
 
             deg = coordinate.getLongitudeDegree();
             min = coordinate.getLongitudeMinute();
             sec = coordinate.getLongitudeSecond();
+            posHemi = R.string.hemisphere_E;
+            negHemi = R.string.hemisphere_W;
 
-            setDMS(deg, min, sec, holder.lngDegView, holder.lngMinView, holder.lngSecView);
+            GBUtilities.locDMS(mActivity, deg, min, sec, locDigOfPrecision,
+                                mIsDir, posHemi, negHemi, holder.latDirView,
+                                holder.lngDegView, holder.lngMinView, holder.lngSecView);
+
         }
         double elevation = coordinate.getElevation();
         double geoid     = coordinate.getGeoid();
 
+        GBUtilities.locDistance(mActivity, elevation, holder.eleView);
+        GBUtilities.locDistance(mActivity, geoid, holder.geoidView);
 
-        if (mMetersVfeet == GBProject.sFeet){
-
-            elevation = coordinate.getElevationFeet();
-            geoid     = coordinate.getGeoidFeet();
-
-        } else if (mMetersVfeet == GBProject.sIntFeet){ //mMetersVfeet = GBProject.sIntFeet
-
-            elevation = coordinate.getElevationIFeet();
-            geoid     = coordinate.getGeoidIFeet();
-
-        }
-        String elevationString = String.valueOf(elevation);
-        String geoidString     = String.valueOf(geoid);
-
-        holder.eleView.setText(elevationString);
-        holder.geoidView.setText(geoidString);
 
     }
 
@@ -164,115 +182,6 @@ class GBCoordinateRawAdapter extends RecyclerView.Adapter<GBCoordinateRawAdapter
         }
         return returnValue;
     }
-
-
-    //Conversion for UI DD to DMS fields
-    //last parameter indicates whether latitude (true) or longitude (false)
-
-    boolean convertDDtoDMS(GBActivity activity,
-                           double  tude,
-                           TextView tudeDInput,
-                           TextView tudeMInput,
-                           TextView tudeSInput,
-                           boolean  isLatitude) {
-
-        String tudeString;
-        if (tude == 0d){
-            tudeString = activity.getString(R.string.zero_decimal_string);
-        } else {
-            tudeString = String.valueOf(tude);
-        }
-
-
-        //The user inputs have to be within range to be
-        if (   (isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
-             ((!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
-
-            tudeDInput.setText(R.string.zero_decimal_string);
-            tudeMInput.setText(R.string.zero_decimal_string);
-            tudeSInput.setText(R.string.zero_decimal_string);
-            return false;
-        }
-
-        //check sign of tude
-        boolean isTudePos = true;
-        int tudeColor= R.color.colorPosNumber;
-        if (tude < 0) {
-            //tude is negative, remember this and work with the absolute value
-            tude = Math.abs(tude);
-            isTudePos = false;
-            tudeColor = R.color.colorNegNumber;
-        }
-
-        //strip out the decimal parts of tude
-        int tudeDegree = (int) tude;
-
-        double degree = tudeDegree;
-
-        //digital degrees minus degrees will be decimal minutes plus seconds
-        //converting to int strips out the seconds
-        double minuteSec = tude - degree;
-        double minutes = minuteSec * 60.;
-        int tudeMinute = (int) minutes;
-        double minuteOnly = (double) tudeMinute;
-
-        //start with the DD, subtract out Degrees, subtract out Minutes
-        //convert the remainder into whole seconds
-        double tudeSecond = (tude - degree - (minuteOnly / 60.)) * (60. * 60.);
-        //tudeSecond = (tude - minutes) * (60. *60.);
-
-        //If tude was negative before, restore it to negative
-        if (!isTudePos) {
-            //tude       = 0. - tude;
-            tudeDegree = 0 - tudeDegree;
-            tudeMinute = 0 - tudeMinute;
-            tudeSecond = 0. - tudeSecond;
-        }
-
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(tudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        tudeSecond = bd.doubleValue();
-
-        //show the user the result
-        tudeDInput.setText(String.valueOf(tudeDegree));
-        tudeMInput.setText(String.valueOf(tudeMinute));
-        tudeSInput.setText(String.valueOf(tudeSecond));
-
-
-        tudeDInput .setTextColor(ContextCompat.getColor(activity, tudeColor));
-        tudeMInput .setTextColor(ContextCompat.getColor(activity, tudeColor));
-        tudeSInput .setTextColor(ContextCompat.getColor(activity, tudeColor));
-
-        return true;
-    }
-
-    //Sets color and value for Digital Degree fields
-    void setDD(double tude, TextView tudeView){
-        String tudeString = String.valueOf(tude);
-        int tudeColor= R.color.colorPosNumber;
-        if (tude < 0) {
-            tudeColor = R.color.colorNegNumber;
-        }
-        tudeView.setTextColor(ContextCompat.getColor(mActivity, tudeColor));
-        tudeView.setText(tudeString);
-    }
-
-    void setDMS(int d, int m, double s, TextView dView, TextView mView, TextView sView){
-
-        int tudeColor= R.color.colorPosNumber;
-        if ((d < 0) || (m < 0) || (s < 0)) {
-            tudeColor = R.color.colorNegNumber;
-        }
-        dView.setTextColor(ContextCompat.getColor(mActivity, tudeColor));
-        dView.setText(String.valueOf(d));
-        mView.setTextColor(ContextCompat.getColor(mActivity, tudeColor));
-        mView.setText(String.valueOf(m));
-        sView.setTextColor(ContextCompat.getColor(mActivity, tudeColor));
-        sView.setText(String.valueOf(s));
-    }
-
-
 
 
 }

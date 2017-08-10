@@ -33,7 +33,7 @@
             />
         <EditText
             android:id               = "@+id/elevationMetersInput"
-            android:hint             = "@string/type_elevation_meters_label"
+            android:hint             = "@string/type_elevation_label"
             android:layout_gravity   = "center_horizontal"
             android:gravity          = "center"
             android:layout_height    = "wrap_content"
@@ -47,25 +47,6 @@
 
             android:textColor        = "@color/colorTextBlack"
             android:background       = "@color/colorGrayish"
-            />
-
-        <EditText
-            android:id="@+id/elevationFeetInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginEnd="@dimen/row_cap_margin"
-            android:layout_weight="75"
-            android:background="@color/colorGrayish"
-
-            android:enabled="false"
-            android:gravity="center"
-
-            android:hint="@string/type_elevation_feet_label"
-
-            android:inputType="numberSigned|numberDecimal"
-            android:textColor="@color/colorTextBlack"
-
             />
 
     </LinearLayout>
@@ -93,7 +74,7 @@
 
         <EditText
             android:id               = "@+id/geoidHeightMetersInput"
-            android:hint             = "@string/type_geoid_height_meters_label"
+            android:hint             = "@string/type_geoid_height_label"
             android:layout_gravity   = "center_horizontal"
             android:gravity          = "center"
             android:layout_height    = "wrap_content"
@@ -101,24 +82,6 @@
             android:layout_weight    = "70"
 
             android:layout_marginEnd = "@dimen/row_between_fields_margin"
-            android:enabled="false"
-
-            android:inputType        = "numberSigned|numberDecimal"
-
-            android:textColor        = "@color/colorTextBlack"
-            android:background       = "@color/colorGrayish"
-            />
-
-        <EditText
-            android:id               = "@+id/geoidHeightFeetInput"
-            android:hint             = "@string/type_geoid_height_feet_label"
-            android:layout_gravity   = "center_horizontal"
-            android:gravity          = "center"
-            android:layout_height    = "wrap_content"
-            android:layout_width     = "0dp"
-            android:layout_weight    = "75"
-
-            android:layout_marginEnd = "@dimen/row_cap_margin"
             android:enabled="false"
 
             android:inputType        = "numberSigned|numberDecimal"

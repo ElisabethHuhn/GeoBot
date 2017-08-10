@@ -1,8 +1,5 @@
 package com.asc.msigeosystems.geobot;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 /**
  * Created by Elisabeth Huhn on 5/25/2016.
  * This coordinate extends the basic capabilities of Prism4DCoordinateEN
@@ -16,71 +13,10 @@ import java.math.RoundingMode;
 class GBCoordinateUTM extends GBCoordinateEN {
 
 
-    static final String sDatum = "UTM";
+    private static final String sDatum = "UTM";
 
     private   char         mHemisphere;  //N or S
     private   char         mLatBand;
-
-    /* ***************************************************/
-    /* ***    Constants and intermediate results    ******/
-    /* ***************************************************/
-    //Conversion Constants
-    //Defined globally in the Utilities
-    //protected double GBUtilities.sEquatorialRadiusA = 6378137.0;
-    //protected double GBUtilities.sPolarRadiusB      = 6356752.314245; //polar semi axis;
-
-    //protected double a = GBUtilities.sEquatorialRadiusA; //equatorialRadiusA;
-    //private   double b = GBUtilities.sPolarRadiusB;      //polarRadiusB;
-
-    //double flatteningF = (equatorialRadiusA-polarRadiusB)/equatorialRadiusA;
-    //double flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
-    //double flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
-
-    //mean radius = sqrt (equatorialRadius * polarRadius)
-
-
-
-    // eccentricity  (.0066943801)1/2 = 0.0818191915
-    protected double e ;
-    //protected double ee ;
-
-    private double n,  n2, n3, n4, n5, n6; //n1,
-    private double a1dot1, a1dot2, a1dot3, a1dot4, a1dot5, a1dot6;
-    private double         a2dot2, a2dot3, a2dot4, a2dot5, a2dot6;
-    private double                 a3dot3, a3dot4, a3dot5, a3dot6;
-    private double                         a4dot4, a4dot5, a4dot6;
-    private double                                 a5dot5, a5dot6;
-    private double                                         a6dot6;
-
-    /*
-    protected double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
-            a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
-            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
-            a4dot4 - a4dot5 + a4dot6,//alpha[3]
-            a5dot5 - a5dot6,//alpha[4]
-            a6dot6};//alpha5]
-*/
-
-    protected double A ;
-
-    //scale the result to give the transverse Mercator easting and northing
-    // UTM scale on the central meridian
-    private double K0;
-
-
-
-
-
-    //alpha α is one-based array (6th order Krüger expressions)
-    //The number of terms used in the series calculations below
-
-    //Karney (12) takes it to n4, (35) to n8
-    //protected double alpha[];
-
-
-    //set in setConstants
-    private double mFalseEasting ;
-    private double mFalseNorthing;
 
 
     /* ******
@@ -92,19 +28,20 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
     GBCoordinateUTM(){super.initializeDefaultVariables();}
 
-    GBCoordinateUTM(String zoneString,
+    GBCoordinateUTM(GBActivity activity,
+                    String zoneString,
                     String latbandString,
                     String hemisphereString,
                     String eastingString,
-                    String eastingFString,
                     String northingString,
-                    String northingFString,
                     String elevationString,
-                    String elevationFString,
                     String geoidString,
-                    String geoidFString,
                     String convergenceString,
                     String scaleString){
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int distUnits = openProject.getDistanceUnits();
+
         int zone = Integer.valueOf(zoneString);
         if ((zone < 1) || (zone > 60)){
             setValidCoordinate(false);
@@ -121,10 +58,10 @@ class GBCoordinateUTM extends GBCoordinateEN {
         }
         setHemisphere(hemi);
 
-        setEasting  (getMeters(eastingString,   eastingFString));
-        setNorthing (getMeters(northingString,  northingFString));
-        setElevation(getMeters(elevationString, elevationFString));
-        setGeoid    (getMeters(geoidString,     geoidFString));
+        setEasting  (getMeters(eastingString,   distUnits));
+        setNorthing (getMeters(northingString,  distUnits));
+        setElevation(getMeters(elevationString, distUnits));
+        setGeoid    (getMeters(geoidString,     distUnits));
 
         setConvergenceAngle(Double.valueOf(convergenceString));
         setScaleFactor(Double.valueOf(scaleString));
@@ -136,7 +73,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //initialize all variables to their defaults
         super.initializeDefaultVariables();
         convertWGStoUTM(coordinate.getLatitude(), coordinate.getLongitude());
-        mDatum = sDatum; //eg WGS84
+        setDatum( sDatum); //eg WGS84
         setElevation(coordinate.getElevation());
         setGeoid(coordinate.getGeoid());
     }
@@ -145,7 +82,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //initialize all variables to their defaults
         super.initializeDefaultVariables();
         convertNADtoUTM(coordinate.getLatitude(), coordinate.getLongitude());
-        mDatum = sDatum; //eg NAD83
+        setDatum( sDatum); //eg NAD83
     }
 
 
@@ -185,8 +122,8 @@ class GBCoordinateUTM extends GBCoordinateEN {
         //initialize all variables common to EN coordinates
         super.initializeDefaultVariables();
 
-        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeUTM;
-        mDatum               = sDatum; //eg WGS84
+        setCoordinateDBType( GBCoordinate.sCoordinateDBTypeUTM);
+        setDatum(sDatum); //eg WGS84
 
     }
 
@@ -241,7 +178,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
      *  {}  Invalid Argument Exception when Lat/Long not numbers or not within range
 
      ***/
-    void convertLLtoUTM (double lat, double longi) {
+    private void convertLLtoUTM(double lat, double longi) {
 
         //Assert that the input parameters are valid (ie are actually numbers)
         if (Double.isNaN(lat) || Double.isNaN(longi)){
@@ -274,8 +211,186 @@ class GBCoordinateUTM extends GBCoordinateEN {
         // zones 1 to 30
 
 
-        setConstants();
+        //Karney:
+        //Consider an ellipsoid of revolution with:
+        // a = equatorial radius
+        // b = polar semi axis, i.e. polar radius
+        // f = flattening = (a - b) / a
+        // e = eccentricity =  sqrt[f * (2.-f)]
+        // n = third flattening = (a-b)/(a+b) = f / (2.-f)
 
+        //WGS84 Datum constants
+        //Karney 2010 page 5
+        //From the Ellipsoid
+        //double equatorialRadiusA = 6378137.0; //equatorial radius in meters
+        //double polarRadiusB = 6356752.314245; //polar semi axis
+
+        //flattening = (equatorialRadius-polarRadius)/equatorialRadius;
+        //double a = GBUtilities.sEquatorialRadiusA; //equatorialRadiusA;
+        //double b = GBUtilities.sPolarRadiusB;      //polarRadiusB;
+
+        //flatteningF = (equatorialRadiusA-polarRadiusB)/equatorialRadiusA;
+        //flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
+        //flatteningF = (a-b)/a;
+        double flatteningF  = GBUtilities.sFlattening;
+        //mean radius = sqrt (equatorialRadius * polarRadius)
+
+   /* ***************************************************/
+    /* ***    Constants and intermediate results    ******/
+    /* ***************************************************/
+        //Conversion Constants
+        //Defined globally in the Utilities
+        //protected double GBUtilities.sEquatorialRadiusA = 6378137.0;
+        //protected double GBUtilities.sPolarRadiusB      = 6356752.314245; //polar semi axis;
+
+        //protected double a = GBUtilities.sEquatorialRadiusA; //equatorialRadiusA;
+        //private   double b = GBUtilities.sPolarRadiusB;      //polarRadiusB;
+
+        //double flatteningF = (equatorialRadiusA-polarRadiusB)/equatorialRadiusA;
+        //double flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
+        //double flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
+
+        //mean radius = sqrt (equatorialRadius * polarRadius)
+
+
+
+          //protected double ee ;
+
+
+    /*
+    protected double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
+            a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
+            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
+            a4dot4 - a4dot5 + a4dot6,//alpha[3]
+            a5dot5 - a5dot6,//alpha[4]
+            a6dot6};//alpha5]
+*/
+
+
+
+
+
+
+
+        //alpha α is one-based array (6th order Krüger expressions)
+        //The number of terms used in the series calculations below
+
+        //Karney (12) takes it to n4, (35) to n8
+        //protected double alpha[];
+
+
+
+
+
+        // eccentricity  (.0066943801)1/2 = 0.0818191915
+        double e = Math.sqrt(flatteningF *(2.- flatteningF));
+        //double ee = Math.sqrt(1. - Math.pow((b/a),2.));
+
+
+
+        //prepare the array for Karney (12) and (35)
+        // WGS84 n = .0033528107/1.9966471893 = .0016792204
+        double n = flatteningF / (2. - flatteningF); // 3rd flattening
+
+
+
+        //alpha α is one-based array (6th order Krüger expressions)
+        //The number of terms used in the series calculations below
+        //double n = (equatorialRadiusA - polarRadiusB)/ (equatorialRadiusA+polarRadiusB);
+        double n2 = n*n; //.0000028197
+        double n3 = n*n2;//.0000000047
+        double n4 = n*n3;
+        double n5 = n*n4;
+        double n6 = n*n5;
+        //double n7 = n*n6; //6 terms are sufficient. Accuracy lost in 7 and 8
+        //double n8 = n*n7;
+
+
+        double a1dot1 = (1.0/2.0)*n;
+        double a1dot2 = (2.0/3.0)*n2;
+        double a1dot3 = (5.0/16.0)*n3;
+        double a1dot4 = (41.0/180.0)*n4;
+        double a1dot5 = (127.0/288.0)*n5;
+        double a1dot6 = (7891.0/37800.0)*n6;
+        //double a1dot7 = (72161/387072)*n7;
+        //double a1dot8 = (18975107/50803200)*n8;
+
+
+        double a2dot2 = (13.0/48.0)*n2;
+        double a2dot3 = (3/5.0)    *n3;
+        double a2dot4 = (557.0/1440.0) *n4;
+        double a2dot5 = (281.0/630.0)     *n5;
+        double a2dot6 = (1983433.0/1935360.0)*n6;
+        //double a2dot7 = (13769.0/28800.0)      *n7;
+        //double a2dot8 = (148003883.0/174182400.0)*n8;
+
+
+        double a3dot3 = (61.0/240.0)*n3;
+        double a3dot4 = (103.0/140.0)*n4;
+        double a3dot5 = (15061.0/26880.0)*n5;
+        double a3dot6 = (167603.0/181440.0)*n6;
+        //double a3dot7 = (67102379.0/29030400.0)*n7;
+        //double a3dot8 = (79682431.0/79833600.0) *n8;
+
+
+        double a4dot4 = (49561.0/161280.0)*n4;
+        double a4dot5 = (179.0/168.0)*n5;
+        double a4dot6 = (6601661.0/7257600.0)*n6;
+        //double a4dot7 = (97445.0/49896.00)*n7;
+        //double a4dot8 = (40176129013.0/7664025600.0)*n8; //does this need to be truncated?
+
+
+        double a5dot5 = (34729.0/80640.0)*n5;
+        double a5dot6 = (3418889.0/1995840.0)*n6;
+        //double a5dot7 = (14644087.0/9123840.0)*n7;
+        //double a5dot8 = (2605413599.0/622702080.0)*n8;
+
+
+        double a6dot6 = (212378941.0/319334400.0)*n6;
+        //double a6dot7 = (30705481.0/10378368.0)*n7;
+        //double a6dot8 = (175214326799.0/58118860800.0)*n8;
+
+
+        //double a7dot7 = (1522256789.0/1383782400.0)*n7;
+        //double a7dot8 = (16759934899.0/3113510400.0)*n8;
+
+
+        //double a8dot8 = (1424729850961.0/743921418240.0)*n8; //Horner form
+
+/*
+        //Karney (12) takes it to n4, (35) to n8
+        double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
+                                   a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
+                                            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
+                                                     a4dot4 - a4dot5 + a4dot6,//alpha[3]
+                                                              a5dot5 - a5dot6,//alpha[4]
+                                                                       a6dot6};//alpha5]
+
+*/
+
+        //scale the result to give the transverse Mercator easting and northing
+        // UTM scale on the central meridian
+        double K0 = 0.9996;
+
+
+
+        // To avoid negative numbers, ‘false eastings’ and ‘false northings’ are used:
+        //Eastings are referenced in meters from the central meridian of each zone,
+        //Eastings are measured from 500,000 metres west of the central meridian
+        //Eastings (at the equator) range from 166,021m to 833,978m
+        // (the range decreases moving away from the equator);
+        // a point on the the central meridian has the value 500,000m.
+        double falseEasting = 500e3;
+
+
+
+
+        //In the northern hemisphere, northings are measured in meters from the equator –
+        // ranging from 0 at the equator to 9,329,005m at 84°N).
+        //In the southern hemisphere they are measured from 10,000,000 metres
+        // south of the equator (close to the pole) –
+        // ranging from 1,116,915m at 80°S to 10,000,000m at the equator.
+        double falseNorthing = 10000e3;
 
         // phi    φ = latitude
         // lamda  λ = longitude
@@ -472,7 +587,8 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
         // 2πA is the circumference of a meridian
         //Karney (14) and (29)
-        A = (GBUtilities.sEquatorialRadiusA/(1.+n)) * (1. + (1./4.)*n2 + (1./64.)*n4 + (1./256.)*n6);// + (25/16384)*n8);
+        double A = (GBUtilities.sEquatorialRadiusA/(1.+n)) *
+                            (1. + (1./4.)*n2 + (1./64.)*n4 + (1./256.)*n6);// + (25/16384)*n8);
 
 
 
@@ -541,185 +657,19 @@ class GBCoordinateUTM extends GBCoordinateEN {
         // To avoid negative numbers, ‘false eastings’ and ‘false northings’ are used:
 
         // shift easting/northing to false origins
-        mEasting = mEasting + mFalseEasting;    // make easting relative to false easting
+        mEasting = mEasting + falseEasting;    // make easting relative to false easting
 
 
         // make northing in southern hemisphere relative to false northing
         if (mNorthing < 0.){
-            mNorthing = mNorthing + mFalseNorthing;
+            mNorthing = mNorthing + falseNorthing;
         }
 
         //double x = mEasting;
         //double y = mNorthing;
 
-
-
-        // round to reasonable precision of 6 decimal places - nanometer precision
-        BigDecimal bdx = new BigDecimal(mEasting).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        mEasting = bdx.doubleValue();
-
-        BigDecimal bdy = new BigDecimal(mNorthing).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        mNorthing = bdy.doubleValue(); // nm precision
-
-
-
-        //report convergence to 9 decimal places
-        // toDegrees() converts a radians number to degrees
-        // degrees = radians * (360 / 2 pi)
-        double nuDegrees = nu * (360. / (2. * Math.PI));
-        BigDecimal bdConvergence = new BigDecimal(nuDegrees).
-                setScale(GBUtilities.sNanometerDigitsOfPrecision,
-                        RoundingMode.HALF_UP);
-        mConvergenceAngle = bdConvergence.doubleValue();
-
-
-        //report scale to 12 decimal places
-        BigDecimal bdScale = new BigDecimal(kappa).setScale(GBUtilities.sPicometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        super.mScaleFactor = bdScale.doubleValue();
         setValidCoordinate(true);
 
     }
-
-
-    private void setConstants() {
-        //Karney:
-        //Consider an ellipsoid of revolution with:
-        // a = equatorial radius
-        // b = polar semi axis, i.e. polar radius
-        // f = flattening = (a - b) / a
-        // e = eccentricity =  sqrt[f * (2.-f)]
-        // n = third flattening = (a-b)/(a+b) = f / (2.-f)
-
-        //WGS84 Datum constants
-        //Karney 2010 page 5
-        //From the Ellipsoid
-        //double equatorialRadiusA = 6378137.0; //equatorial radius in meters
-        //double polarRadiusB = 6356752.314245; //polar semi axis
-
-        //flattening = (equatorialRadius-polarRadius)/equatorialRadius;
-        //double a = GBUtilities.sEquatorialRadiusA; //equatorialRadiusA;
-        //double b = GBUtilities.sPolarRadiusB;      //polarRadiusB;
-
-        //flatteningF = (equatorialRadiusA-polarRadiusB)/equatorialRadiusA;
-        //flatteningF = 1/298.257223563; //0.0033528107 WGS numbers
-        //flatteningF = (a-b)/a;
-        double flatteningF  = GBUtilities.sFlattening;
-        //mean radius = sqrt (equatorialRadius * polarRadius)
-
-
-
-        // eccentricity  (.0066943801)1/2 = 0.0818191915
-        e = Math.sqrt(flatteningF *(2.- flatteningF));
-        //double ee = Math.sqrt(1. - Math.pow((b/a),2.));
-
-        //prepare the array for Karney (12) and (35)
-        // WGS84 n = .0033528107/1.9966471893 = .0016792204
-        n = flatteningF / (2. - flatteningF); // 3rd flattening
-
-
-
-        //alpha α is one-based array (6th order Krüger expressions)
-        //The number of terms used in the series calculations below
-        //double n = (equatorialRadiusA - polarRadiusB)/ (equatorialRadiusA+polarRadiusB);
-        n2 = n*n; //.0000028197
-        n3 = n*n2;//.0000000047
-        n4 = n*n3;
-        n5 = n*n4;
-        n6 = n*n5;
-        //double n7 = n*n6; //6 terms are sufficient. Accuracy lost in 7 and 8
-        //double n8 = n*n7;
-
-
-        a1dot1 = (1.0/2.0)*n;
-        a1dot2 = (2.0/3.0)*n2;
-        a1dot3 = (5.0/16.0)*n3;
-        a1dot4 = (41.0/180.0)*n4;
-        a1dot5 = (127.0/288.0)*n5;
-        a1dot6 = (7891.0/37800.0)*n6;
-        //double a1dot7 = (72161/387072)*n7;
-        //double a1dot8 = (18975107/50803200)*n8;
-
-
-        a2dot2 = (13.0/48.0)*n2;
-        a2dot3 = (3/5.0)    *n3;
-        a2dot4 = (557.0/1440.0) *n4;
-        a2dot5 = (281.0/630.0)     *n5;
-        a2dot6 = (1983433.0/1935360.0)*n6;
-        //double a2dot7 = (13769.0/28800.0)      *n7;
-        //double a2dot8 = (148003883.0/174182400.0)*n8;
-
-
-        a3dot3 = (61.0/240.0)*n3;
-        a3dot4 = (103.0/140.0)*n4;
-        a3dot5 = (15061.0/26880.0)*n5;
-        a3dot6 = (167603.0/181440.0)*n6;
-        //double a3dot7 = (67102379.0/29030400.0)*n7;
-        //double a3dot8 = (79682431.0/79833600.0) *n8;
-
-
-        a4dot4 = (49561.0/161280.0)*n4;
-        a4dot5 = (179.0/168.0)*n5;
-        a4dot6 = (6601661.0/7257600.0)*n6;
-        //double a4dot7 = (97445.0/49896.00)*n7;
-        //double a4dot8 = (40176129013.0/7664025600.0)*n8; //does this need to be truncated?
-
-
-        a5dot5 = (34729.0/80640.0)*n5;
-        a5dot6 = (3418889.0/1995840.0)*n6;
-        //double a5dot7 = (14644087.0/9123840.0)*n7;
-        //double a5dot8 = (2605413599.0/622702080.0)*n8;
-
-
-        a6dot6 = (212378941.0/319334400.0)*n6;
-        //double a6dot7 = (30705481.0/10378368.0)*n7;
-        //double a6dot8 = (175214326799.0/58118860800.0)*n8;
-
-
-        //double a7dot7 = (1522256789.0/1383782400.0)*n7;
-        //double a7dot8 = (16759934899.0/3113510400.0)*n8;
-
-
-        //double a8dot8 = (1424729850961.0/743921418240.0)*n8; //Horner form
-
-/*
-        //Karney (12) takes it to n4, (35) to n8
-        double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
-                                   a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
-                                            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
-                                                     a4dot4 - a4dot5 + a4dot6,//alpha[3]
-                                                              a5dot5 - a5dot6,//alpha[4]
-                                                                       a6dot6};//alpha5]
-
-*/
-
-        //scale the result to give the transverse Mercator easting and northing
-        // UTM scale on the central meridian
-        K0 = 0.9996;
-
-
-
-        // To avoid negative numbers, ‘false eastings’ and ‘false northings’ are used:
-        //Eastings are referenced in meters from the central meridian of each zone,
-        //Eastings are measured from 500,000 metres west of the central meridian
-        //Eastings (at the equator) range from 166,021m to 833,978m
-        // (the range decreases moving away from the equator);
-        // a point on the the central meridian has the value 500,000m.
-        mFalseEasting = 500e3;
-
-
-
-
-        //In the northern hemisphere, northings are measured in meters from the equator –
-        // ranging from 0 at the equator to 9,329,005m at 84°N).
-        //In the southern hemisphere they are measured from 10,000,000 metres
-        // south of the equator (close to the pole) –
-        // ranging from 1,116,915m at 80°S to 10,000,000m at the equator.
-        mFalseNorthing = 10000e3;
-
-    }
-
 
 }

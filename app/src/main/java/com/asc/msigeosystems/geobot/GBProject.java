@@ -32,7 +32,7 @@ public class GBProject {
     private static final String sProjectDescTag   = "PROJECT_DESCRIPTION";
     private static final String sProjectCoordType = "PROJECT_COORDINATE_TYPE";
     private static final String sProjectNxtPointNumbTag = "PROJECT_NXT_POINT_NUM";
-    //private static final String sProjectSettingsTag = "PROJECT_SETTINGS";
+
     //private static final String sProjectPointsTag = "PROJECT_POINTS";
 
     private static final String sProjectDefaultName  = "Project ";
@@ -61,26 +61,6 @@ public class GBProject {
 
 
 
-    static boolean getProjectExport (GBActivity activity, String tag) {
-        if (activity == null){
-            return false;
-        }
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        boolean defaultValue = true;
-        return sharedPref.getBoolean(tag, defaultValue);
-    }
-    static void    setProjectExport  (GBActivity activity, String tag, boolean isExported) {
-        if (activity == null){
-            return;
-        }
-        //Store the PersonID for the next time
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(tag, isExported);
-        editor.apply();
-    }
-
-
 
 
     //These constants define the order of the corresponding spinner positions
@@ -91,38 +71,7 @@ public class GBProject {
     static final String sFeetString     = "Feet";
     static final String sIntFeetString  = "International Feet";
 
-    static final int sAUTOSAVE = 0;
-    static final int sMANUAL   = 1;
 
-
-    static final int    sEN             = 0;//values for EN v NE
-    static final int    sNE             = 1;
-    static final String sENString       = "Easting / Northing";
-    static final String sNEString       = "Northing / Easting";
-
-
-    static final int    sLatLng         = 0;//values for LatLng v LngLat
-    static final int    sLngLat         = 1;
-    static final String sLatLngString   = "Latitude / Longitude";
-    static final String sLngLatString   = "Longitude / Latitude";
-
-
-    static final int    sRMS            = 0;//values for RMS v StdDev
-    static final int    sStdDev         = 1;
-    static final String sRMSString      = "RMS";
-    static final String sStdDevString   = "Standard Deviation";
-
-
-    static final int    sDD             = 0;//values for DD v DMS
-    static final int    sDMS            = 1;
-    static final String sDDString       = "Digital Degrees";
-    static final String sDMSString      = "Degrees Minutes Seconds";
-
-
-    static final int    sDirections         = 0;//values for Directions v PlusMinus
-    static final int    sPlusMinus          = 1;
-    static final String sDirectionsString   = "Directions N/S and E/W";
-    static final String sPlusMinusString    = "Plus for N & E, Minus for S & W";
 
     static final int sDataSourceNoneSelected            = 0;
     static final int sDataSourceWGSManual               = 1;
@@ -159,21 +108,11 @@ public class GBProject {
     private int          mNumMean;       // number of raw points in a mean calculation
     private int          mZone;          //spc Zone
     private int          mDistanceUnits; //0= Meters, 1=Feet
-    private int          mAutosave;
-    private int          mRMSvStD;       //Does the user prefer RMS notation or Standard Deviation
-    private int          mOrderOnUI;     //order of presentation on a screen eg.Easting/Northing or Lat/Lng
-    private int          mDDvDMS;        //Digital Degrees vs Degrees Minutes Seconds
-    private int          mDIRvPlusMinus; //Are Lat/Lng  in directions or plus/minus
     private int          mDataSource;    //eg phone gps vs external gps vs etc.
-
-    private int          mLocPrecision;  //number of digits of precision in UI
-    private int          mStdDevPrecision;
 
     private ArrayList<GBPoint>   mPoints;
     private ArrayList<GBPicture> mPictures;
-    //Settings are linked to the project with an attribute on the project settings
-    //which is the project ID the settings belong to
-    private GBProjectSettings    mSettings;
+
 
 
 
@@ -268,21 +207,10 @@ public class GBProject {
         this.mDescription  = "";
         this.mHeight       = 0d;
         this.mCoordinateDBType = GBCoordinate.sCoordinateDBTypeWGS84;
-        // TODO: 12/23/2016 Should we add in a default settings object here?
-        // TODO: 7/10/2017 Should we even have a separate project settings object?
-        //this.mSettings     = new GBProjectSettings();
         this.mNumMean       = 10;
         this.mZone          = 0;
         this.mDistanceUnits = sMeters;
-        this.mAutosave      = sMANUAL;
-        this.mRMSvStD       = sStdDev;
-        this.mOrderOnUI     = sNE;
-        this.mDDvDMS        = sDD;
-        this.mDIRvPlusMinus = sPlusMinus;
         this.mDataSource    = sDataSourcePhoneGps;
-
-        this.mLocPrecision    = GBUtilities.sHundredthsDigitsOfPrecision;
-        this.mStdDevPrecision = GBUtilities.sHundredthsDigitsOfPrecision;
 
         this.mPoints       = new ArrayList<>();
         this.mPictures     = new ArrayList<>();
@@ -298,10 +226,7 @@ public class GBProject {
     long  getProjectID()        { return mProjectID; }
     void  setProjectID(long id) {
         this.mProjectID = id;
-        GBProjectSettings projectSettings = this.getSettings();
-        if (projectSettings != null) {
-            projectSettings.setProjectID(id);
-        }
+
     }
 
 
@@ -452,44 +377,6 @@ public class GBProject {
         mDistanceUnits = distanceUnits;
     }
 
-    int  getAutosave() {
-        return mAutosave;
-    }
-    boolean isAutosave(){
-        return  (mAutosave == sAUTOSAVE);
-    }
-    void setAutosave(int autosave) {
-        mAutosave = autosave;
-    }
-
-    int  getRMSvStD() {
-        return mRMSvStD;
-    }
-    void setRMSvStD(int RMSvStD) {
-        mRMSvStD = RMSvStD;
-    }
-
-
-    int getUIOrder() {
-        return mOrderOnUI;
-    }
-    void setOrderOnUI(int orderOnUI) {
-        mOrderOnUI = orderOnUI;
-    }
-
-    int  getDDvDMS() {
-        return mDDvDMS;
-    }
-    void setDDvDMS(int DDvDMS) {
-        mDDvDMS = DDvDMS;
-    }
-
-    int  getDIRvPlusMinus() {
-        return mDIRvPlusMinus;
-    }
-    void setDIRvPlusMinus(int dIRvPlusMinus) {
-        mDIRvPlusMinus = dIRvPlusMinus;
-    }
 
 
     int  getDataSource() {
@@ -499,21 +386,6 @@ public class GBProject {
         mDataSource = dataSource;
     }
 
-
-
-    int  getLocPrecision() {
-        return mLocPrecision;
-    }
-    void setLocPrecision(int locPrecision) {
-        mLocPrecision = locPrecision;
-    }
-
-    int  getStdDevPrecision() {
-        return mStdDevPrecision;
-    }
-    void setStdDevPrecision(int stdDevPrecision) {
-        mStdDevPrecision = stdDevPrecision;
-    }
 
      //The cascade objects aren't pulled from the DB unless they are explicityly asked for
     //Creating a Project Object from the DB is not enough to populate the cascading objects
@@ -557,22 +429,6 @@ public class GBProject {
         return (!((mPictures == null) || (mPictures.size()==0)));
     }
 
-    GBProjectSettings getSettings(){
-        if (!areSettingsInMemory()) {
-            GBDatabaseManager databaseManager = GBDatabaseManager.getInstance();
-            mSettings = databaseManager.getProjectSettings(mProjectID);
-        }
-
-        if (mSettings == null){
-            mSettings = new GBProjectSettings();
-        }
-        return mSettings;
-    }
-    boolean areSettingsInMemory(){
-        return (!(mSettings == null));
-
-    }
-    void              setSettings(GBProjectSettings settings) {mSettings = settings;}
 
     //************************************/
     /*          Static Methods           */

@@ -18,7 +18,7 @@ class GBCoordinateSPCS extends GBCoordinateEN {
     //+**********      Static Constants                         **********/
     //+*******************************************************************/
 
-    static final String sDatum = "SPCS";
+    private static final String sDatum = "SPCS";
 
 
 
@@ -52,19 +52,19 @@ class GBCoordinateSPCS extends GBCoordinateEN {
 
     GBCoordinateSPCS() {initializeDefaultVariables(); }
 
-    GBCoordinateSPCS(String zoneString,
+    GBCoordinateSPCS(GBActivity activity,
+                     String zoneString,
                      String stateString,
                      String eastingString,
-                     String eastingFString,
                      String northingString,
-                     String northingFString,
                      String elevationString,
-                     String elevationFString,
                      String geoidString,
-                     String geoidFString,
                      String convergenceString,
                      String scaleString){
         initializeDefaultVariables();
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int distUnits = openProject.getDistanceUnits();
 
         if (GBUtilities.isEmpty(zoneString)){
             setZone((int) GBUtilities.ID_DOES_NOT_EXIST);
@@ -72,29 +72,25 @@ class GBCoordinateSPCS extends GBCoordinateEN {
             setZone(Integer.valueOf(zoneString));
         }
         setState    (stateString);
-        if ((!GBUtilities.isEmpty(eastingString))||
-            (!GBUtilities.isEmpty(eastingFString))) {
+        if (!GBUtilities.isEmpty(eastingString)) {
 
-            setEasting(getMeters(eastingString, eastingFString));
+            setEasting(getMeters(eastingString, distUnits));
         } else {
             setEasting(0d);
         }
-        if ((!GBUtilities.isEmpty(northingString))||
-            (!GBUtilities.isEmpty(northingFString))) {
-            setNorthing(getMeters(northingString, northingFString));
+        if (!GBUtilities.isEmpty(northingString)) {
+            setNorthing(getMeters(northingString, distUnits));
         } else {
             setNorthing(0d);
         }
-        if ((!GBUtilities.isEmpty(elevationString))||
-            (!GBUtilities.isEmpty(elevationFString))) {
+        if (!GBUtilities.isEmpty(elevationString)) {
 
-            setElevation(getMeters(elevationString, elevationFString));
+            setElevation(getMeters(elevationString, distUnits));
         } else {
             setElevation(0d);
         }
-        if ((!GBUtilities.isEmpty(geoidString))||
-            (!GBUtilities.isEmpty(geoidFString))) {
-            setGeoid(getMeters(geoidString, geoidFString));
+        if (!GBUtilities.isEmpty(geoidString)) {
+            setGeoid(getMeters(geoidString, distUnits));
         } else {
             setGeoid(0d);
         }
@@ -150,8 +146,8 @@ class GBCoordinateSPCS extends GBCoordinateEN {
         super.initializeDefaultVariables();
 
         //initialize all variables from this level
-        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeSPCS;
-        mDatum               = sDatum; //eg WGS84
+        setCoordinateDBType( GBCoordinate.sCoordinateDBTypeSPCS);
+        setDatum( sDatum); //eg WGS84
 
 
     }

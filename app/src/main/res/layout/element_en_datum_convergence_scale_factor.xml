@@ -16,6 +16,7 @@
         >
         <!-- Dataum -->
         <TextView
+            android:id="@+id/datumLabel"
             android:text="@string/datum_label"
             android:layout_height="wrap_content"
             android:layout_width="0dp"

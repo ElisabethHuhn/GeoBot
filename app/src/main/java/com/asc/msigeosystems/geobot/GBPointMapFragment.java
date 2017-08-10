@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -37,6 +36,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -61,7 +61,7 @@ import static android.provider.CalendarContract.CalendarCache.URI;
  * when the user is making point measurements in the field
  * Created by Elisabeth Huhn on 4/13/2016.
  */
-public class GBPointCollectFragment extends Fragment implements //OnMapReadyCallback,
+public class GBPointMapFragment extends Fragment implements //OnMapReadyCallback,
                                                                          //GpsStatus.Listener,
         LocationListener,
                                                                          GpsStatus.NmeaListener {
@@ -151,7 +151,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     private int    mOffsetCheckedID  = OFFSET_NEXT_ONLY + OFFSET_ID_CONSTANT;
 
 
- 
+
 
 
        //Token for the meaning process
@@ -163,7 +163,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //  the intervening time period
     private GBMeanToken mMeanToken;
 
- 
+
 
 
     //These fields come from NMEA, but ultimately are saved on the point
@@ -253,7 +253,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //* *******************************************************************/
     /*                Constructor                                         */
     //* *******************************************************************/
-    public GBPointCollectFragment() {
+    public GBPointMapFragment() {
         //for now, we don't need to initialize anything when the fragment
         //  is first created
     }
@@ -267,7 +267,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                              Bundle savedInstanceState) {
 
         //Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_points_collect_gb, container, false);
+        View v = inflater.inflate(R.layout.fragment_points_map_gb, container, false);
 
         //update the view with the mapsView
        // addMapsView(v);
@@ -279,14 +279,14 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         CharSequence projectName = GBUtilities.getInstance().
                                         getOpenProject((GBActivity)getActivity()).getProjectName();
-
+/* footer has been removed
         //Inform the user of the name of the open project
         TextView currentProjectField  = (TextView)v.findViewById(R.id.currentProjectField);
         String currentFileString = String.format(Locale.getDefault(),
                                                  getString(R.string.current_file_label),
                                                  projectName);
         currentProjectField.setText(currentFileString);
-
+*/
         initializeGPS();
 
         //Set the titlebar subtitle
@@ -603,7 +603,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     @Override
     public void onNmeaReceived(long timestamp, String nmea) {
         GBNmea nmeaData;
-        //todo maybe need to do something with the timestamp
 
         try {
              //Parse the raw GPS data
@@ -624,13 +623,14 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                 nmeaData = getNmeaFromTestData();
                 if (nmeaData == null)return;
             }
+            //********** END OF TESTING BLOCK *******************
 
+            //todo maybe need to do something with the timestamp
+            nmeaData.setTimeStamp(timestamp);
 
-// TODO: 6/18/2017 There is too much overlap between refineNmeaPosition and updateUIwNmeaPosition
-            //refine the lat/long position based on nmea type and the projects coordinate type
-            //truncates to number of digits we are interesed in
-            //strips out some types we aren't interested in
-            nmeaData = refineNmeaPosition(nmeaData);
+            //filters out all sentences other than the location sentences we are interested in
+            //keeps track of the satalite sentence DOP before dropping the nmea sentence
+            nmeaData = filterNmeaPosition(nmeaData);
             if (nmeaData == null)return;
 
             //update the UI
@@ -654,22 +654,24 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                     mMeanToken.setStartMeanTime(mNmeaData.getTime());
 
                     //No marker, so we have to create one
-                    LatLng newLocation = new LatLng(meanCoordinate.getLatitude(), meanCoordinate.getLongitude());
+                    LatLng newLocation = new LatLng(meanCoordinate.getLatitude(),
+                                                    meanCoordinate.getLongitude());
 
-                    mLastMarkerAdded   = makeNewMarker(newLocation,
-                            getString(R.string.collect_points_provisional_marker),
-                            markerColorProvisional);
+                    mLastMarkerAdded   = makeNewMarker( newLocation,
+                                                        getString(R.string.collect_points_provisional_marker),
+                                                        markerColorProvisional);
                 }
 
                 //is meaning done?
                 boolean isMeanComplete = isMeaningDone(nmeaData, mMeanToken);
-                mMeanToken.setLastPointInMean(isMeanComplete);
+
 
 
                 if (mMeanToken.isLastPointInMean()){
                     mMeanToken.setEndMeanTime(System.currentTimeMillis());
                     //the handler is smart enough to know whether to get location from nmea or mean
                     handleStorePosition(nmeaData, meanCoordinate);
+                    GBUtilities.soundMeanComplete((GBActivity)getActivity());
                 } else {
                     updateMapWMean(meanCoordinate);
                 }
@@ -700,34 +702,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //* ****************** Nmea Utilities ********************//
     //* **********************************************************//
 
-    private boolean updateCoordinateLabels(){
-        //*+********* Update the UI coordinate labels ******************/
-        //project has to be open
-        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
-        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return false;
 
-        int coordinateType = GBCoordinate.getCoordinateCategoryFromProjectID(openProjectID);
-        String nLable = "N: ";
-        String eLable = "E: ";
 
-        if (coordinateType == GBCoordinate.sLLWidgets) {
-            nLable = "Lat: ";
-            eLable = "Long: ";
-        }
-
-        View v = getView();
-        if (v != null) {
-            TextView currentNorthingPositionLable = (TextView) v.findViewById(R.id.currentNorthingPositionLabel);
-            TextView currentEastingPositionLabel = (TextView) v.findViewById(R.id.currentEastingPositionLabel);
-
-            currentNorthingPositionLable.setText(nLable);
-            currentEastingPositionLabel.setText(eLable);
-        }
-        return true;
-
-    }
-
-    private GBNmea refineNmeaPosition(GBNmea nmeaData){
+    private GBNmea filterNmeaPosition(GBNmea nmeaData){
 
         if (nmeaData == null)return null;
 
@@ -746,32 +723,11 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //the primary location sentences
         if ((type.contains("GGA")) || (type.contains("GNS")) ){
 
-            double nLat, eLong, ele;
-            GBCoordinateUTM utmCoordinate = null;
-
-            if (coordinateType == GBCoordinate.sLLWidgets){
-                nLat =   nmeaData.getLatitude();
-                eLong =  nmeaData.getLongitude();
-            } else {
-                // TODO: 12/7/2016 this conversion assumes wgs and utm. Bad assumption, fix
-                GBCoordinateWGS84 wgsCoordinate =
-                        new GBCoordinateWGS84(mNmeaData.getLatitude(), mNmeaData.getLongitude());
-
-                //The UTM constructor performs the conversion from WGS84
-                utmCoordinate = new GBCoordinateUTM(wgsCoordinate);
-                if (!wgsCoordinate.isValidCoordinate()){
-                    GBUtilities.getInstance().showStatus(getActivity(),R.string.coordinate_not_valid);
-
-                    throw new RuntimeException(getString(R.string.coordinate_not_valid));
-                }
-
-                nLat =  utmCoordinate.getNorthing();
-                eLong = utmCoordinate.getEasting();
+            //Location data at (0,0) is assumed to be invalid
+            if ((nmeaData.getLatitude() == 0.0d) && (nmeaData.getLongitude() == 0.0d)){
+                return null;
             }
-            ele = nmeaData.getOrthometricElevation();
 
-            nmeaData.setLatitude(nLat);
-            nmeaData.setLongitude(eLong);
 
             mPointQualityToken.setHdop(nmeaData.getHdop());
             return nmeaData;
@@ -801,6 +757,9 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     //truncates coordinate location fields as a side effect
     private GBNmea updateUIwNmeaPosition(GBNmea nmeaData){
 
+        View v = getView();
+        if (v == null) return null;
+
         if (nmeaData == null){
             //there was an exception processing the NMEA Sentence
             GBUtilities.getInstance().showStatus(getActivity(),R.string.null_type_found);
@@ -813,69 +772,57 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
         //*+********* Update the UI   ******************/
-        if (!updateCoordinateLabels())return null;
 
 
-        long openProjectID = GBUtilities.getInstance().getOpenProjectID((GBActivity)getActivity());
-        if (openProjectID == GBUtilities.ID_DOES_NOT_EXIST) return null;
-
-        int coordinateType = GBCoordinate.getCoordinateCategoryFromProjectID(openProjectID);
+        GBActivity activity = (GBActivity)getActivity();
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
 
         //the primary location sentences
         if ((type.contains("GGA")) || (type.contains("GNS")) ){
-            //update the location values
+            GBActivity myActivity = (GBActivity)getActivity();
+            //update the location values on the UI
+            GBCoordinateWGS84 wgsCoordinate = new GBCoordinateWGS84(myActivity, nmeaData);
+            GBCoordinate coordinate;
+            //But have to update using the coordinate of the project
+            int coordType = openProject.getCoordinateType();
+            if (coordType == GBCoordinate.sCoordinateDBTypeWGS84){
+                coordinate = wgsCoordinate;
 
-            double nLat, eLong, ele;
+            } else if (coordType == GBCoordinate.sCoordinateDBTypeSPCS){
+                coordinate = new GBCoordinateSPCS(wgsCoordinate, openProject.getZone());
 
-            nLat =   nmeaData.getLatitude();
-            eLong =  nmeaData.getLongitude();
+            } else if (coordType == GBCoordinate.sCoordinateDBTypeUTM){
+                coordinate = new GBCoordinateUTM(wgsCoordinate);
 
-
-            ele = nmeaData.getOrthometricElevation();
-
-            View v = getView();
-            if (v != null) {
-
-                TextView currentNorthingPositionField = (TextView) v.findViewById(R.id.currentNorthingPositionField);
-                TextView currentEastingPositionField  = (TextView) v.findViewById(R.id.currentEastingPositionField);
-                TextView currentElevationField        = (TextView) v.findViewById(R.id.currentElevationField);
-
-                GBActivity activity = (GBActivity)getActivity();
-
-                int locPrecision = GBGeneralSettings.getLocPrecision(activity);
-
-
-                String northingValue  = GBUtilities.truncatePrecisionString(nLat, locPrecision);
-                String eastingValue   = GBUtilities.truncatePrecisionString(eLong, locPrecision);
-                String elevationValue = GBUtilities.truncatePrecisionString(ele, locPrecision);
-
-                currentNorthingPositionField.setText(northingValue);
-                currentEastingPositionField.setText(eastingValue);
-                currentElevationField.setText(elevationValue);
+            } else {
+                coordinate = wgsCoordinate;
             }
+
+            updateCurrentPositionFields(coordinate);
+
             return nmeaData;
         }
 
         else if (type.contains("GSA")) {
             //update the footer values from the satellite;
             // TODO: 1/16/2017 GSA is the sentence that gives us the number of satellites in the fix
-              View v = getView();
-            if (v != null) {
-                TextView hdopField            = (TextView)v.findViewById(R.id.hdop_field);
-                TextView vdopField            = (TextView)v.findViewById(R.id.vdop_field);
-                TextView pdopField            = (TextView)v.findViewById(R.id.pdop_field);
 
-                String pdopValue = String.format(Locale.getDefault(),
-                                                getString(R.string.pdop_msg), nmeaData.getPdop());
-                String hdopValue = String.format(Locale.getDefault(),
-                                                getString(R.string.hdop_msg), nmeaData.getHdop());
-                String vdopValue = String.format(Locale.getDefault(),
-                                                getString(R.string.vdop_msg), nmeaData.getVdop());
+            TextView hdopField            = (TextView)v.findViewById(R.id.hdop_field);
+            TextView vdopField            = (TextView)v.findViewById(R.id.vdop_field);
+            TextView pdopField            = (TextView)v.findViewById(R.id.pdop_field);
 
-                pdopField.setText(pdopValue);
-                hdopField.setText(hdopValue);
-                vdopField.setText(vdopValue);
-            }
+
+            int locPrecision = GBGeneralSettings.getLocPrecision(activity);
+
+            String pdopValue = GBUtilities.truncatePrecisionString(nmeaData.getPdop(), locPrecision);
+            String hdopValue = GBUtilities.truncatePrecisionString(nmeaData.getHdop(), locPrecision);
+            String vdopValue = GBUtilities.truncatePrecisionString(nmeaData.getVdop(), locPrecision);
+/*
+            pdopField.setText(pdopValue);
+            hdopField.setText(hdopValue);
+            vdopField.setText(vdopValue);
+*/
+
             mPointQualityToken.setInFix( nmeaData.getSatellites());
             mPointQualityToken.setPdop ( nmeaData.getPdop());
             mPointQualityToken.setHdop ( nmeaData.getHdop());
@@ -890,6 +837,208 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
 
 
+    private void updateCurrentPositionFields(GBPoint point){
+        if (point == null)return;
+
+        //update the current position fields to the last point
+        View v = getView();
+        if (v == null) return;
+
+        TextView currentPointIDField = (TextView) v.findViewById(R.id.pointIDField);
+        TextView currentHeightField  = (EditText) v.findViewById(R.id.currentHeightField);
+        TextView currentFeatureCodeField = (EditText) v.findViewById(R.id.currentFeatureCodeField);
+
+        currentPointIDField    .setText(String.valueOf(point.getPointID()));
+        currentFeatureCodeField.setText(point.getPointFeatureCode());
+        currentHeightField     .setText(String.valueOf(point.getHeight()));
+
+        updateCurrentPositionFields(point.getCoordinate());
+      }
+
+    private void updateCurrentPositionFields(GBCoordinate coordinate ){
+        if (coordinate == null)return;
+
+        //update the current position fields to the last point
+        View v = getView();
+        if (v == null) return;
+
+        GBActivity myActivity = (GBActivity)getActivity();
+        boolean isPM = GBGeneralSettings.isPM(myActivity);
+        boolean isDD = GBGeneralSettings.isLocDD(myActivity);
+        int locDigOfPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        boolean isDir = GBGeneralSettings.isDir(myActivity);
+
+        boolean isLngLat = GBGeneralSettings.isLngLat(myActivity);
+        boolean isEN     = GBGeneralSettings.isEN(myActivity);
+        GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
+        int coordType    = GBUtilities.getCoordinateTypeFromProject(openProject);
+        int distUnits = openProject.getDistanceUnits();
+
+
+        TextView currentNorthingPositionLabel = (TextView) v.findViewById(R.id.currentNorthingPositionLabel);
+        TextView currentEastingPositionLabel  = (TextView) v.findViewById(R.id.currentEastingPositionLabel);
+
+        TextView currentHorzLocField = (TextView) v.findViewById(R.id.currentEastingPositionField);
+        TextView currentVertLocField = (TextView) v.findViewById(R.id.currentNorthingPositionField);
+        TextView currentElevationField = (EditText) v.findViewById(R.id.currentElevationField);
+
+        TextView curLatHemField = (TextView) v.findViewById(R.id.currentLatitudeDir);
+        TextView curLatDDField  = (TextView) v.findViewById(R.id.currentNorthingPositionField);
+        TextView curLatDegField = (TextView) v.findViewById(R.id.currentLatitudeDeg);
+        TextView curLatMinField = (TextView) v.findViewById(R.id.currentLatitudeMin);
+        TextView curLatSecField = (TextView) v.findViewById(R.id.currentLatitudeSec);
+
+        TextView curLngHemField = (TextView) v.findViewById(R.id.currentLongitudeDir);
+        TextView curLngDDField  = (TextView) v.findViewById(R.id.currentEastingPositionField);
+        TextView curLngDegField = (TextView) v.findViewById(R.id.currentLongitudeDeg);
+        TextView curLngMinField = (TextView) v.findViewById(R.id.currentLongitudeMin);
+        TextView curLngSecField = (TextView) v.findViewById(R.id.currentLongitudeSec);
+
+
+
+        String nLabel = getString(R.string.n_label);
+        String eLabel = getString(R.string.e_label);
+        double horzLoc = 0;
+        double vertLoc = 0;
+        double eleValue = 0;
+        if (coordType == GBCoordinate.sNEWidgets) {
+
+            if (isEN){
+                currentNorthingPositionLabel = (TextView)v.findViewById(R.id.currentEastingPositionLabel);
+                currentEastingPositionLabel  = (TextView)v.findViewById(R.id.currentNorthingPositionLabel);
+                currentHorzLocField = (TextView) v.findViewById(R.id.currentNorthingPositionField);
+                currentVertLocField = (TextView) v.findViewById(R.id.currentEastingPositionField);
+            }
+
+            nLabel = getString(R.string.n_label);
+            eLabel = getString(R.string.e_label);
+            currentNorthingPositionLabel.setText(nLabel);
+            currentEastingPositionLabel .setText(eLabel);
+
+
+
+            horzLoc = ((GBCoordinateEN)coordinate).getEasting();
+            vertLoc = ((GBCoordinateEN)coordinate).getNorthing();
+            eleValue = ((GBCoordinateEN)coordinate).getElevation();
+
+
+            GBUtilities.locDistance(myActivity, vertLoc,  currentVertLocField);
+            GBUtilities.locDistance(myActivity, horzLoc,   currentHorzLocField);
+            GBUtilities.locDistance(myActivity, eleValue, currentElevationField);
+
+            curLatHemField.setVisibility(View.GONE);
+            curLngHemField.setVisibility(View.GONE);
+
+            curLatDegField.setVisibility(View.GONE);
+            curLatMinField.setVisibility(View.GONE);
+            curLatSecField.setVisibility(View.GONE);
+            curLngDegField.setVisibility(View.GONE);
+            curLngMinField.setVisibility(View.GONE);
+            curLngSecField.setVisibility(View.GONE);
+
+        } else {
+
+            if (isLngLat){
+                currentNorthingPositionLabel = (TextView)v.findViewById(R.id.currentEastingPositionLabel);
+                currentEastingPositionLabel  = (TextView)v.findViewById(R.id.currentNorthingPositionLabel);
+
+                curLatHemField = (TextView) v.findViewById(R.id.currentLatitudeDir);
+                curLatDDField  = (TextView) v.findViewById(R.id.currentEastingPositionField);
+                curLatDegField = (TextView) v.findViewById(R.id.currentLatitudeDeg);
+                curLatMinField = (TextView) v.findViewById(R.id.currentLatitudeMin);
+                curLatSecField = (TextView) v.findViewById(R.id.currentLatitudeSec);
+
+                curLngHemField = (TextView) v.findViewById(R.id.currentLongitudeDir);
+                curLngDDField  = (TextView) v.findViewById(R.id.currentNorthingPositionField);
+                curLngDegField = (TextView) v.findViewById(R.id.currentLongitudeDeg);
+                curLngMinField = (TextView) v.findViewById(R.id.currentLongitudeMin);
+                curLngSecField = (TextView) v.findViewById(R.id.currentLongitudeSec);
+
+            }
+
+            nLabel = getString(R.string.latitude_label);
+            eLabel = getString(R.string.longitude_label);
+            currentNorthingPositionLabel.setText(nLabel);
+            currentEastingPositionLabel .setText(eLabel);
+
+
+
+            horzLoc = ((GBCoordinateLL)coordinate).getLongitude();
+            vertLoc = ((GBCoordinateLL)coordinate).getLatitude();
+            eleValue = ((GBCoordinateLL)coordinate).getElevation();
+
+            if (isPM){
+                curLatHemField.setVisibility(View.GONE);
+                curLngHemField.setVisibility(View.GONE);
+            } else {
+                curLatHemField.setVisibility(View.VISIBLE);
+                curLngHemField.setVisibility(View.VISIBLE);
+            }
+            if (isDD) {
+                double latitude = horzLoc;
+                double longitude = vertLoc;
+                int posHemi = R.string.hemisphere_N;
+                int negHemi = R.string.hemisphere_S;
+                GBUtilities.locDD(myActivity, latitude, locDigOfPrecision,
+                        isDir, posHemi, negHemi,
+                        curLatHemField, curLatDDField);
+
+                posHemi = R.string.hemisphere_E;
+                negHemi = R.string.hemisphere_W;
+                GBUtilities.locDD(myActivity, longitude, locDigOfPrecision,
+                        isDir, posHemi, negHemi,
+                        curLngHemField, curLngDDField);
+
+                curLatDDField.setVisibility(View.VISIBLE);
+                curLngDDField.setVisibility(View.VISIBLE);
+
+                curLatDegField.setVisibility(View.GONE);
+                curLatMinField.setVisibility(View.GONE);
+                curLatSecField.setVisibility(View.GONE);
+                curLngDegField.setVisibility(View.GONE);
+                curLngMinField.setVisibility(View.GONE);
+                curLngSecField.setVisibility(View.GONE);
+
+            } else {
+                int deg = ((GBCoordinateLL)coordinate).getLatitudeDegree();
+                int min = ((GBCoordinateLL)coordinate).getLatitudeMinute();
+                double sec = ((GBCoordinateLL)coordinate).getLatitudeSecond();
+                int posHemi = R.string.hemisphere_N;
+                int negHemi = R.string.hemisphere_S;
+
+                GBUtilities.locDMS(myActivity, deg, min, sec, locDigOfPrecision,
+                        isDir, posHemi, negHemi, curLatHemField,
+                        curLatDegField, curLatMinField, curLatSecField);
+
+                deg = ((GBCoordinateLL)coordinate).getLongitudeDegree();
+                min = ((GBCoordinateLL)coordinate).getLongitudeMinute();
+                sec = ((GBCoordinateLL)coordinate).getLongitudeSecond();
+                posHemi = R.string.hemisphere_E;
+                negHemi = R.string.hemisphere_W;
+
+                GBUtilities.locDMS(myActivity, deg, min, sec, locDigOfPrecision,
+                        isDir, posHemi, negHemi, curLngHemField,
+                        curLngDegField, curLngMinField, curLngSecField);
+
+                curLatDDField.setVisibility(View.GONE);
+                curLngDDField.setVisibility(View.GONE);
+
+                curLatDegField.setVisibility(View.VISIBLE);
+                curLatMinField.setVisibility(View.VISIBLE);
+                curLatSecField.setVisibility(View.VISIBLE);
+                curLngDegField.setVisibility(View.VISIBLE);
+                curLngMinField.setVisibility(View.VISIBLE);
+                curLngSecField.setVisibility(View.VISIBLE);
+
+            }
+            double elevation = eleValue;
+            GBUtilities.locDistance(myActivity, elevation, currentElevationField);
+
+        }
+
+    }
+
+
     private boolean isMeaningDone(GBNmea nmeaData, GBMeanToken meanToken){
         //if there isn't a mean in progress, by definition we are done
         if (isMeanStopped()) return true;
@@ -897,10 +1046,10 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         //Check if this is the last point to be meaned
         GBProject openProject = GBUtilities.getInstance().getOpenProject((GBActivity)getActivity());
 
-        boolean endMeaning =  (meanToken.getFixedReadings() >= openProject.getNumMean());
+        boolean isMeanDone =  (meanToken.getFixedReadings() >= openProject.getNumMean());
 
-        meanToken.setLastPointInMean(endMeaning);
-        return endMeaning;
+        meanToken.setLastPointInMean(isMeanDone);
+        return isMeanDone;
     }
 
     private void updateMapWMean(GBCoordinateMean meanCoordinate){
@@ -1016,6 +1165,13 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             }
         });
 
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+        try {
+            MapsInitializer.initialize(this.getActivity());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (mMarkers == null){
             mMarkers = new ArrayList<>();
         }
@@ -1038,6 +1194,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
     }
 
     private void wireWidgets(View v){
+        /*
         //We need permissions to take pictures with the camera then store the images
         if (ContextCompat.checkSelfPermission
                 (getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -1049,7 +1206,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE },
                                               requestCode);
         }
-
+*/
 
         //Current Position Block of fields and buttons
         Button currentPositionButton = (Button) v.findViewById(R.id.currentPositionButton);
@@ -1062,20 +1219,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
             }
         });
-
-
-        TextView currentPointIDField = (TextView)v.findViewById(R.id.pointIDField);
-
-        TextView currentNorthingPositionLable = (TextView)v.findViewById(R.id.currentNorthingPositionLabel);
-        TextView currentNorthingPositionField = (TextView) v.findViewById(R.id.currentNorthingPositionField);
-        TextView currentEastingPositionLabel  = (TextView)v.findViewById(R.id.currentEastingPositionLabel);
-        TextView currentEastingPositionField  = (TextView) v.findViewById(R.id.currentEastingPositionField);
-        //TextView currentElevationLabel        = (TextView)v.findViewById(R.id.currentElevationLabel);
-        TextView currentElevationField        = (EditText)v.findViewById(R.id.currentElevationField);
-
-        TextView currentFeatureCodeField      = (EditText)v.findViewById(R.id.currentFeatureCodeField);
-        TextView currentHeightField           = (EditText)v.findViewById(R.id.currentHeightField);
-
 
 
         //Store position button
@@ -1145,7 +1288,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         });
 
 
-        //Average Button
+        //Show All Points Button
         Button showAllPointsButton = (Button) v.findViewById(R.id.showAllPointsButton);
         showAllPointsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1158,6 +1301,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             }
         });
 
+        //Button row above the map view
+        TextView scaleFactorField = (TextView)v.findViewById(R.id.scaleFactorField) ;
 
         //maps Button
         Button mapsButton = (Button) v.findViewById(R.id.mapsButtonCollect);
@@ -1178,6 +1323,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         //picture (as in camera or video) Button
         Button pictureButton = (Button) v.findViewById(R.id.pictureButton);
+        pictureButton.setVisibility(View.GONE);
+        /*
         pictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -1189,7 +1336,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             }
         });
 
-
+*/
         //notes Button
         Button notesButton = (Button) v.findViewById(R.id.notesButton);
         notesButton.setOnClickListener(new View.OnClickListener() {
@@ -1247,7 +1394,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         //FOOTER WIDGETS
 
-
+/*
         //Footer fields with status and quality info about GPS source
         TextView currentProjectField  = (TextView)v.findViewById(R.id.currentProjectField);
 
@@ -1321,7 +1468,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             }
         });
 
-
+*/
     }
 
     /* **********************************************************/
@@ -1630,9 +1777,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             LatLng fromLocation = new LatLng(wgs84Coordinate.getLatitude(), wgs84Coordinate.getLongitude());
             LatLng toLocation = SphericalUtil.computeOffset(fromLocation, mOffsetDistance, mOffsetHeading);
 
-            wgs84Coordinate.setLatitude(toLocation.latitude);
-            wgs84Coordinate.setLongitude(toLocation.longitude);
-
             double newElevation = wgs84Coordinate.getElevation() + mOffsetElevation;
             wgs84Coordinate.setElevation(newElevation);
 
@@ -1659,6 +1803,7 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             if (height != 0d) {
                 double elevation = wgs84Coordinate.getElevation();
                 elevation = elevation - height;
+
                 wgs84Coordinate.setElevation(elevation);
             }
         }
@@ -1739,20 +1884,16 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         setFocus(latLng);
         getMarkerByFocus();//It sets the PointID as a side effect
 
-
-        double latitude = latLng.latitude;
-
+        double latitude  = latLng.latitude;
         double longitude = latLng.longitude;
 
-        GBActivity myActivity = (GBActivity)getActivity();
-        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
-
+        int locPrecision = GBGeneralSettings.getLocPrecision((GBActivity)getActivity());
 
         String msg = getString(R.string.map_touched) +
-            " " + getString(R.string.latitude_label)+ " " +
-            GBUtilities.truncatePrecisionString(latitude, locPrecision) +
-            ", " + getString(R.string.longitude_label)+ " " +
-            GBUtilities.truncatePrecisionString(longitude,locPrecision) ;
+                " " + getString(R.string.latitude_label)+ " " +
+                GBUtilities.truncatePrecisionString(latitude, locPrecision) +
+                ", " + getString(R.string.longitude_label)+ " " +
+                GBUtilities.truncatePrecisionString(longitude,locPrecision) ;
 
         GBUtilities.getInstance().showStatus(getActivity(), msg);
 
@@ -1846,22 +1987,8 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             setFocus(markerLocation);
         }
 
-        //update the current position fields to the last point
-        View v = getView();
-        if ((point != null) && (v != null)){
-            try {
-                TextView currentPointIDField     = (TextView) v.findViewById(R.id.pointIDField);
-                TextView currentHeightField      = (EditText) v.findViewById(R.id.currentHeightField);
-                TextView currentFeatureCodeField = (EditText) v.findViewById(R.id.currentFeatureCodeField);
-
-                currentPointIDField    .setText(String.valueOf(point.getPointID()));
-                currentFeatureCodeField.setText(point.getPointFeatureCode());
-                currentHeightField     .setText(String.valueOf(point.getHeight()));
-            } catch (NullPointerException e){
-                GBUtilities.getInstance().showStatus(getActivity(),  R.string.unable_to_update_ui);
-
-            }
-        }
+        //Tell the user the location of the most recent point
+       // updateCurrentPositionFields(point);
 
     }
 
@@ -1891,7 +2018,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             dispatchTakePictureIntent();
         }
     }
-
 
 
     /* **********************************************************/
@@ -2302,8 +2428,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
         }
     }
 
-
-
     private GBCoordinateWGS84 getCoordinateFromPoint(GBProject project, GBPoint point){
 
         GBCoordinateWGS84 coordinateWGS84;
@@ -2330,9 +2454,6 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
 
         return coordinateWGS84;
     }
-
-
-
 
 
     private GBNmea getNmeaFromTestData(){

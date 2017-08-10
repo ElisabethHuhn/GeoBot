@@ -205,29 +205,7 @@ class GBDatabaseManager {
         return returnCode;
     }
 
-    long addProjectSettingsToDB(GBProject project) {
 
-        long returnCode = sDB_ERROR_CODE;
-
-        GBProjectSettings projectSettings = project.getSettings();
-        if (projectSettings == null) {
-            //Settings had not yet been created. Do so now, with default values
-            projectSettings = new GBProjectSettings();//defaults
-            projectSettings.setProjectID(project.getProjectID());
-            project.setSettings(projectSettings);
-        }
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        //store the settings in the DB with the project
-        returnCode = mDatabaseHelper.add(mDatabase,
-                GBDatabaseSqliteHelper.TABLE_PROJECT_SETTINGS,
-                projectManager.getCVFromProjectSettings(project),
-                getProjectSettingsWhereClause(project.getProjectID()),
-                GBDatabaseSqliteHelper.PROJECT_SETTINGS_ID);
-        if (returnCode == sDB_ERROR_CODE) return returnCode;
-        //return the new ID to the caller
-        projectSettings.setProjectSettingsID(returnCode);
-        return returnCode;
-    }
 
     /// ********************************** READ ********************************
     /* *****************************
@@ -312,26 +290,6 @@ class GBDatabaseManager {
     }
 
 
-    //get project settings from the DB, analogous to getProject(projectID)
-    GBProjectSettings getProjectSettings(long projectID) {
-
-        Cursor cursor = mDatabaseHelper.getObject(mDatabase,      //the db to access
-                GBDatabaseSqliteHelper.TABLE_PROJECT_SETTINGS,//table
-                null,           //get the whole project
-                getProjectSettingsWhereClause(projectID), //where clause
-                null, null, null, null); //args,group,row grouping,order
-
-        //create a project object from the Cursor object
-        GBProjectManager projectManager = GBProjectManager.getInstance();
-        int position = 0;
-
-        GBProjectSettings projectSettings =
-                projectManager.getProjectSettingsFromCursor(cursor, position);
-        cursor.close();
-        return projectSettings;
-
-    }
-
     /// ********************************** UPDATE ********************************
     //Update is now part of ADD
     //Cascade of add/update happens at the Manager level
@@ -342,20 +300,9 @@ class GBDatabaseManager {
     //The return code indicates how many rows affected
     int removeProject(long projectID) {
 
-        removeProjectSettings(projectID);
-
         return mDatabaseHelper.remove(mDatabase,
                 GBDatabaseSqliteHelper.TABLE_PROJECT,
                 getProjectWhereClause(projectID),
-                null);  //values that replace ? in where clause
-    }
-
-    //The return code indicates how many rows affected
-    void removeProjectSettings(long projectID) {
-
-        mDatabaseHelper.remove(mDatabase,
-                GBDatabaseSqliteHelper.TABLE_PROJECT_SETTINGS,
-                getProjectSettingsWhereClause(projectID),
                 null);  //values that replace ? in where clause
     }
 
@@ -368,9 +315,6 @@ class GBDatabaseManager {
     }
 
 
-    private String getProjectSettingsWhereClause(long projectID) {
-        return GBDatabaseSqliteHelper.PROJECT_SETTINGS_ID + " = " + String.valueOf(projectID);
-    }
 
 
     // ***********************************************/

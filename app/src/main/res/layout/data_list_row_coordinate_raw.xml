@@ -14,10 +14,6 @@
     android:background="?android:attr/selectableItemBackground"
     >
 
-
-
-
-
     <!-- Time  10 -->
     <TextView
         android:id="@+id/coordinateRowTime"
@@ -45,7 +41,7 @@
         android:layout_weight="2"
 
         android:gravity="center"
-       
+
         android:layout_marginEnd="@dimen/row_between_fields_margin"
 
         android:textColor="@color/colorTextBlack"
@@ -70,6 +66,38 @@
 
         />
 
+    <!-- Direction 5 -->
+    <TextView
+        android:id="@+id/coordinateRowLatDir"
+        android:hint="@string/type_lat_dir"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:gravity="center"
+
+        android:enabled="false"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorGrayish"
+        />
+    <!-- Latitude  10 -->
+    <TextView
+        android:id="@+id/coordinateRowLatitude"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
     <!-- Latitude Degrees 5 -->
     <TextView
         android:id="@+id/coordinateRowLatitudeDeg"
@@ -116,6 +144,39 @@
 
         />
 
+
+    <!-- Direction 5 -->
+    <TextView
+        android:id="@+id/coordinateRowLngDir"
+        android:hint="@string/type_lng_dir"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:gravity="center"
+
+        android:enabled="false"
+
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorGrayish"
+        />
+    <!-- Longitude  10 -->
+    <TextView
+        android:id="@+id/coordinateRowLongitude"
+
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/row_between_fields_margin"
+
+        android:textColor="@color/colorTextBlack"
+        android:background="@color/colorWhite"
+
+        />
     <!-- Longitude Degrees 5 -->
     <TextView
         android:id="@+id/coordinateRowLongitudeDeg"
@@ -161,6 +222,8 @@
         android:background="@color/colorWhite"
 
         />
+
+
 
     <!-- Elevation 10 -->
     <TextView

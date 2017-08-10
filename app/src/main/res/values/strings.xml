@@ -78,6 +78,7 @@
     <string name="action_project_open"      >Project Open</string>
     <string name="action_project_list"      >Project List</string>
     <string name="action_point_list"        >Point List</string>
+    <string name="action_point_edit"        >Point Edit</string>
     <string name="action_map_points"        >Map Points</string>
     <string name="action_project_export"    >Export Project</string>
     <string name="action_collect"           >Collect</string>
@@ -255,12 +256,24 @@
 
     <!-- Spinners -->
     <string name="dist_units"               >Dist Units</string>
-    <string name="measure_autosave"         >Measure Autosave</string>
+    <string name="manual_label"             >Manual Save</string>
     <string name="data_source"              >Data Source</string>
-    <string name="en_order"                 >EN or NE order</string>
+    <string name="loc_ui_order"             >Loc order</string>
+    <string name="latlng_ui_order"          >UI Order: Latitude/Longitude</string>
+    <string name="lnglat_ui_order"          >UI Order: Longitude/Latitude</string>
+    <string name="ne_ui_order"              >UI Order: Northing/Easting</string>
+    <string name="en_ui_order"              >UI Order: Easting/Northing</string>
     <string name="latlng_order"             >Lat/Lng or Lng/Lat order</string>
     <string name="rms_stddev_terminology"   >RMS or StdDev used</string>
-    <string name="dd_dms_terminology"       >DD or DMS input</string>
+    <string name="dd_dms_terminology"       >DD or DMS</string>
+    <string name="dd_ui_display"            >Locations in Digital Degrees</string>
+    <string name="dms_ui_display"           >Locations in Degrees/Minutes/Seconds</string>
+    <string name="ca_dd_ui_display"         >Convergence Angle in Digital Degrees</string>
+    <string name="ca_dms_ui_display"        >Convergence Angle in Degrees/Minutes/Seconds</string>
+    <string name="rms_ui_display"           >RMS: Root Mean Square</string>
+    <string name="std_ui_display"           >StdDev: Standard Deviations</string>
+    <string name="dir_hemi_ui_display"      >Hemisphere indicated by Direction (N, S, E, and W)</string>
+    <string name="pm_hemi_ui_display"       >Hemisphere indicated by Plus / Minus</string>
     <string name="dir_pm_terminology"       >NS/EW or Plus Minus</string>
     <string name="project_loc_precision"    >Location Precision</string>
     <string name="project_stddev_precision" >RMS Precision</string>
@@ -280,8 +293,7 @@
 
 
     <!-- Point List Strings -->
-    <string name="point_row_project_id_label"   >Project</string>
-    <string name="point_row_point_id_label"     >Point</string>
+    <string name="point_row_point_nb_label"     >Point Nb</string>
     <string name="point_row_easting_label"      >Easting</string>
     <string name="point_row_northing_label"     >Northing</string>
     <string name="point_row_latitude_label"     >Latitude</string>
@@ -328,7 +340,6 @@
     <string name="cant_view_points"             >Can not view points on create path</string>
     <string name="point_unchanged"              >Point unchanged, exit without saving</string>
     <string name="point_no_selection"           >Point does not exist</string>
-    <string name="point_view_existing_label"    >Existing Points</string>
     <string name="point_view_raw_label"         >Raw Points</string>
 
     <string name="save_new_project"         >New Project saved to Permanent Storage</string>
@@ -385,7 +396,7 @@
     <string name="null_type_found"              >Null NMEA type found</string>
     <string name="marker_touched"               >Marker Touched</string>
     <string name="unable_to_update_ui"          >Unable to update UI</string>
-    <string name="scale_factor_msg"             >SF: %.0f meters per inch</string>
+    <string name="scale_factor_msg"             >SF: %s meters per inch</string>
     <string name="pdop_msg"                     >PDop: %.0f</string>
     <string name="hdop_msg"                     >HDop: %.0f</string>
     <string name="vdop_msg"                     >VDop: %.0f</string>
@@ -405,7 +416,7 @@
 
     <!-- Text View Labels (initial text displayed) -->
     <string name="scale_factor_prefix"    >SF: </string>
-    <string name="point_id_label"         >PT:</string>
+    <string name="point_id_label"         >Nxt PT:</string>
     <string name="current_northing_label" >N: </string>
     <string name="current_easting_label"  >E: </string>
     <string name="current_elevation_label">ELE:</string>
@@ -427,14 +438,14 @@
     <string name="iwcp_number_fixed"      ># Fixed: </string>
     <string name="iwcp_number_valid"      ># Valid: </string>
     <string name="iwcp_of"                > out of </string>
-    <string name="iwcp_satellites"        ># Satellites in Fix</string>
+    <string name="iwcp_satellites"        ># Sat</string>
     <string name="iwcp_project_id_label"  >Project</string>
     <string name="iwcp_point_id_label"    >Point</string>
     <string name="iwcp_easting_label"     >Easting</string>
     <string name="iwcp_northing_label"    >Northing</string>
-    <string name="iwcp_latitude_label"    >Latitude</string>
-    <string name="iwcp_longitude_label"   >Longitude</string>
-    <string name="iwcp_elevation_label"   >Elevation</string>
+    <string name="iwcp_latitude_label"    >Lat</string>
+    <string name="iwcp_longitude_label"   >Lng</string>
+    <string name="iwcp_elevation_label"   >Ele</string>
     <string name="iwcp_sd_easting_label"  >Std Dev Easting</string>
     <string name="iwcp_sd_northing_label" >Std Dev Northing</string>
     <string name="iwcp_sd_latitude_label" >Std Dev Latitude</string>
@@ -664,45 +675,63 @@
 
 
     <!-- Text View Labels (initial text displayed) -->
-    <string name="distance_units_label">Dist Units: </string>
-    <string name="decimal_display_label">Decimal Display: </string>
-    <string name="angle_units_label">Angle Units: </string>
-    <string name="angle_display_label">Angle Display: </string>
-    <string name="grid_direction_label">Grid Direction: </string>
-    <string name="scale_factor_settings_label">Scale Factor: </string>
-    <string name="sea_level_label">Sea Level: </string>
-    <string name="refraction_label">Refraction: </string>
-    <string name="datum_label">Datum: </string>
-    <string name="projection_label">Projection: </string>
+    <string name="distance_units_label"             >Dist Units: </string>
+    <string name="decimal_display_label"            >Decimal Display: </string>
+    <string name="angle_units_label"                >Angle Units: </string>
+    <string name="angle_display_label"              >Angle Display: </string>
+    <string name="grid_direction_label"             >Grid Direction: </string>
+    <string name="scale_factor_settings_label"      >Scale Factor: </string>
+    <string name="sea_level_label"                  >Sea Level: </string>
+    <string name="refraction_label"                 >Refraction: </string>
+    <string name="datum_label"                      >Datum: </string>
+    <string name="projection_label"                 >Projection: </string>
 
-    <string name="coordinate_display_label">Scale Factor: </string>
-    <string name="geod_model_label">Geoid Model: </string>
-    <string name="starting_point_id_label">Starting Point ID: </string>
-    <string name="alphanumeric_label">Alphanumeric: </string>
-    <string name="feature_codes_label">Feature Codes: </string>
-    <string name="feature_codes_control_file_label">FC Control File: </string>
-    <string name="feature_codes_time_stamp_label">FC Time Stamp: </string>
+    <string name="coordinate_display_label"         >Scale Factor: </string>
+    <string name="geod_model_label"                 >Geoid Model: </string>
+    <string name="starting_point_id_label"          >Starting Point ID: </string>
+    <string name="alphanumeric_label"               >Alphanumeric: </string>
+    <string name="feature_codes_label"              >Feature Codes: </string>
+    <string name="feature_codes_control_file_label" >FC Control File: </string>
+    <string name="feature_codes_time_stamp_label"   >FC Time Stamp: </string>
 
 
     <!-- Footer -->
     <!-- Button Labels -->
-    <string name="esc_button_label">Esc</string>
-    <string name="enter_button_label">Enter</string>
-    <string name="enter_to_save_button_label">Save / Exit</string>
-    <string name="enter_to_copy_button_label">Copy / Exit</string>
-    <string name="enter_to_create_button_label">Create / Exit</string>
+    <string name="esc_button_label"                 >Esc</string>
+    <string name="enter_button_label"               >Enter</string>
+    <string name="enter_to_save_button_label"       >Save / Exit</string>
+    <string name="enter_to_copy_button_label"       >Copy / Exit</string>
+    <string name="enter_to_create_button_label"     >Create / Exit</string>
 
     <!-- Text View Labels (initial text displayed) -->
-    <string name="filename_label">Current File: Cambridge_16021002</string>
-    <string name="model_label">Model: </string>
-    <string name="sn_label">S/N:</string>
-    <string name="hdop_label">HDOP: </string>
-    <string name="vdop_label">VDOP: </string>
-    <string name="tdop_label">TDOP: </string>
-    <string name="pdop_label">PDOP: </string>
-    <string name="gdop_label">GDOP: </string>
-    <string name="hrms_label">HRMS: </string>
-    <string name="vrms_label">VRMS: </string>
+    <string name="filename_label"       >Current File: Cambridge_16021002</string>
+    <string name="model_label"          >Model: </string>
+    <string name="sn_label"             >S/N:</string>
+    <string name="hdop_label"           >HDOP: </string>
+    <string name="vdop_label"           >VDOP: </string>
+    <string name="tdop_label"           >TDOP: </string>
+    <string name="pdop_label"           >PDOP: </string>
+    <string name="gdop_label"           >GDOP: </string>
+    <string name="hrms_label"           >HRMS: </string>
+    <string name="vrms_label"           >VRMS: </string>
+    <string name="sd_easting_label"     >Std Dev E</string>
+    <string name="sd_northing_label"    >Std Dev N</string>
+    <string name="sd_latitude_label"    >Std Dev Lat</string>
+    <string name="sd_longitude_label"   >Std Dev Lng</string>
+    <string name="sd_elevation_label"   >Std Dev Ele</string>
+    <string name="rms_elevation_label"  >Ele RMS</string>
+    <string name="lat_sigma_label"      >Lat SDev:</string>
+    <string name="lng_sigma_label"      >Lng SDev:</string>
+    <string name="ning_sigma_label"     >V SDev:</string>
+    <string name="eing_sigma_label"     >H SDev:</string>
+    <string name="elev_sigma_label"     >Ele SDev:</string>
+    <string name="vector_sigma_label"   >Vect SDev:</string>
+    <string name="lat_rms_label"        >HRMS:</string>
+    <string name="lng_rms_label"        >VRMS:</string>
+    <string name="ning_rms_label"       >VRMS:</string>
+    <string name="eing_rms_label"       >HRMS:</string>
+    <string name="ele_rms_label"        >Ele RMS:</string>
+    <string name="vector_rms_label"     >Vect RMS:</string>
 
     <!-- Footer Strings -->
 
@@ -719,6 +748,26 @@
     <string name="gps_off"                  >GPS is off</string>
     <string name="autosave_on"              >Autosave on</string>
     <string name="autosave_off"             >Autosave off</string>
+    <string name="autosave_on_label"        >autosave</string>
+    <string name="autosave_off_label"       >manual save</string>
+    <string name="autosave_label"           >   Automatic Save   </string>
+    <string name="terminology_label"        >    Terminology    </string>
+    <string name="rms_label"                >RMS</string>
+    <string name="std_label"                >StdDev</string>
+    <string name="coord_ord_label"          >     Coord Order     </string>
+    <string name="coord_ord_on_label"       >Lat / Lng</string>
+    <string name="coord_ord_off_label"      >Lng / Lat</string>
+    <string name="coord_ne_ord_label"       >     Coord Order     </string>
+    <string name="coord_ne_ord_on_label"    >NorthingEasting</string>
+    <string name="coord_ne_ord_off_label"   >EastingNorthing</string>
+    <string name="dd_dms_label"             >       Location      </string>
+    <string name="dd_dms_on_label"          >DD</string>
+    <string name="dd_dms_off_label"         >DMS</string>
+    <string name="hemisph_label"            > Hemisphere </string>
+    <string name="hemisph_on_label"         >NSEW</string>
+    <string name="hemisph_off_label"        >+/-</string>
+    <string name="ca_label"                 > Convergence Angle </string>
+
     <string name="start_mean_button_label"  >Start Mean</string>
     <string name="stop_mean_button_label"   >Stop Mean</string>
 
@@ -727,11 +776,19 @@
 
     <string name="convert_button_label"     >Convert</string>
     <string name="convert_coordinates"      >Convert Coordinates</string>
+    <string name="convert_error_mean"       >Can not convert while mean in progress</string>
+    <string name="convert_error_ui"         >Can not convert until screen initialized</string>
+    <string name="convert_error_source"     >Can not convert, source data not valid</string>
+    <string name="convert_failed"           >Conversion Failed</string>
+    <string name="convert_success"          >Coordinates Converted</string>
+
     <string name="clear_form_button_label"  >Clear Form</string>
 
     <!-- Text View Labels (initial text displayed) -->
     <string name="latitude_label"           >Lat:  </string>
-    <string name="longitude_label"          >Long: </string>
+    <string name="longitude_label"          >Lng: </string>
+    <string name="e_label"                  >E:  </string>
+    <string name="n_label"                  >N: </string>
     <string name="elevation_label"          >Ele:  </string>
     <string name="geoid_height_label"       >Geoid: </string>
 
@@ -739,43 +796,34 @@
     <string name="utm_coord_label"          >UTM Coord: </string>
     <string name="utm_so_label"             >UTM Coord: </string>
     <string name="utm_zone_label"           >Zone </string>
-    <string name="utm_easting_label"        >Easting M/F:</string>
-    <string name="utm_northing_label"       >Northing M/F:</string>
-    <string name="utm_easting_meters_label" >Easting Meters</string>
-    <string name="utm_northing_meters_label">Northing Meters</string>
-    <string name="utm_easting_feet_label"   >Easting Feet</string>
-    <string name="utm_northing_feet_label"  >Northing Feet</string>
+    <string name="utm_easting_label"        >Easting:</string>
+    <string name="utm_northing_label"       >Northing:</string>
+
+
     <string name="utm_hemisphere_label"     >Hemi </string>
     <string name="utm_latband_label"        >Latband </string>
-     <string name="utm_meters"               >in Meters:</string>
+    <string name="utm_meters"              >in Meters:</string>
     <string name="utm_feet"                 >in Feet:</string>
 
     <string name="spc_label"                >SPC Coord: </string>
     <string name="spc_zone_label"           >SPC Zone </string>
-    <string name="spc_easting_label"        >Easting M/F:</string>
-    <string name="spc_northing_label"       >Northing M/F:</string>
-    <string name="spc_easting_meters_label" >Easting Meters</string>
-    <string name="spc_northing_meters_label">Northing Meters</string>
-    <string name="spc_easting_feet_label"   >Easting Feet</string>
-    <string name="spc_northing_feet_label"  >Northing Feet</string>
+    <string name="spc_easting_label"        >Easting:</string>
+    <string name="spc_northing_label"       >Northing:</string>
     <string name="spc_hemisphere_label"     >Hemi </string>
     <string name="spc_state_label"          >State </string>
-    <string name="spc_meters"               >in Meters:</string>
-    <string name="spc_feet"                 >in Feet:</string>
     <string name="spc_zone_error"           >SPCS Zone not found</string>
 
     <string name="coord_label"          >Coord: </string>
     <string name="zone_label"           >Zone </string>
     <string name="easting_label"        >Easting:</string>
     <string name="northing_label"       >Northing:</string>
-    <string name="easting_meters_label" >Easting Meters</string>
-    <string name="northing_meters_label">Northing Meters</string>
-    <string name="easting_feet_label"   >Easting Feet</string>
-    <string name="northing_feet_label"  >Northing Feet</string>
     <string name="hemisphere_label"     >Hemi </string>
     <string name="latband_label"        >Latband </string>
-    <string name="meters_label"         >in Meters:</string>
-    <string name="feet_label"           >in Feet:</string>
+    <string name="in_meters_label"      >in Meters:</string>
+    <string name="in_feet_label"        >in Feet:</string>
+    <string name="meters_label"         >Meters</string>
+    <string name="feet_label"           >Feet</string>
+    <string name="ifeet_label"          >International Feet</string>
 
     <!-- Measure -->
     <string name="coordinate_measure"       >Measure Coordinate</string>
@@ -800,8 +848,6 @@
     <string name="phone_gps_not_available"  >Phone GPS not available</string>
     <string name="cell_tower_triangu_not_available" >Cell Tower triangulation not available</string>
     <string name="save_not_available"       >Save not available</string>
-    <string name="conversion_failed"        >Conversion Failed</string>
-    <string name="can_not_convert_during_mean">Can not convert while mean is in progress</string>
     <string name="zone_input_hint"          >Must input UTM Zone before converting</string>
     <string name="mean_token_not_saved"     >Could not save raw data in Mean</string>
 
@@ -827,6 +873,7 @@
     <string name="default_latband"          >A</string>
     <string name="default_zone"             >0</string>
     <string name="default_hemisphere"       >N</string>
+    <string name="null_hemisphere"          > </string>
 
     <string name="mean_start_time_label"        >Start time:</string>
     <string name="mean_end_time_label"          >End time:</string>
@@ -835,7 +882,7 @@
     <string name="mean_number_of_points_label"  ># read</string>
     <string name="mean_standard_deviation"      >SDev:</string>
     <string name="mean_lat_sigma"               >Lat SDev:</string>
-    <string name="mean_lng_sigma"              >Lng SDev:</string>
+    <string name="mean_lng_sigma"               >Lng SDev:</string>
     <string name="mean_elev_sigma"              >Ele SDev:</string>
     <string name="mean_vector_sigma"            >Vect SDev:</string>
     <string name="gps_time_label"               >Timestamp:</string>
@@ -845,15 +892,23 @@
     <string name="longitude_prompt"     >Longitude must be between -180.0 and 180.0</string>
     <string name="elevation_prompt"     >Elevation Prompt (What should this say?)</string>
 
-    <string name="coordinate_type_button"       >Change Type</string>
-    <string name="type_decimal_degrees_label"   >Decimal Degrees</string>
-    <string name="type_degrees_label"           >Deg</string>
-    <string name="type_minutes_label"           >Min</string>
-    <string name="type_seconds_label"           >Sec</string>
-    <string name="type_elevation_feet_label"    >Elevation feet</string>
-    <string name="type_elevation_meters_label"  >Elevation meters</string>
-    <string name="type_geoid_height_feet_label" >Geoid Height feet</string>
-    <string name="type_geoid_height_meters_label">Geoid Height meters</string>
+    <string name="coordinate_type_button"        >Change Type</string>
+    <string name="type_decimal_degrees_label"    >Decimal Degrees</string>
+    <string name="type_hemisphere_label"         >H</string>
+    <string name="type_lat_dir"                  >NS</string>
+    <string name="type_lng_dir"                  >EW</string>
+    <string name="hemisphere_N"                  >N</string>
+    <string name="hemisphere_S"                  >S</string>
+    <string name="hemisphere_E"                  >E</string>
+    <string name="hemisphere_W"                  >W</string>
+    <string name="type_degrees_label"            >Deg</string>
+    <string name="type_minutes_label"            >Min</string>
+    <string name="type_seconds_label"            >Sec</string>
+    <string name="degrees_label"                 >°</string>
+    <string name="minutes_label"                 >\'</string>
+    <string name="seconds_label"                 > " </string>
+    <string name="type_elevation_label"         >Elevation</string>
+    <string name="type_geoid_height_label"      >Geoid Height</string>
 
     <string name="utm_integer_output_prompt"    >Meter Precision UTM  (from IBM)</string>
     <string name="utm_nanometer_output_prompt"  >Nanometer Precision UTM (GeoBot)</string>
@@ -865,7 +920,6 @@
     <string name="gps_off_before_save"          >GPS must be off to save coordinate</string>
 
     <!-- Stubs -->
-    <string name="conversion_stub"                  >Coordinates Converted</string>
 
 
     <!-- Content Descriptions for images -->
@@ -882,23 +936,24 @@
 
 
     <!-- Exchange Screen  -->
-    <string name="export_destinations"        >--------Destination of Exported Information---------</string>
+    <string name="export_destinations"        >--------Destination of Exchangeed Information---------</string>
     <string name="export_radio_email"         >Email</string>
     <string name="export_radio_text"          >Text</string>
     <string name="export_radio_file"          >File</string>
     <string name="export_radio_general"       >General</string>
-    <string name="export_content"             >-------------- Content to be Exported --------------</string>
+    <string name="export_content"             >-------------- Content to be Exchangeed --------------</string>
     <string name="export_content_readability" >-------------- Content Readability --------------</string>
     <string name="export_lf_on_comma_off"     >Off = comma deliminated, On = Linefeed for readability</string>
 
-    <string name="exchange_proj_properties"     >---------- Project Properties to export ----------</string>
+
+    <string name="exchange_proj_properties"     >---------- Project Properties to Exchange ----------</string>
     <string name="exc_switch_proj_headers"     >Include Headers?</string>
     <string name="exc_switch_proj_name"          >Name</string>
     <string name="exc_switch_proj_create"        >Created</string>
     <string name="exc_switch_proj_last_touched"  >Last Touched</string>
     <string name="exc_switch_proj_desc"          >Desc</string>
 
-    <string name="exchange_proj_settings"      >---------- Project Settings Included in Export ----------</string>
+    <string name="exchange_proj_settings"      >---------- Project Settings Included in Exchange ----------</string>
     <string name="exc_switch_proj_height"        >Height</string>
     <string name="exc_switch_proj_coord_type"    >Coord Type</string>
     <string name="exc_switch_proj_nb_mean"       >Nb in Mean</string>
@@ -912,10 +967,14 @@
     <string name="exc_switch_proj_dirVpm"        >Dir v PlusMinus</string>
     <string name="exc_switch_proj_data_src"      >Data Source</string>
 
+    <string name="ui_precision"                  >Digits of Precision for User Interface</string>
+    <string name="export_precision"              >---------- Digits of Precision for Exchange ----------</string>
     <string name="exc_switch_proj_loc_prc"       >Loc Precision</string>
     <string name="exc_switch_proj_std_prc"       >RMS Precision</string>
+    <string name="exc_switch_proj_ca_prc"        >Convergence Precision</string>
+    <string name="exc_switch_proj_sf_prc"        >Scale Factor Precision</string>
 
-    <string name="exchange_point_properties"    >---------- Point Properties to Export ----------</string>
+    <string name="exchange_point_properties"    >---------- Point Properties to Exchange ----------</string>
     <string name="exc_switch_pnt_nb"             >Point Number</string>
     <string name="exc_switch_pnt_ismeaned"       >Is Meaned</string>
     <string name="exc_switch_pnt_fc"             >Feature Code</string>
@@ -934,6 +993,18 @@
     <string name="start_pt_nb_label"              >Starting Point Number</string>
     <string name="end_pt_nb_label"                >Ending Point Number</string>
 
+    <string name="exchange_coord_properties"      >---------- Coordinate Properties to Exchange ----------</string>
+    <string name="exc_switch_coord_time"          >Time</string>
+    <string name="exc_switch_coord_northing"      >Northing</string>
+    <string name="exc_switch_coord_easting"       >Easting</string>
+    <string name="exc_switch_coord_ele"           >Elevation</string>
+    <string name="exc_switch_coord_geoid"         >Geoid</string>
+    <string name="exc_switch_coord_sf"            >Scale Factor</string>
+    <string name="exc_switch_coord_ca"            >Convergence Angle</string>
+
+    <string name="exc_switch_coord_lat"           >Latitude</string>
+    <string name="exc_switch_coord_lng"           >Longitude</string>
+
 
 
 
@@ -941,11 +1012,11 @@
     <string name="exc_switch_pnt_ll_prop"        >Pt Nb</string>
 
 
-    <string name="export_subject"                 >Export of Project %s</string>
-    <string name="export_label"                   >Export</string>
-    <string name="export_chooser_title"           >Export to:</string>
-    <string name="export_file_written"            >Export file has been written</string>
-    <string name="export_no_app" >No app found on your phone which can perform this export</string>
+    <string name="export_subject"                 >Exchange of Project %s</string>
+    <string name="export_label"                   >Exchange</string>
+    <string name="export_chooser_title"           >Exchange to:</string>
+    <string name="export_file_written"            >Exchange file has been written</string>
+    <string name="export_no_app" >No app found on your phone which can perform this exchange</string>
 
     <string name="directory_path_label"             >Dir Path:</string>
     <string name="sub_directory_label"              >Sub-Dir:</string>
@@ -958,7 +1029,7 @@
     <string name="error_unable_to_access_storage"   >ERROR: unable to access storage. Data not saved</string>
 
     <!-- Snackbar display of DOP values -->
-
+    <string name="dop_values_stub"                  >HDOP       VDOP       PDOP</string>
     <!-- Button Labels -->
 
     <!-- Text View Labels (initial text displayed) -->

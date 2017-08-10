@@ -17,8 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Locale;
 
 /**
@@ -311,7 +309,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
                 //performConversion();
 
                 if (mMeanToken == null)return;
-                GBUtilities.getInstance().showStatus(getActivity(), R.string.conversion_stub);
+                GBUtilities.getInstance().showStatus(getActivity(), R.string.convert_success);
 
                 //The UTM constructor performs the conversion from WGS84
                 //make sure the mean is up to date
@@ -580,14 +578,17 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
                 //setText(Double.toString(coordinateWGS84.getTime()));
                 //setText(Double.toString(nmeaData.getTime()));
 
-        gpsWgs84LatitudeInput  .setText(doubleToUI(coordinateWGS84.getLatitude()));
+        GBActivity myActivity = (GBActivity)getActivity();
+        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
 
-        gpsWgs84LongitudeInput  .setText(doubleToUI(coordinateWGS84.getLongitude()));
+        gpsWgs84LatitudeInput  .setText(truncatePrecisionString(locPrecision, coordinateWGS84.getLatitude()));
 
-        gpsWgs84ElevationMetersInput  .setText(doubleToUI(coordinateWGS84.getElevation()));
-        gpsWgs84GeoidHeightMetersInput.setText(doubleToUI(coordinateWGS84.getGeoid()));
-        gpsWgs84ElevationFeetInput.setText(doubleToUI(coordinateWGS84.getElevationFeet()));
-        gpsWgs84GeoidHeightFeetInput.setText(doubleToUI(coordinateWGS84.getGeoidFeet()));
+        gpsWgs84LongitudeInput  .setText(truncatePrecisionString(locPrecision, coordinateWGS84.getLongitude()));
+
+        gpsWgs84ElevationMetersInput  .setText(truncatePrecisionString(locPrecision, coordinateWGS84.getElevation()));
+        gpsWgs84GeoidHeightMetersInput.setText(truncatePrecisionString(locPrecision, coordinateWGS84.getGeoid()));
+        gpsWgs84ElevationFeetInput.setText(truncatePrecisionString(locPrecision, coordinateWGS84.getElevationFeet()));
+        gpsWgs84GeoidHeightFeetInput.setText(truncatePrecisionString(locPrecision, coordinateWGS84.getGeoidFeet()));
 
 
         boolean isLatitude = true;
@@ -645,7 +646,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
         //Mean Standard Deviations
         TextView meanWgs84LatSigmaOutput = (TextView)v.findViewById(R.id.meanWgs84LatSigmaOutput);
-        TextView meanWgs84LongSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84LongSigmaOutput);
+        TextView meanWgs84LongSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84LngSigmaOutput);
         TextView meanWgs84ElevSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84ElevSigmaOutput);
 
 
@@ -657,17 +658,21 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
         meanWgs84StartTimeOutput.setText(String.valueOf(meanToken.getStartMeanTime()));
         meanWgs84EndTimeOutput.setText(String.valueOf(meanToken.getEndMeanTime()));
 
-        meanWgs84LatitudeInput  .setText(doubleToUI(meanCoordinate.getLatitude()));
-        meanWgs84LongitudeInput  .setText(doubleToUI(meanCoordinate.getLongitude()));
+        GBActivity myActivity = (GBActivity)getActivity();
+        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        int stdPrecision  = GBGeneralSettings.getStdDevPrecision(myActivity);
 
-        meanWgs84ElevationMetersInput  .setText(doubleToUI(meanCoordinate.getElevation()));
-        meanWgs84ElevationFeetInput    .setText(doubleToUI(meanCoordinate.getElevationFeet()));
-        meanWgs84GeoidHeightMetersInput.setText(doubleToUI(meanCoordinate.getGeoid()));
-        meanWgs84GeoidHeightFeetInput  .setText(doubleToUI(meanCoordinate.getGeoidFeet()));
+        meanWgs84LatitudeInput   .setText(truncatePrecisionString(locPrecision, meanCoordinate.getLatitude()));
+        meanWgs84LongitudeInput  .setText(truncatePrecisionString(locPrecision, meanCoordinate.getLongitude()));
 
-        meanWgs84LatSigmaOutput .setText(doubleToUI(meanCoordinate.getLatitudeStdDev()));
-        meanWgs84LongSigmaOutput.setText(doubleToUI(meanCoordinate.getLongitudeStdDev()));
-        meanWgs84ElevSigmaOutput.setText(doubleToUI(meanCoordinate.getElevationStdDev()));
+        meanWgs84ElevationMetersInput  .setText(truncatePrecisionString(locPrecision, meanCoordinate.getElevation()));
+        meanWgs84ElevationFeetInput    .setText(truncatePrecisionString(locPrecision, meanCoordinate.getElevationFeet()));
+        meanWgs84GeoidHeightMetersInput.setText(truncatePrecisionString(locPrecision, meanCoordinate.getGeoid()));
+        meanWgs84GeoidHeightFeetInput  .setText(truncatePrecisionString(locPrecision, meanCoordinate.getGeoidFeet()));
+
+        meanWgs84LatSigmaOutput .setText(truncatePrecisionString(stdPrecision, meanCoordinate.getLatitudeStdDev()));
+        meanWgs84LongSigmaOutput.setText(truncatePrecisionString(stdPrecision, meanCoordinate.getLongitudeStdDev()));
+        meanWgs84ElevSigmaOutput.setText(truncatePrecisionString(stdPrecision, meanCoordinate.getElevationStdDev()));
 
         boolean isLatitude = true;
         convertDDtoDMS(getActivity(),
@@ -697,75 +702,79 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
                                   TextView tudeSInput,
                                   boolean  isLatitude) {
 
-        String tudeString = tudeDDInput.getText().toString().trim();
-        if (tudeString.isEmpty()) {
-            tudeString = context.getString(R.string.zero_decimal_string);
-            tudeDDInput.setText(tudeString);
-        }
+         String tudeString = tudeDDInput.getText().toString().trim();
+         if (tudeString.isEmpty()) {
+             tudeString = context.getString(R.string.zero_decimal_string);
+             tudeDDInput.setText(tudeString);
+         }
 
-        double tude = Double.parseDouble(tudeString);
+         double tude = Double.parseDouble(tudeString);
 
-        //The user inputs have to be within range to be
-        if (   (isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
-                ((!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
+         //The user inputs have to be within range to be
+         if (   (isLatitude   && ((tude < -90.0) || (tude >= 90.0)))  || //Latitude
+              ((!isLatitude)  && ((tude < -180.) || (tude >= 180.)))) {  //Longitude
 
             tudeDInput.setText(R.string.zero_decimal_string);
             tudeMInput.setText(R.string.zero_decimal_string);
             tudeSInput.setText(R.string.zero_decimal_string);
             return false;
-        }
+         }
 
-        //check sign of tude
-        boolean isTudePos = true;
-        int tudeColor= R.color.colorPosNumber;
-        if (tude < 0) {
-            //tude is negative, remember this and work with the absolute value
-            tude = Math.abs(tude);
-            isTudePos = false;
-            tudeColor = R.color.colorNegNumber;
-        }
+         //check sign of tude
+         boolean isTudePos = true;
+         int tudeColor= R.color.colorPosNumber;
+         if (tude < 0) {
+             //tude is negative, remember this and work with the absolute value
+             tude = Math.abs(tude);
+             isTudePos = false;
+             tudeColor = R.color.colorNegNumber;
+         }
 
-        //strip out the decimal parts of tude
-        int tudeDegree = (int) tude;
+         //strip out the decimal parts of tude
+         int tudeDegree = (int) tude;
 
-        double degree = tudeDegree;
+         double degree = tudeDegree;
 
-        //digital degrees minus degrees will be decimal minutes plus seconds
-        //converting to int strips out the seconds
-        double minuteSec = tude - degree;
-        double minutes = minuteSec * 60.;
-        int tudeMinute = (int) minutes;
-        double minuteOnly = (double) tudeMinute;
+         //digital degrees minus degrees will be decimal minutes plus seconds
+         //converting to int strips out the seconds
+         double minuteSec = tude - degree;
+         double minutes = minuteSec * 60.;
+         int tudeMinute = (int) minutes;
+         double minuteOnly = (double) tudeMinute;
 
-        //start with the DD, subtract out Degrees, subtract out Minutes
-        //convert the remainder into whole seconds
-        double tudeSecond = (tude - degree - (minuteOnly / 60.)) * (60. * 60.);
-        //tudeSecond = (tude - minutes) * (60. *60.);
+         //start with the DD, subtract out Degrees, subtract out Minutes
+         //convert the remainder into whole seconds
+         double tudeSecond = (tude - degree - (minuteOnly / 60.)) * (60. * 60.);
+         //tudeSecond = (tude - minutes) * (60. *60.);
 
-        //If tude was negative before, restore it to negative
-        if (!isTudePos) {
-            //tude       = 0. - tude;
-            tudeDegree = 0 - tudeDegree;
-            tudeMinute = 0 - tudeMinute;
-            tudeSecond = 0. - tudeSecond;
-        }
+         //If tude was negative before, restore it to negative
+         if (!isTudePos) {
+             //tude       = 0. - tude;
+             tudeDegree = 0 - tudeDegree;
+             tudeMinute = 0 - tudeMinute;
+             tudeSecond = 0. - tudeSecond;
+         }
 
-        //truncate to a reasonable number of decimal digits
-        BigDecimal bd = new BigDecimal(tudeSecond).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                RoundingMode.HALF_UP);
-        tudeSecond = bd.doubleValue();
 
-        //show the user the result
-        tudeDInput.setText(String.valueOf(tudeDegree));
-        tudeMInput.setText(String.valueOf(tudeMinute));
-        tudeSInput.setText(String.valueOf(tudeSecond));
+         GBActivity myActivity = (GBActivity)getActivity();
+         int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+         int caPrecision  = GBGeneralSettings.getCAPrecision(myActivity);
+         int sfPrecision  = GBGeneralSettings.getSfPrecision(myActivity);
+         int stdPrecision = GBGeneralSettings.getStdDevPrecision(myActivity);
 
-        tudeDDInput.setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeDInput .setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeMInput .setTextColor(ContextCompat.getColor(context, tudeColor));
-        tudeSInput .setTextColor(ContextCompat.getColor(context, tudeColor));
 
-        return true;
+         //show the user the result
+         tudeDDInput.setText(truncatePrecisionString(locPrecision, tude));
+         tudeDInput.setText(String.valueOf(tudeDegree));
+         tudeMInput.setText(String.valueOf(tudeMinute));
+         tudeSInput.setText(truncatePrecisionString(locPrecision, tudeSecond));
+
+         tudeDDInput.setTextColor(ContextCompat.getColor(context, tudeColor));
+         tudeDInput .setTextColor(ContextCompat.getColor(context, tudeColor));
+         tudeMInput .setTextColor(ContextCompat.getColor(context, tudeColor));
+         tudeSInput .setTextColor(ContextCompat.getColor(context, tudeColor));
+
+         return true;
     }
 
 
@@ -840,34 +849,30 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
         TextView spcConvergenceOutput    =  (TextView) v.findViewById(R.id.spcConvergenceOutput);
         TextView spcScaleFactorOutput    =  (TextView) v.findViewById(R.id.spcScaleFactorOutput);
 
+        GBActivity myActivity = (GBActivity)getActivity();
+        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        int caPrecision  = GBGeneralSettings.getCAPrecision(myActivity);
+        int sfPrecision  = GBGeneralSettings.getSfPrecision(myActivity);
 
-        spcZoneInput            .setText(String.valueOf(spcsCoordinate.getZone()));
+        spcZoneInput           .setText(String.valueOf(spcsCoordinate.getZone()));
         spcStateOutput         .setText(spcsCoordinate.getState());
-        spcEastingMetersOutput .setText(String.valueOf(doubleToUI(spcsCoordinate.getEasting())));
+        spcEastingMetersOutput .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getEasting()));
 
-        spcNorthingMetersOutput.setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthing())));
-        spcEastingFeetOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getEastingFeet())));
-        spcNorthingFeetOutput  .setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthingFeet())));
-        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergenceAngle())));
+        spcNorthingMetersOutput.setText(truncatePrecisionString(locPrecision, spcsCoordinate.getNorthing()));
+        spcEastingFeetOutput   .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getEastingFeet()));
+        spcNorthingFeetOutput  .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getNorthingFeet()));
+        spcConvergenceOutput   .setText(truncatePrecisionString(caPrecision, spcsCoordinate.getConvergenceAngle()));
 
-        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScaleFactor())));
+        spcScaleFactorOutput   .setText(truncatePrecisionString(sfPrecision, spcsCoordinate.getScaleFactor()));
 
 
     }
 
 
-
-    private String doubleToUI(double reading){
-        return String.valueOf(truncatePrecision(reading));
-    }
-    private String intToUI   (int reading)    {return String.valueOf(reading);}
 
     //truncate digits of precision
-    private double truncatePrecision(double reading) {
-
-        BigDecimal bd = new BigDecimal(reading).
-                setScale(GBUtilities.sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+    private String truncatePrecisionString(int digitsOfPrecision, double reading) {
+        return GBUtilities.truncatePrecisionString(reading, digitsOfPrecision);
     }
 
 
@@ -901,7 +906,7 @@ public class GBCoordWorkflowFragment extends Fragment implements GpsStatus.Liste
 
         //Mean Standard Deviations
         TextView meanWgs84LatSigmaOutput = (TextView)v.findViewById(R.id.meanWgs84LatSigmaOutput);
-        TextView meanWgs84LongSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84LongSigmaOutput);
+        TextView meanWgs84LongSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84LngSigmaOutput);
         TextView meanWgs84ElevSigmaOutput= (TextView)v.findViewById(R.id.meanWgs84ElevSigmaOutput);
 
         //Mean Latitude

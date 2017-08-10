@@ -34,30 +34,41 @@ abstract class GBCoordinate {
 
     static final int sUNKWidgets = 0;
     static final int sLLWidgets = 1;
-    static final int sENWidgets = 2;
+    static final int sNEWidgets = 2;
 
+
+    //Tags for shared pref settings for whether the property was exported last time
+    static final String sCoordinateTimeExportTag        = "COORD_TIME_EXPORT";
+    static final String sCoordinateNorthingExportTag    = "COORD_NORTHING_EXPORT";
+    static final String sCoordinateEastingExportTag     = "COORD_EASTING_EXPORT";
+    static final String sCoordinateElevationExportTag   = "COORD_ELE_EXPORT";
+    static final String sCoordinateGeoidExportTag       = "COORD_GEOID_EXPORT";
+    static final String sCoordinateScaleFactorExportTag = "COORD_SF_EXPORT";
+    static final String sCoordinateCAngleExportTag      = "COORD_CA_EXPORT";
+    static final String sCoordinateLatExportTag         = "COORD_LAT_EXPORT";
+    static final String sCoordinateLngExportTag         = "COORD_LNG_EXPORT";
 
 
     /* *********************************************************/
     /* ***    Variables common to ALL coordinates        *******/
     /* *********************************************************/
-    protected long    mCoordinateID; //All coordinates have a DB ID
-    protected long    mProjectID; //May or may not describe a point
-    protected long    mPointID;   //These will be null if not describing a point
-    protected int     mCoordinateDBType;
+    private long    mCoordinateID; //All coordinates have a DB ID
+    private long    mProjectID; //May or may not describe a point
+    private long    mPointID;   //These will be null if not describing a point
+    private int     mCoordinateDBType;
 
-    protected long    mTime; //time coordinate taken in milliseconds
+    private long    mTime; //time coordinate taken in milliseconds
 
-    protected double  mElevation; //Orthometric Elevation in Meters
-    protected double  mGeoid;     //Mean Sea Level in Meters
+    private double  mElevation; //Orthometric Elevation in Meters
+    private double  mGeoid;     //Mean Sea Level in Meters
 
-    protected double  mScaleFactor;
-    protected double  mConvergenceAngle;
+    private double  mScaleFactor;
+    private double  mConvergenceAngle;
 
-    protected boolean mValidCoordinate = true;
-    protected boolean mIsFixed         = true;
+    private boolean mValidCoordinate = true;
+    private boolean mIsFixed         = true;
 
-    protected CharSequence mDatum = ""; //eg WGS84
+    private CharSequence mDatum = ""; //eg WGS84
 
 
     /* *********************************************************/
@@ -71,9 +82,9 @@ abstract class GBCoordinate {
     /*      Return codes are static int's:                             */
     /*                       GBCoordinate.sUNKWidgets                  */
     /*                       GBCoordinate.sLLWidgets                   */
-    /*                       GBCoordinate.sENWidgets                   */
+    /*                       GBCoordinate.sNEWidgets                   */
     /* *****************************************************************/
-    static int getCoordinateTypeFromProjectID(long projectID){
+    static int getCoordinateCategoryFromProjectID(long projectID){
         if (projectID == GBUtilities.ID_DOES_NOT_EXIST)return GBCoordinate.sUNKWidgets;
         int returnCode = GBCoordinate.sUNKWidgets;
 
@@ -97,7 +108,7 @@ abstract class GBCoordinate {
             } else if (coordinateType.equals(GBCoordinate.sCoordinateTypeUTM) ||
                        coordinateType.equals(GBCoordinate.sCoordinateTypeSPCS) ){
 
-                returnCode = GBCoordinate.sENWidgets;
+                returnCode = GBCoordinate.sNEWidgets;
             }
         }
         return returnCode;
@@ -166,6 +177,9 @@ abstract class GBCoordinate {
     void setScaleFactor(double scaleFactor) { mScaleFactor = scaleFactor; }
 
     double getConvergenceAngle()       { return mConvergenceAngle;       }
+    int    getConvergenceAngleDegree()  { return GBUtilities.getDegrees(mConvergenceAngle);  }
+    int    getConvergenceAngleMinute()  { return GBUtilities.getMinutes(mConvergenceAngle);  }
+    double getConvergenceAngleSecond()  { return GBUtilities.getSeconds(mConvergenceAngle);  }
     void setConvergenceAngle(double convergenceAngle) { mConvergenceAngle = convergenceAngle; }
 
 
@@ -209,21 +223,24 @@ abstract class GBCoordinate {
 
     }
 
-    protected double getMeters(String metersString, String feetString){
-        double meters;
+    protected double getMeters(String distString, int distUnits){
+        //The distString is in the units defined by the UI setting in the project
+        //Must convert to meters to store in the object or the DB
+        double distValue;
         // TODO: 7/21/2017 need to get rid of commas, and be able to differentiate between 6,0 AND 6.0
-        if (GBUtilities.isEmpty(metersString)) {
-            if (GBUtilities.isEmpty(feetString)) {
-                //both are empty
-                meters = 0.;
-            } else {
-                meters = Double.valueOf(feetString);
-                meters = GBUtilities.convertFeetToMeters(meters);
-            }
-        } else {
-            meters = Double.valueOf(metersString);
+        if (GBUtilities.isEmpty(distString)) return 0.d;
+
+        distValue = Double.valueOf(distString);
+        //if (distUnits == GBProject.sMeters)//do nothing, the value is already in meters
+
+        if (distUnits == GBProject.sFeet){
+            distValue = GBUtilities.convertFeetToMeters(distValue);
         }
-        return meters;
+        if (distUnits == GBProject.sIntFeet){
+            distValue = GBUtilities.convertFeetToMeters(distValue);
+        }
+
+        return distValue;
 
     }
 

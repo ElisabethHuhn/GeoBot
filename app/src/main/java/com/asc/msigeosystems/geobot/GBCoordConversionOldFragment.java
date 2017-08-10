@@ -11,8 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Locale;
 
 /**
@@ -79,7 +77,7 @@ public class GBCoordConversionOldFragment extends Fragment {
                 performConversion();
 
                 Toast.makeText(getActivity(),
-                        R.string.conversion_stub,
+                        R.string.convert_success,
                         Toast.LENGTH_SHORT).show();
 
             }//End on Click
@@ -114,10 +112,12 @@ public class GBCoordConversionOldFragment extends Fragment {
         EditText longMinInput    = (EditText) v.findViewById(R.id.longMinutesInput);
         EditText longSecInput    = (EditText) v.findViewById(R.id.longSecondsInput);
 
-        mCoordinateWGS84 = new GBCoordinateWGS84(latDigDegInput.getText().toString(),
-                                                      longDigDegInput.getText().toString());
+        // TODO: 8/2/2017 This does not conform to directional designation, eg S & W being neg
+        mCoordinateWGS84 = new GBCoordinateWGS84(latDigDegInput .getText().toString(),
+                                                 longDigDegInput.getText().toString());
 
         if (!mCoordinateWGS84.isValidCoordinate()) {
+            // TODO: 8/2/2017 This does not conform to directional designation, eg S & W being neg
             mCoordinateWGS84 = new GBCoordinateWGS84(latDegInput.getText(),
                                                           latMinInput.getText(),
                                                           latSecInput.getText(),
@@ -260,6 +260,7 @@ public class GBCoordConversionOldFragment extends Fragment {
         TextView utmNmNorthingFOutput  =  (TextView) v.findViewById(R.id.utm_northing_feet);
 
 
+
         try{
             //The UTM constructor performs the conversion from WGS84
             GBCoordinateUTM utmCoordinate = new GBCoordinateUTM(mCoordinateWGS84);
@@ -268,22 +269,12 @@ public class GBCoordConversionOldFragment extends Fragment {
             utmNmZoneOutput      .setText(String.valueOf(utmCoordinate.getZone()));
             utmNmHemisphereOutput.setText(String.valueOf(utmCoordinate.getHemisphere()));
             utmNmLatBandOutput   .setText(String.valueOf(utmCoordinate.getLatBand()));
-            utmNmEastingMOutput  .setText(String.valueOf(utmCoordinate.getEasting()));
-            utmNmNorthingMOutput .setText(String.valueOf(utmCoordinate.getNorthing()));
 
-            //convert meters to feet
-            double temp = utmCoordinate.getEastingFeet();
-            //and round to a reasonable precision
-            BigDecimal bdTemp = new BigDecimal(temp).setScale(6, RoundingMode.HALF_UP);
-            temp = bdTemp.doubleValue();
-            utmNmEastingFOutput.setText(String.valueOf(temp));
-
-            temp = utmCoordinate.getNorthingFeet();
-            bdTemp = new BigDecimal(temp).setScale(GBUtilities.sMicrometerDigitsOfPrecision,
-                                                   RoundingMode.HALF_UP);
-            temp = bdTemp.doubleValue();
-
-            utmNmNorthingFOutput.setText(String.valueOf(temp ));
+            int locPrecision = GBGeneralSettings.getLocPrecision((GBActivity)getActivity());
+            utmNmEastingMOutput .setText(truncatePrecisionString(locPrecision, utmCoordinate.getEasting()));
+            utmNmNorthingMOutput.setText(truncatePrecisionString(locPrecision, utmCoordinate.getNorthing()));
+            utmNmEastingFOutput .setText(truncatePrecisionString(locPrecision, utmCoordinate.getEastingFeet()));
+            utmNmNorthingFOutput.setText(truncatePrecisionString(locPrecision, utmCoordinate.getNorthingFeet()));
             return true;
 
         } catch (IllegalArgumentException exc) {
@@ -297,13 +288,18 @@ public class GBCoordConversionOldFragment extends Fragment {
         }
     }
 
+    private String truncatePrecisionString(int digitsOfPrecision, double inputValue){
+        return GBUtilities.truncatePrecisionString(inputValue, digitsOfPrecision);
+
+    }
+
     private void updateSPCSUI(GBCoordinateWGS84 coordinateWgs){
         View v = getView();
         if (v == null)return;
         //need to ask for zone, then convert based on the zone
         EditText spcZoneInput = (EditText)v.findViewById(R.id.spcZoneOutput);
         String zoneString = spcZoneInput.getText().toString();
-        if (GBUtilities.getInstance().isEmpty(zoneString)){
+        if (GBUtilities.isEmpty(zoneString)){
             spcZoneInput.setText(getString(R.string.spc_zone_error));
             return;
         }
@@ -336,33 +332,25 @@ public class GBCoordConversionOldFragment extends Fragment {
         TextView spcConvergenceOutput    =  (TextView) v.findViewById(R.id.spcConvergenceOutput);
         TextView spcScaleFactorOutput    =  (TextView) v.findViewById(R.id.spcScaleFactorOutput);
 
+        GBActivity myActivity = (GBActivity)getActivity();
+        int locPrecision = GBGeneralSettings.getLocPrecision(myActivity);
+        int caPrecision  = GBGeneralSettings.getCAPrecision(myActivity);
+        int sfPrecision  = GBGeneralSettings.getSfPrecision(myActivity);
 
-        spcZoneInput            .setText(String.valueOf(spcsCoordinate.getZone()));
+        spcZoneInput           .setText(String.valueOf(spcsCoordinate.getZone()));
         spcStateOutput         .setText(spcsCoordinate.getState());
-        spcEastingMetersOutput .setText(String.valueOf(doubleToUI(spcsCoordinate.getEasting())));
+        spcEastingMetersOutput .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getEasting()));
 
-        spcNorthingMetersOutput.setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthing())));
-        spcEastingFeetOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getEastingFeet())));
-        spcNorthingFeetOutput  .setText(String.valueOf(doubleToUI(spcsCoordinate.getNorthingFeet())));
-        spcConvergenceOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getConvergenceAngle())));
+        spcNorthingMetersOutput.setText(truncatePrecisionString(locPrecision, spcsCoordinate.getNorthing()));
+        spcEastingFeetOutput   .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getEastingFeet()));
+        spcNorthingFeetOutput  .setText(truncatePrecisionString(locPrecision, spcsCoordinate.getNorthingFeet()));
+        spcConvergenceOutput   .setText(truncatePrecisionString(caPrecision, spcsCoordinate.getConvergenceAngle()));
 
-        spcScaleFactorOutput   .setText(String.valueOf(doubleToUI(spcsCoordinate.getScaleFactor())));
+        spcScaleFactorOutput   .setText(truncatePrecisionString(sfPrecision, spcsCoordinate.getScaleFactor()));
 
 
     }
 
-    private String doubleToUI(double reading){
-        return String.valueOf(truncatePrecision(reading));
-    }
-    private String intToUI   (int reading)    {return String.valueOf(reading);}
-
-    //truncate digits of precision
-    private double truncatePrecision(double reading) {
-
-        BigDecimal bd = new BigDecimal(reading).
-                setScale(GBUtilities.sMicrometerDigitsOfPrecision, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
 
 
     private void clearSPCSUI(View v){
