@@ -2,6 +2,9 @@ package com.asc.msigeosystems.geobot;
 
 import android.os.Bundle;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
+
 import java.util.ArrayList;
 
 /**
@@ -75,6 +78,8 @@ class GBPoint {
     private long         mForProjectID;
 
     //Actual location of point is given by Coordinate
+    //The coordinate location does NOT reflect the offsets
+    //It is the pre-offset location
     private long         mHasACoordinateID;
 
     private int          mPointNumber;
@@ -162,18 +167,17 @@ class GBPoint {
     /* ***********************************/
     /*         CONSTRUCTORS              */
     /* ***********************************/
-
-    /* ***************************************************/
-    /* ******    Constructors                    *********/
-    /* ***************************************************/
-    //Need to know what project the new point will be in
-    GBPoint(GBProject project) {
+    //This creates a point and writes it to the DB
+    GBPoint(GBActivity activity, GBCoordinate coordinate, GBMeanToken token) {
 
         initializeDefaultVariables();
-        //initialize all variables so we are assured that none are null
-        //that way we never have to check for null later
-        this.mForProjectID = project.getProjectID();
-        this.mPointID      = GBUtilities.ID_DOES_NOT_EXIST;
+
+        setPointID( GBUtilities.ID_DOES_NOT_EXIST);
+        setHasACoordinateID(GBUtilities.ID_DOES_NOT_EXIST);
+        setForProjectID(GBUtilities.ID_DOES_NOT_EXIST);
+
+        updatePoint(activity, coordinate, token);
+
     }
 
 
@@ -380,5 +384,164 @@ class GBPoint {
                 System.getProperty("line.separator");
     }
 
+    GBPoint updatePoint(GBActivity activity, GBCoordinate coordinate, GBMeanToken token) {
+
+        initializeDefaultVariables();
+
+        setPointID( GBUtilities.ID_DOES_NOT_EXIST);
+        setHasACoordinateID(GBUtilities.ID_DOES_NOT_EXIST);
+        setForProjectID(GBUtilities.ID_DOES_NOT_EXIST);
+
+        //
+        //initialize with values from the Project
+        //
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        long openProjectID = openProject.getProjectID();
+        if (openProject == null)  return this;
+        setForProjectID(openProjectID);
+        setHeight      (openProject.getHeight());
+        setPointNumber (openProject.getNextPointNumber(activity));
+
+
+
+        //
+        //initialize with values from the coordinate
+        //
+        //Coordinate must exist and be valid
+        if ((coordinate == null) || (!coordinate.isValidCoordinate())) return this;
+
+        //Coordinate must belong to the open project
+        long coordProjectID = coordinate.getProjectID();
+        if (coordProjectID == GBUtilities.ID_DOES_NOT_EXIST){
+            coordinate.setProjectID(openProjectID);
+        }
+        if (openProjectID != coordProjectID)return this;
+
+
+        long coordinateID = coordinate.getCoordinateID();
+        if (coordinateID == GBUtilities.ID_DOES_NOT_EXIST){
+            //the coordinate has not yet been saved
+            coordinateID = setCoordinate(coordinate);
+
+        }
+        if (coordinateID == GBUtilities.ID_DOES_NOT_EXIST) return this;//can't add the coordinate without an ID
+
+        //Add everything to the DB
+        GBPointManager pointManager = GBPointManager.getInstance();
+
+        //The only way to assign a pointID is to save it to the DB.
+        // The final parameter says add to DB
+        if (!pointManager.addPointToProject(openProject, this, true)) {
+            //This will NOT do a cascade add of coordinate, meanToken
+            //GBUtilities.getInstance().showStatus(activity, activity.getString(R.string.error_adding_point));
+            return this ;
+        }
+        //point the coordinate back at the newly created point
+        coordinate.setPointID(this.getPointID());
+        //write the coordinate back out to the DB
+        setCoordinate(coordinate);
+
+
+        //
+        // Initialize Mean Token
+        //
+        if (token != null){
+            token.setProjectID(openProjectID);
+            token.setPointID(this.getPointID());
+            //this writes the token to the DB as well as setting it here
+            setMeanToken(token);
+            GBCoordinateMean coordinateMean = token.getMeanCoordinate();
+            setVrms(coordinateMean.getVrms());
+            setHrms(coordinateMean.getVrms());
+        }
+        setHdop(GBSatelliteManager.getInstance().getHdop());
+        setVdop(GBSatelliteManager.getInstance().getVdop());
+        setPdop(GBSatelliteManager.getInstance().getPdop());
+
+        //As the coordinate & token were changed, we need to update the point in the DB again.
+        pointManager.addPointToProject(openProject, this, true);
+
+        return this;
+
+    }
+
+    GBCoordinate getCoordinateWithOffsets(GBActivity activity){
+        //point has values for offset distance, direction, elevation
+        //point has raw coordinate
+        //this method calculates a new coordinate by adding the offsets to the raw saved coordinate
+
+        //get the full coordinate corresponding to this point
+        GBCoordinate pointCoordinate = getCoordinate();
+        if (pointCoordinate == null)return null;
+
+        GBProject openProject = GBUtilities.getInstance().getOpenProject(activity);
+        int coordinateType = openProject.getCoordinateType();
+
+        //The addition of offsets is only to WGS84 type coordinates, so we'll have to convert
+        GBCoordinateWGS84 coordinateWGS84 = null;
+        switch (coordinateType) {
+            case GBCoordinate.sCoordinateDBTypeWGS84:
+                // TODO: 8/11/2017 Have to do a deep copy here
+                coordinateWGS84 = (GBCoordinateWGS84)pointCoordinate;
+                break;
+            case GBCoordinate.sCoordinateDBTypeSPCS:
+                coordinateWGS84 = new GBCoordinateWGS84((GBCoordinateSPCS) pointCoordinate);
+                break;
+            case GBCoordinate.sCoordinateDBTypeUTM:
+                coordinateWGS84 = new GBCoordinateWGS84((GBCoordinateUTM) pointCoordinate);
+                break;
+            case GBCoordinate.sCoordinateDBTypeNAD83:
+                coordinateWGS84 = new GBCoordinateWGS84((GBCoordinateNAD83) pointCoordinate);
+                break;
+        }
+        if (coordinateWGS84 == null)return null;
+        //calculate the location using the offset
+        LatLng fromLocation = new LatLng(coordinateWGS84.getLatitude(), coordinateWGS84.getLongitude());
+        LatLng toLocation = SphericalUtil.computeOffset(fromLocation, getOffsetDistance(), getOffsetHeading());
+
+        coordinateWGS84.setLatitude(toLocation.latitude);
+        coordinateWGS84.setLongitude(toLocation.longitude);
+
+        double newElevation = coordinateWGS84.getElevation() + getOffsetElevation();
+        coordinateWGS84.setElevation(newElevation);
+
+        //Now convert back to the coordinate type of the open project
+        GBCoordinate returnCoordinate = null;
+        switch (coordinateType) {
+            case GBCoordinate.sCoordinateDBTypeWGS84:
+                returnCoordinate = coordinateWGS84;
+                break;
+            case GBCoordinate.sCoordinateDBTypeSPCS:
+                int zone = openProject.getZone();
+                returnCoordinate = new GBCoordinateSPCS(coordinateWGS84, zone);
+                break;
+            case GBCoordinate.sCoordinateDBTypeUTM:
+                returnCoordinate = new GBCoordinateUTM( coordinateWGS84);
+                break;
+            case GBCoordinate.sCoordinateDBTypeNAD83:
+                returnCoordinate = new GBCoordinateNAD83( coordinateWGS84);
+                break;
+        }
+
+        return (GBCoordinate)returnCoordinate;
+
+    }
+
+    double getElevationWithHeight(){
+        //get the full coordinate corresponding to this point
+        GBCoordinate pointCoordinate = getCoordinate();
+        if (pointCoordinate == null)return -1;
+
+        return (pointCoordinate.getElevation()-getHeight());
+
+    }
+
+
+    GBCoordinate getCoordinateWithHeightOffsets(GBActivity activity){
+        GBCoordinate returnCoordinate = getCoordinateWithOffsets(activity);
+        returnCoordinate.setElevation(getElevationWithHeight());
+
+        return  returnCoordinate;
+    }
 
 }

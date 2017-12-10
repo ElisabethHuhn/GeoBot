@@ -211,6 +211,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
         // zones 1 to 30
 
 
+        // TODO: 8/16/2017 Constants need to come from GBCoordinateConstants
         //Karney:
         //Consider an ellipsoid of revolution with:
         // a = equatorial radius
@@ -257,26 +258,12 @@ class GBCoordinateUTM extends GBCoordinateEN {
           //protected double ee ;
 
 
-    /*
-    protected double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
-            a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
-            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
-            a4dot4 - a4dot5 + a4dot6,//alpha[3]
-            a5dot5 - a5dot6,//alpha[4]
-            a6dot6};//alpha5]
-*/
 
 
 
 
 
 
-
-        //alpha α is one-based array (6th order Krüger expressions)
-        //The number of terms used in the series calculations below
-
-        //Karney (12) takes it to n4, (35) to n8
-        //protected double alpha[];
 
 
 
@@ -288,15 +275,16 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
 
 
+        // *************** calculate the alpha array ************************** //
         //prepare the array for Karney (12) and (35)
         // WGS84 n = .0033528107/1.9966471893 = .0016792204
         double n = flatteningF / (2. - flatteningF); // 3rd flattening
+        //double n = (equatorialRadiusA - polarRadiusB)/ (equatorialRadiusA+polarRadiusB);
 
-
+        //Karney (12) takes it to n4, (35) to n8
 
         //alpha α is one-based array (6th order Krüger expressions)
         //The number of terms used in the series calculations below
-        //double n = (equatorialRadiusA - polarRadiusB)/ (equatorialRadiusA+polarRadiusB);
         double n2 = n*n; //.0000028197
         double n3 = n*n2;//.0000000047
         double n4 = n*n3;
@@ -317,7 +305,7 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
 
         double a2dot2 = (13.0/48.0)*n2;
-        double a2dot3 = (3/5.0)    *n3;
+        double a2dot3 = (3.0/5.0)    *n3;
         double a2dot4 = (557.0/1440.0) *n4;
         double a2dot5 = (281.0/630.0)     *n5;
         double a2dot6 = (1983433.0/1935360.0)*n6;
@@ -357,16 +345,19 @@ class GBCoordinateUTM extends GBCoordinateEN {
 
         //double a8dot8 = (1424729850961.0/743921418240.0)*n8; //Horner form
 
-/*
         //Karney (12) takes it to n4, (35) to n8
         double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
-                                   a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
-                                            a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
-                                                     a4dot4 - a4dot5 + a4dot6,//alpha[3]
-                                                              a5dot5 - a5dot6,//alpha[4]
-                                                                       a6dot6};//alpha5]
+                a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
+                a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
+                a4dot4 - a4dot5 + a4dot6,//alpha[3]
+                a5dot5 - a5dot6,//alpha[4]
+                a6dot6};//alpha5]
 
-*/
+        // *************** calculate the alpha array ************************** //
+
+
+
+
 
         //scale the result to give the transverse Mercator easting and northing
         // UTM scale on the central meridian
@@ -545,13 +536,6 @@ class GBCoordinateUTM extends GBCoordinateEN {
         double termz = Math.sqrt((z * z) + 1.);
         double etaPrime = Math.log(z + termz);
 
-        //Karney (12) takes it to n4, (35) to n8
-        double alpha[] = {a1dot1 - a1dot2 + a1dot3 + a1dot4 - a1dot5 + a1dot6, //alpha[0]
-                a2dot2 - a2dot3 + a2dot4 + a2dot5 - a2dot6,//alpha[1]
-                a3dot3 - a3dot4 + a3dot5 + a3dot6,//alpha[2]
-                a4dot4 - a4dot5 + a4dot6,//alpha[3]
-                a5dot5 - a5dot6,//alpha[4]
-                a6dot6};//alpha5]
 
 
         //xi ξ = ξʹ
@@ -671,5 +655,99 @@ class GBCoordinateUTM extends GBCoordinateEN {
         setValidCoordinate(true);
 
     }
+
+    /**
+     * Converts UTM coordinate to latitude/longitude.
+     *
+     * Implements Karney’s method, using Krüger series to order n^6,
+     *
+     *  {}  Invalid Argument Exception when easting/northing not numbers or not within range
+
+     ***/
+    private void convertUTMtoLL(double northing, double easting) {
+
+        // *************** calculate the alpha array ************************** //
+        //prepare the array for Karney (12) and (35)
+        // WGS84 n = .0033528107/1.9966471893 = .0016792204
+        double n = .0016792204;
+        //double n = flatteningF / (2. - flatteningF); // 3rd flattening
+        //double n = (equatorialRadiusA - polarRadiusB)/ (equatorialRadiusA+polarRadiusB);
+
+        //Karney (12) takes it to n4, (35) to n8
+
+        //alpha α is one-based array (6th order Krüger expressions)
+        //The number of terms used in the series calculations below
+        double n2 = n*n; //.0000028197
+        double n3 = n*n2;//.0000000047
+        double n4 = n*n3;
+        double n5 = n*n4;
+        double n6 = n*n5;
+        //double n7 = n*n6; //6 terms are sufficient. Accuracy lost in 7 and 8
+        //double n8 = n*n7;
+
+
+        double b1dot1 = (1.0/2.0)*n;
+        double b1dot2 = (2.0/3.0)*n2;
+        double b1dot3 = (37.0/96.0)*n3;
+        double b1dot4 = (1.0/360.0)*n4;
+        double b1dot5 = (81.0/512.0)*n5;
+        double b1dot6 = (96199.0/604800.0)*n6;
+        //double b1dot7 = (5406467.0/38707200.0)*n7;
+        //double b1dot8 = (7944359.0/67737600)*n8;
+
+
+        double b2dot2 = (1.0/48.0)*n2;
+        double b2dot3 = (1.0/15.0)    *n3;
+        double b2dot4 = (437.0/1440.0) *n4;
+        double b2dot5 = (46.0/105.0)     *n5;
+        double b2dot6 = (1118711.0/3870720.0)*n6;
+        //double b2dot7 = (51841.0/1209600.0)      *n7;
+        //double b2dot8 = (24749483.0/348364800.0)*n8;
+
+
+        double b3dot3 = (17.0/480.0)*n3;
+        double b3dot4 = (37.0/840.0)*n4;
+        double b3dot5 = (209.0/4480.0)*n5;
+        double b3dot6 = (5569.0/90720.0)*n6;
+        //double b3dot7 = (9261899.0/58060800.0)*n7;
+        //double b3dot8 = (6457463.0.0/11740800.0.0) *n8;
+
+
+        double b4dot4 = (4397.0/161280.0)*n4;
+        double b4dot5 = (11.0/504.0)*n5;
+        double b4dot6 = (830251.0/7257600.0)*n6;
+        //double b4dot7 = (466511.0.0/2494800.0)*n7;
+        //double b4dot8 = (324154477.0/7664025600.0)*n8; //does this need to be truncated?
+
+
+        double b5dot5 = (4583.0/161280.0)*n5;
+        double b5dot6 = (108847.0/3991680.0)*n6;
+        //double b5dot7 = (8005831.0/63866880.0)*n7;
+        //double b5dot8 = (22894433.0/124540416.0)*n8;
+
+
+        double b6dot6 = (20648693.0/638668800.0)*n6;
+        //double b6dot7 = (16363163.0/518918400.0)*n7;
+        //double b6dot8 = (2204645983.0/12915302400.0)*n8;
+
+
+        //double b7dot7 = (219941297.0/5535129600.0)*n7;
+        //double b7dot8 = (497323811.0.0/12454041600.0)*n8;
+
+
+        //double b8dot8 = (191773887257.0/3719607091200.0)*n8; //Horner form
+
+        //Karney (12) takes it to n4, (35) to n8
+        double beta[] = {b1dot1 - b1dot2 + b1dot3 - b1dot4 - b1dot5 + b1dot6, //beta[0]
+                b2dot2 + b2dot3 - b2dot4 + b2dot5 - b2dot6,//beta[1]
+                b3dot3 - b3dot4 - b3dot5 + b3dot6,//beta[2]
+                b4dot4 - b4dot5 - b4dot6,//beta[3]
+                b5dot5 - b5dot6,//beta[4]
+                b6dot6};//beta5]
+
+        // *************** calculate the beta array ************************** //
+
+    }
+
 
 }

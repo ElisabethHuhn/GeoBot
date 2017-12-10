@@ -90,9 +90,8 @@ class GBCoordinateNAD83 extends GBCoordinateLL {
 
         //initialize all variables from this level
         //initialize all variables from this level
-        mCoordinateDBType    = GBCoordinate.sCoordinateDBTypeNAD83;
-
-        mDatum               = sDatum; //eg WGS84
+        setCoordinateDBType(GBCoordinate.sCoordinateDBTypeNAD83);
+        setDatum(sDatum);
 
     }
 

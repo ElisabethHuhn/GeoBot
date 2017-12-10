@@ -871,8 +871,6 @@ public class GBCoordinateMeasureFragment extends Fragment implements GpsStatus.L
 
         GBCoordinate coordinate = null;
 
-        // TODO: 7/26/2017 These conversions are invalid. The screen values have been truncated
-
         if (coordinateType.equals(GBCoordinate.sCoordinateTypeWGS84)){
 
             if ((mMeanToken != null) && (mMeanToken.getCoordinateSize() > 0)){
@@ -898,58 +896,9 @@ public class GBCoordinateMeasureFragment extends Fragment implements GpsStatus.L
         coordinate.setProjectID(openProjectID);
 
         if (coordinate.isValidCoordinate()) {
-            //store the mean token
-            GBMeanTokenManager tokenManager = GBMeanTokenManager.getInstance();
 
-            //when here, know the coordinate is valid, and
-            // the mean token has been successfully saved to the DB
-            if (mPointBeingMaintained == null) {
-                //Create the new point and put it on the project
-                mPointBeingMaintained = new GBPoint();
-                initializePoint();//initialize point with values from project
-            }
-            //now add the point to memory and db
-            //Have to make sure the point is in the DB before the coordinate
-            // TODO: 7/2/2017 do we really need to write point to DB twice???
-            GBPointManager pointManager = GBPointManager.getInstance();
-            boolean addToDBToo = true;
-            if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
-                //This will NOT do a cascade add of coordinate, meanToken
-                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
-                return false;
-            }
-            //The setCoordinate() and setMeanToken() routines update
-            // the DB as well as the local point object
-
-            //update the coordinate with the point id
-            coordinate.setPointID(mPointBeingMaintained.getPointID());
-            coordinate.setProjectID(openProjectID);
-            //setCoordinate() also stores the coordinate in the DB
-            mPointBeingMaintained.setCoordinate(coordinate);
-            if (mMeanToken != null) {
-                //record it in DB an on the point
-                //Writing to the DB results in the ID being assigned
-                mMeanToken.setProjectID(openProjectID);
-                mMeanToken.setPointID(mPointBeingMaintained.getPointID());
-                //setting the Mean Token on the point writes the token to the DB as well
-                mPointBeingMaintained.setMeanToken(mMeanToken);
-
-                GBCoordinateMean coordinateMean = mMeanToken.getMeanCoordinate();
-                //set the RMS of the point
-                mPointBeingMaintained.setVrms(coordinateMean.getLatitudeStdDev());
-                mPointBeingMaintained.setHrms(coordinateMean.getLongitudeStdDev());
-
-            }
-            mPointBeingMaintained.setHdop(GBSatelliteManager.getInstance().getHdop());
-            mPointBeingMaintained.setVdop(GBSatelliteManager.getInstance().getVdop());
-            mPointBeingMaintained.setPdop(GBSatelliteManager.getInstance().getPdop());
-
-            //As the coordinate & token were changed, we need to update the point in the DB again.
-            if (!pointManager.addPointToProject(openProject, mPointBeingMaintained, addToDBToo)) {
-                //This will NOT do a cascade add of coordinate, meanToken
-                GBUtilities.getInstance().showStatus(getActivity(), getString(R.string.error_adding_point));
-                return false;
-            }
+            if (mPointBeingMaintained == null)mPointBeingMaintained = new GBPoint();
+            mPointBeingMaintained.updatePoint((GBActivity)getActivity(), coordinate, mMeanToken);
         } else {
             GBUtilities.getInstance().showStatus(getActivity(), R.string.coordinate_not_valid);
             return false;

@@ -1626,20 +1626,14 @@ public class GBPointCollectFragment extends Fragment implements //OnMapReadyCall
             (mOffsetHeading   != 0) ||
             (mOffsetElevation != 0)) {
 
-            //calculate the location using the offset
-            LatLng fromLocation = new LatLng(wgs84Coordinate.getLatitude(), wgs84Coordinate.getLongitude());
-            LatLng toLocation = SphericalUtil.computeOffset(fromLocation, mOffsetDistance, mOffsetHeading);
 
-            wgs84Coordinate.setLatitude(toLocation.latitude);
-            wgs84Coordinate.setLongitude(toLocation.longitude);
-
-            double newElevation = wgs84Coordinate.getElevation() + mOffsetElevation;
-            wgs84Coordinate.setElevation(newElevation);
 
             //record the offset itself
             point.setOffsetDistance (mOffsetDistance);
             point.setOffsetHeading  (mOffsetHeading);
             point.setOffsetElevation(mOffsetElevation);
+
+            wgs84Coordinate = (GBCoordinateWGS84)point.getCoordinateWithOffsets((GBActivity)getActivity());
 
             //then reset the offsets if it was for a single point
             if (mOffsetCheckedID == (OFFSET_NEXT_ONLY + OFFSET_ID_CONSTANT)) {
