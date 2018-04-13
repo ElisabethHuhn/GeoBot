@@ -92,7 +92,7 @@
     <string name="action_convert"           >Convert</string>
 
 
-    <!-- Project Subtitles -->
+    <!-- Screen Subtitles -->
     <string name="subtitle_home"            >Home</string>
     <string name="subtitle_create_project"  >Create Project</string>
     <string name="subtitle_open_project"    >Open Project</string>
@@ -240,12 +240,12 @@
     <string name="project_id_will_be_label" >ID will be:</string>
     <string name="project_creation_date_label"      >Created: </string>
     <string name="project_last_modified_date_label" >Modified: </string>
-    <string name="project_description_label">Description: </string>
-    <string name="project_coord_label"      >Coord Type</string>
-    <string name="project_can_not_change"   >Can not make this change after points created</string>
-    <string name="project_num_mean"         >Max in Mean:</string>
-    <string name="project_height_label"     >Height: </string>
-    <string name="project_nxt_point_num"    >Nxt Pt Num:</string>
+    <string name="project_description_label"        >Description: </string>
+    <string name="project_coord_label"              >Coord Type</string>
+    <string name="project_can_not_change"    >Can not make this change after points created</string>
+    <string name="project_num_mean"                 >Max in Mean:</string>
+    <string name="project_height_label"             >Height: </string>
+    <string name="project_nxt_point_num"            >Nxt Pt Num:</string>
 
 
     <!-- Prompts -->

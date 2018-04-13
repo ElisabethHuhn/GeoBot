@@ -62,9 +62,9 @@ import static android.provider.CalendarContract.CalendarCache.URI;
  * Created by Elisabeth Huhn on 4/13/2016.
  */
 public class GBPointMapFragment extends Fragment implements //OnMapReadyCallback,
-                                                                         //GpsStatus.Listener,
-        LocationListener,
-                                                                         GpsStatus.NmeaListener {
+                                                            //GpsStatus.Listener,
+                                                            LocationListener,
+                                                            GpsStatus.NmeaListener {
 
     //DEFINE constants / literals
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;

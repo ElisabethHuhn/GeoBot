@@ -495,23 +495,6 @@ public class GBProjectEditFragment extends    Fragment {
     }
 
 
-    private void wireDataSourceSpinner(View v){
-
-        //Create the array of spinner choices from the Types of Coordinates defined
-
-        //Then initialize the spinner itself
-
-        // Create an ArrayAdapter using the Activities context AND
-        // the string array and a default spinner layout
-
-        // Specify the layout to use when the list of choices appears
-        // Apply the adapter to the spinner
-
-        //attach the listener to the spinner
-
-    }
-
-
     private boolean canMakeChange(){
         long projectID = mProjectBeingMaintained.getProjectID();
         if (projectID != GBUtilities.ID_DOES_NOT_EXIST){

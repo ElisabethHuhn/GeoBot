@@ -42,6 +42,10 @@ public class GBActivity extends AppCompatActivity {
     static final int MY_PERMISSIONS_REQUEST_COURSE_LOCATIONS = 1;
     static final int MY_PERMISSIONS_REQUEST_FINE_LOCATIONS = 2;
 
+    static final int    sCollectPointsRequestCode  = 1;
+    static final String sDestinationFragmentKey    = "DESTINATION_KEY";
+    static final String sPopToBackStackTag     = "POP_TO_BACKSTACK";
+
     static final String sOpenProjectIDTag      = "OPEN_PROJECT_ID";
     static final String sOpenPointIDTag        = "OPEN_POINT_ID";
 
@@ -73,7 +77,6 @@ public class GBActivity extends AppCompatActivity {
     private static final String sCollectTopTag         = "COLLECT_TOP";
     static final String sCollectPointsTag              = "COLLECT_POINTS";
     static final String sMapPointsTag                  = "MAP_POINTS";
-    static final int    sCollectPointsRequestCode  = 1;
 
     private static final String sStakeoutTopTag        = "STAKEOUT_TOP";
 
@@ -101,8 +104,6 @@ public class GBActivity extends AppCompatActivity {
 
     private static final String sConversionTag         = "CONVERSION";
 
-    static final String sDestinationFragmentKey = "DESTINATION_KEY";
-    static final String sPopToBackStackTag     = "POP_TO_BACKSTACK";
 
 
 
@@ -136,7 +137,7 @@ public class GBActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_gb1);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         initializeDB();
@@ -150,8 +151,6 @@ public class GBActivity extends AppCompatActivity {
 
         initializeGps();
 
-        //initialize the database here for the whole application
-        //GBatabaseManager.initializeInstance(this);
     }
 
 

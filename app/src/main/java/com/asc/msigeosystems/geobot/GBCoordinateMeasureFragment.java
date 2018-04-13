@@ -1822,6 +1822,7 @@ public class GBCoordinateMeasureFragment extends Fragment implements GpsStatus.L
 
         double newElevation = coordinateWGS84.getElevation() + offsetElevation;
         coordinateWGS84.setElevation(newElevation);
+        // TODO: 1/7/2018 This is wrong! it never adds in the offsets of lat/lng
         return coordinateWGS84;
 
     }
